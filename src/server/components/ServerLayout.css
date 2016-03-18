@@ -1,0 +1,19 @@
+.html {
+	height: 100vh;
+	width: 100vw;
+	display: flex;
+	all: initial;
+
+	body {
+		all: initial;
+		height: inherit;
+		width: inherit;
+		display: inherit;
+
+		> div:first-child {
+			height: inherit;
+			width: inherit;
+			display: inherit;
+		}
+	}
+}

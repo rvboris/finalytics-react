@@ -1,0 +1,10 @@
+.login {
+	padding: 20px;
+	display: inline-block;
+	text-align: center;
+}
+
+.container {
+	box: vertical middle center;
+	height: inherit;
+}
