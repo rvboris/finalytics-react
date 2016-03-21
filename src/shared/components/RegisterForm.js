@@ -5,11 +5,13 @@ import { each, noop } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import FlatButton from 'material-ui/lib/flat-button';
+import IconButton from 'material-ui/lib/icon-button';
 import TextField from 'material-ui/lib/text-field';
 import Paper from 'material-ui/lib/paper';
 
 import validationHandler from '../utils/validation-handler';
 import styles from './RegisterForm.css';
+import fonts from '../fonts.css';
 
 const fields = ['email', 'password', 'repeatPassword'];
 
@@ -67,6 +69,18 @@ const messages = defineMessages({
   },
 });
 
+const onGoogle = () => {
+  window.location.pathname = '/api/auth/google';
+};
+
+const onFacebook = () => {
+  window.location.pathname = '/api/auth/facebook';
+};
+
+const onTwitter = () => {
+  window.location.pathname = '/api/auth/twitter';
+};
+
 let RegisterForm = (props) => {
   const {
     form: { fields: { email, password, repeatPassword }, handleSubmit, fields },
@@ -114,14 +128,16 @@ let RegisterForm = (props) => {
         <h3><FormattedMessage { ...messages.title } /></h3>
 
         <form onSubmit={ onSubmit } noValidate>
-          <div>
-            <TextField type="email" { ...email } />
-          </div>
-          <div>
-            <TextField type="password" { ...password } />
-          </div>
-          <div>
-            <TextField type="password" { ...repeatPassword } />
+          <div className={ styles.fields }>
+            <div>
+              <TextField type="email" { ...email } />
+            </div>
+            <div>
+              <TextField type="password" { ...password } />
+            </div>
+            <div>
+              <TextField type="password" { ...repeatPassword } />
+            </div>
           </div>
           <FlatButton
             type="submit"
@@ -133,6 +149,24 @@ let RegisterForm = (props) => {
             primary
           />
         </form>
+
+        <div className={ styles.social }>
+          <IconButton
+            onTouchTap={ onGoogle }
+            iconClassName={ `social ${fonts['icon-google']}` }
+            tooltip="Google"
+          />
+          <IconButton
+            onTouchTap={ onFacebook }
+            iconClassName={ `social ${fonts['icon-facebook']}` }
+            tooltip="Facebook"
+          />
+          <IconButton
+            onTouchTap={ onTwitter }
+            iconClassName={ `social ${fonts['icon-twitter']}` }
+            tooltip="Twitter"
+          />
+        </div>
       </Paper>
     </div>
   );

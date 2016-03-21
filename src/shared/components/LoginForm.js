@@ -5,11 +5,13 @@ import { each, noop } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import FlatButton from 'material-ui/lib/flat-button';
+import IconButton from 'material-ui/lib/icon-button';
 import TextField from 'material-ui/lib/text-field';
 import Paper from 'material-ui/lib/paper';
 
 import validationHandler from '../utils/validation-handler';
 import styles from './LoginForm.css';
+import fonts from '../fonts.css';
 
 const fields = ['email', 'password'];
 
@@ -53,6 +55,11 @@ const messages = defineMessages({
     description: 'Login dialog submit button label in process state',
     defaultMessage: 'Please wait...',
   },
+  registerButton: {
+    id: 'auth.login.registerButton',
+    description: 'Login dialog register button label',
+    defaultMessage: 'Registration',
+  },
 });
 
 let LoginForm = (props) => {
@@ -61,6 +68,7 @@ let LoginForm = (props) => {
     intl: { formatMessage },
     process,
     login,
+    go,
     onSuccess,
     onError,
   } = props;
@@ -68,6 +76,7 @@ let LoginForm = (props) => {
   each(fields, (field, fieldName) => {
     field.hintText = formatMessage(messages[fieldName].hint);
     field.floatingLabelText = formatMessage(messages[fieldName].floatHint);
+    field.fullWidth = true;
 
     if (field.touched && field.error) {
       field.errorText = formatMessage({ id: field.error });
@@ -96,18 +105,40 @@ let LoginForm = (props) => {
     handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
   };
 
+  const onRegister = () => go('/register');
+
+  const onGoogle = () => {
+    window.location.pathname = '/api/auth/google';
+  };
+
+  const onFacebook = () => {
+    window.location.pathname = '/api/auth/facebook';
+  };
+
+  const onTwitter = () => {
+    window.location.pathname = '/api/auth/twitter';
+  };
+
   return (
     <div className={ styles.container }>
       <Paper className={ styles.login } zDepth={ 1 }>
         <h3><FormattedMessage { ...messages.title } /></h3>
 
         <form onSubmit={ onSubmit } noValidate>
-          <div>
-            <TextField type="email" { ...email } />
+          <div className={ styles.fields }>
+            <div>
+              <TextField type="email" { ...email } />
+            </div>
+            <div>
+              <TextField type="password" { ...password } />
+            </div>
           </div>
-          <div>
-            <TextField type="password" { ...password } />
-          </div>
+          <FlatButton
+            type="button"
+            disabled={ process }
+            onTouchTap={ onRegister }
+            label={ formatMessage(messages.registerButton) }
+          />
           <FlatButton
             type="submit"
             disabled={ process }
@@ -118,6 +149,24 @@ let LoginForm = (props) => {
             primary
           />
         </form>
+
+        <div className={ styles.social }>
+          <IconButton
+            onTouchTap={ onGoogle }
+            iconClassName={ `social ${fonts['icon-google']}` }
+            tooltip="Google"
+          />
+          <IconButton
+            onTouchTap={ onFacebook }
+            iconClassName={ `social ${fonts['icon-facebook']}` }
+            tooltip="Facebook"
+          />
+          <IconButton
+            onTouchTap={ onTwitter }
+            iconClassName={ `social ${fonts['icon-twitter']}` }
+            tooltip="Twitter"
+          />
+        </div>
       </Paper>
     </div>
   );
@@ -128,6 +177,7 @@ LoginForm.propTypes = {
   intl: React.PropTypes.object.isRequired,
   process: React.PropTypes.bool.isRequired,
   login: React.PropTypes.func.isRequired,
+  go: React.PropTypes.func.isRequired,
   onSuccess: React.PropTypes.func,
   onError: React.PropTypes.func,
 };

@@ -3,11 +3,16 @@ import uniqueValidator from 'mongoose-unique-validator';
 import isEmail from 'validator/lib/isEmail';
 import moment from 'moment';
 
+import config from '../../shared/config';
+
 const crypto = require('crypto');
 const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
+  googleId: { type: String, unique: true },
+  facebookId: { type: String, unique: true },
+  twitterId: { type: String, unique: true },
   email: {
     type: String,
     validate: {
@@ -33,7 +38,7 @@ const model = new mongoose.Schema({
     type: Object,
     required: false,
     default: {
-      locale: 'ru',
+      locale: config.defaultLang,
       timezone: 'Europe/Moscow',
     },
   },

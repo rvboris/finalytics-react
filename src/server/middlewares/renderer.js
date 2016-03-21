@@ -11,7 +11,7 @@ import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
 import ServerLayout from '../components/ServerLayout';
-import { authActions, localeActions } from '../../shared/actions';
+import { authActions } from '../../shared/actions';
 
 const runRouter = (location, routes) =>
   new Promise((resolve) =>
@@ -29,11 +29,11 @@ const profileResolvedAction = (user) => ({
 
 export default async(ctx, next) =>
   passport.authenticate('jwt', async (user) => {
-    const token = ctx.cookies.get('jwt');
+    const { token } = ctx.session;
 
     if (token && !user) {
       ctx.status = 403;
-      ctx.cookies.set('jwt', '');
+      ctx.session = null;
       ctx.redirect('/login');
 
       return;
@@ -45,7 +45,6 @@ export default async(ctx, next) =>
 
     if (token && user) {
       store.dispatch(authActions.setToken(token));
-      store.dispatch(localeActions.load(user.settings.locale));
       store.dispatch(profileResolvedAction(user));
     }
 

@@ -6,6 +6,8 @@ import cssnext from 'postcss-cssnext';
 import initial from 'postcss-initial';
 import magician from 'postcss-font-magician';
 import flexbox from 'postcss-flexbox';
+import atImport from 'postcss-import';
+
 import * as configs from '../config';
 
 const pkg = require('../package.json');
@@ -107,6 +109,10 @@ export default {
         loader: 'isomorphic-style!css?modules&importLoaders=1!postcss',
       },
       {
+        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        loader: 'file-loader?name=assets/fonts/[sha512:hash:base64:7].[ext]',
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel',
@@ -143,6 +149,7 @@ export default {
   postcss: () => [
     precss,
     cssnext,
+    atImport({ addDependencyTo: webpack }),
     initial(),
     magician(),
     flexbox(),

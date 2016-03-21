@@ -10,6 +10,6 @@ export default (ctx, next) =>
     }
 
     ctx.status = 403;
-    ctx.cookies.set('jwt', '');
+    ctx.session = null;
     ctx.body = { error: 'auth.login.error.password.invalid' };
   })(ctx, next);

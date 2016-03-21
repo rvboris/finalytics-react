@@ -2,40 +2,56 @@ import Koa from 'koa';
 import * as middlewares from './middlewares';
 import config from '../shared/config';
 import log, { error } from '../shared/log';
+import { connect } from './models';
 
 process.on('uncaughtException', error);
 
-const app = new Koa();
+const createApp = () => {
+  const app = new Koa();
 
-app.use(middlewares.hot);
-app.use(middlewares.errorHandler);
-app.use(middlewares.log);
-app.use(middlewares.assets);
-app.use(middlewares.responseTime);
-app.use(middlewares.body);
-app.use(middlewares.passport);
-app.use(middlewares.etag);
-app.use(middlewares.helmet);
-app.use(middlewares.router);
-app.use(middlewares.renderer);
+  app.keys = config.sessionKeys;
 
-const server = app.listen(config.port, () =>
-  log(`app is started on port ${config.port}`));
+  app.use(middlewares.responseTime);
+  app.use(middlewares.hot);
+  app.use(middlewares.errorHandler);
+  app.use(middlewares.log);
+  app.use(middlewares.assets);
+  app.use(middlewares.session);
+  app.use(middlewares.body);
+  app.use(middlewares.passport);
+  app.use(middlewares.etag);
+  app.use(middlewares.helmet);
+  app.use(middlewares.router);
+  app.use(middlewares.renderer);
 
-if (__DEVELOPMENT__) {
-  if (module.hot) {
-    module.hot.accept();
+  const server = app.listen(config.port, () =>
+    log(`app is started on port ${config.port}`));
 
-    module.hot.dispose(() => {
-      server.close();
-    });
+  if (__DEVELOPMENT__) {
+    if (module.hot) {
+      module.hot.accept();
 
-    module.hot.addStatusHandler((status) => {
-      if (status !== 'abort') {
-        return;
-      }
+      module.hot.dispose(() => {
+        server.close();
+      });
 
-      setTimeout(() => process.exit(0), 0);
-    });
+      module.hot.addStatusHandler((status) => {
+        if (status !== 'abort') {
+          return;
+        }
+
+        setTimeout(() => process.exit(0), 0);
+      });
+    }
   }
-}
+};
+
+(async () => {
+  try {
+    await connect();
+  } catch (e) {
+    return;
+  }
+
+  createApp();
+})();

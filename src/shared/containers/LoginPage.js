@@ -10,11 +10,13 @@ import LoginForm from '../components/LoginForm';
 const onSuccess = (dispatch) => () => dispatch(push('/dashboard'));
 
 const loginPage = (props) => {
-  const action = bindActionCreators(authActions.login, props.dispatch);
+  const login = bindActionCreators(authActions.login, props.dispatch);
+  const go = bindActionCreators(push, props.dispatch);
 
   return (
     <LoginForm
-      login = { action }
+      login = { login }
+      go = { go }
       onSuccess={ onSuccess(props.dispatch) }
     />
   );

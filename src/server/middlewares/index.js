@@ -9,3 +9,4 @@ export { default as router } from './router';
 export { default as body } from './body';
 export { default as passport } from './passport';
 export { default as log } from './log';
+export { default as session } from './session';

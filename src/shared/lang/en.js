@@ -6,6 +6,7 @@ export default {
   'auth.login.password.floatHint': 'Enter your password',
   'auth.login.button': 'Login',
   'auth.login.processButton': 'Please wait...',
+  'auth.login.registerButton': 'Registration',
   'auth.login.error.email.invalid': 'Invalid email',
   'auth.login.error.email.required': 'Email is required',
   'auth.login.error.password.required': 'Password is required',
@@ -27,5 +28,6 @@ export default {
   'auth.register.error.repeatPassword.required': 'Password is required',
   'auth.register.error.password.identical': 'Passwords must be identical',
   'auth.register.error.password.short': 'Password must be larger than 8 chars',
+  'auth.logout.done': 'The logout is complete, return to the main page...',
   'global.error.technical': 'Something went wrong, sorry',
 };

@@ -1,25 +1,22 @@
 import Router from 'koa-66';
 import passport from 'koa-passport';
 import jwt from 'jsonwebtoken';
-import moment from 'moment';
+import fs from 'fs';
 
 import { UserModel } from '../models';
 import { error } from '../../shared/log';
+import config from '../../shared/config';
 
 const router = new Router();
 
-const getToken = (user) => jwt.sign({ id: user._id }, 'secret', { expiresIn: '7 days' });
+const tokenKey = fs.readFileSync(`./keys/token-private-${config.env}.pem`);
 
-const setTokenCookie = (ctx, token) => {
-  ctx.cookies.set('jwt', token, {
-    expires: moment(moment.utc()).add(7, 'days').toDate(),
-  });
-};
+const getToken = (user) => jwt.sign({ id: user._id }, tokenKey, { expiresIn: '7 days' });
 
-router.post('/login', (ctx, next) =>
-  passport.authenticate('local', (user) => {
+const oauthHandler = (provider, options) => (ctx, next) =>
+  passport.authenticate(provider, options, (user) => {
     if (!user) {
-      ctx.cookies.set('jwt', '');
+      ctx.session = null;
       ctx.status = 401;
       ctx.body = { error: 'auth.login.error.password.invalid' };
       return;
@@ -27,11 +24,11 @@ router.post('/login', (ctx, next) =>
 
     const token = getToken(user);
 
-    setTokenCookie(ctx, token);
+    ctx.session.token = token;
+    ctx.redirect('/dashboard');
+  })(ctx, next);
 
-    ctx.body = { token };
-  })(ctx, next)
-);
+router.post('/login', oauthHandler('local'));
 
 router.post('/register', async (ctx) => {
   const user = new UserModel({ email: ctx.request.body.email });
@@ -68,14 +65,28 @@ router.post('/register', async (ctx) => {
 
   const token = getToken(user);
 
-  setTokenCookie(ctx, token);
-
+  ctx.session.token = token;
   ctx.body = { token };
 });
 
 router.post('/logout', { jwt: true }, (ctx) => {
-  ctx.cookies.set('jwt', '');
+  ctx.session = null;
   ctx.status = 200;
 });
+
+router.get('/google', (ctx, next) =>
+  passport.authenticate('google', {
+    scope: 'https://www.googleapis.com/auth/userinfo.email',
+  })(ctx, next));
+
+router.get('/facebook', (ctx, next) =>
+  passport.authenticate('facebook')(ctx, next));
+
+router.get('/twitter', (ctx, next) =>
+  passport.authenticate('twitter')(ctx, next));
+
+router.get('/google/callback', oauthHandler('google', { failureRedirect: '/register' }));
+router.get('/facebook/callback', oauthHandler('facebook', { failureRedirect: '/register' }));
+router.get('/twitter/callback', oauthHandler('twitter', { failureRedirect: '/register' }));
 
 export default router;

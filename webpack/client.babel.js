@@ -1,6 +1,6 @@
 import webpack from 'webpack';
 import path from 'path';
-import { mapValues, merge } from 'lodash';
+import { mapValues, merge, omit } from 'lodash';
 import precss from 'precss';
 import cssnext from 'postcss-cssnext';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
@@ -8,6 +8,7 @@ import AssetsPlugin from 'assets-webpack-plugin';
 import initial from 'postcss-initial';
 import flexbox from 'postcss-flexbox';
 import magician from 'postcss-font-magician';
+import atImport from 'postcss-import';
 
 import * as configs from '../config';
 
@@ -37,13 +38,22 @@ entry.app = [
   '../src/server/components/ServerLayout.css',
 ];
 
+const configForClient = omit(config, [
+  'sessionKeys',
+  'db',
+  'google',
+  'facebook',
+  'twitter',
+  'openexchangerates',
+]);
+
 const plugins = [
   new webpack.DefinePlugin({
     __CLIENT__: true,
     __SERVER__: false,
     __DEVELOPMENT__: env === 'development',
     __PRODUCTION__: env === 'production',
-    __CONFIG__: JSON.stringify(config),
+    __CONFIG__: JSON.stringify(configForClient),
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -157,6 +167,10 @@ export default {
           'css?modules&importLoaders=1!postcss'),
       },
       {
+        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        loader: 'file-loader?name=fonts/[sha512:hash:base64:7].[ext]',
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel',
@@ -186,6 +200,7 @@ export default {
   postcss: () => [
     precss,
     cssnext,
+    atImport({ addDependencyTo: webpack }),
     initial(),
     magician(),
     flexbox(),
