@@ -3,10 +3,10 @@ import path from 'path';
 import { mapValues, merge, forEach } from 'lodash';
 import precss from 'precss';
 import cssnext from 'postcss-cssnext';
-import initial from 'postcss-initial';
 import magician from 'postcss-font-magician';
 import flexbox from 'postcss-flexbox';
 import atImport from 'postcss-import';
+import stylelint from 'stylelint';
 
 import * as configs from '../config';
 
@@ -138,6 +138,7 @@ export default {
       'node_modules',
     ],
     extensions: ['', '.json', '.js'],
+    packageMains: ['style'],
   },
   node: {
     __dirname: true,
@@ -147,11 +148,11 @@ export default {
     configFile: '.eslintrc',
   },
   postcss: () => [
-    precss,
-    cssnext,
+    stylelint(),
     atImport({ addDependencyTo: webpack }),
-    initial(),
     magician(),
     flexbox(),
+    precss,
+    cssnext,
   ],
 };

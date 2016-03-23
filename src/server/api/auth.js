@@ -38,6 +38,8 @@ router.post('/register', async (ctx) => {
     ctx.request.body.repeatPassword
   );
 
+  user.settings.locale = ctx.language;
+
   if (setPassword.error) {
     ctx.body = setPassword;
     ctx.status = 400;
@@ -47,9 +49,11 @@ router.post('/register', async (ctx) => {
   try {
     await user.save();
   } catch (e) {
+    error(e);
+
     ctx.status = 400;
 
-    if (e.errors.email) {
+    if (e.errors && e.errors.email) {
       ctx.body = { error: e.errors.email.message };
 
       return;
@@ -57,8 +61,6 @@ router.post('/register', async (ctx) => {
 
     ctx.status = 500;
     ctx.body = { error: 'global.error.technical' };
-
-    error(e);
 
     return;
   }

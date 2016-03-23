@@ -1,5 +1,7 @@
 import Koa from 'koa';
+import { each } from 'lodash';
 import * as middlewares from './middlewares';
+import * as tasks from './tasks';
 import config from '../shared/config';
 import log, { error } from '../shared/log';
 import { connect } from './models';
@@ -11,18 +13,20 @@ const createApp = () => {
 
   app.keys = config.sessionKeys;
 
+  app.use(middlewares.errorHandler);
   app.use(middlewares.responseTime);
   app.use(middlewares.hot);
-  app.use(middlewares.errorHandler);
   app.use(middlewares.log);
   app.use(middlewares.assets);
   app.use(middlewares.session);
-  app.use(middlewares.body);
   app.use(middlewares.passport);
-  app.use(middlewares.etag);
   app.use(middlewares.helmet);
-  app.use(middlewares.router);
+  app.use(middlewares.etag);
+  app.use(middlewares.body);
+  app.use(middlewares.acceptLanguage);
   app.use(middlewares.renderer);
+  app.use(middlewares.router);
+  app.use(middlewares.errorMessage);
 
   const server = app.listen(config.port, () =>
     log(`app is started on port ${config.port}`));
@@ -46,6 +50,10 @@ const createApp = () => {
   }
 };
 
+const initTasks = () => {
+  each(tasks, (task) => task());
+};
+
 (async () => {
   try {
     await connect();
@@ -54,4 +62,5 @@ const createApp = () => {
   }
 
   createApp();
+  initTasks();
 })();

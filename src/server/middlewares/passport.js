@@ -67,7 +67,7 @@ passport.use(new JwtStrategy(jwtStrategyOptions, async (payload, done) => {
   let user;
 
   try {
-    user = await UserModel.findOne(payload.id);
+    user = await UserModel.findById(payload.id);
   } catch (e) {
     error(e);
     done(e, false);

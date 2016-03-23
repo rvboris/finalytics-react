@@ -10,9 +10,9 @@ const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
-  googleId: { type: String, unique: true },
-  facebookId: { type: String, unique: true },
-  twitterId: { type: String, unique: true },
+  googleId: { type: String, index: { unique: true, sparse: true } },
+  facebookId: { type: String, index: { unique: true, sparse: true } },
+  twitterId: { type: String, index: { unique: true, sparse: true } },
   email: {
     type: String,
     validate: {
@@ -20,6 +20,7 @@ const model = new mongoose.Schema({
       message: 'auth.register.error.email.invalid',
     },
     unique: true,
+    trim: true,
     required: 'auth.register.error.email.required',
   },
   password: {
@@ -35,11 +36,10 @@ const model = new mongoose.Schema({
     required: 'auth.register.error.updated.required',
   },
   settings: {
-    type: Object,
+    type: mongoose.Schema.Types.Mixed,
     required: false,
     default: {
       locale: config.defaultLang,
-      timezone: 'Europe/Moscow',
     },
   },
 });
@@ -110,6 +110,14 @@ model.pre('validate', function preValidate(next) {
   }
 
   this.updated = moment.utc();
+
+  const providers = ['twitterId', 'googleId', 'facebookId'];
+
+  providers.forEach(provider => {
+    if (!this[provider]) {
+      this[provider] = undefined;
+    }
+  });
 
   next();
 });

@@ -5,10 +5,10 @@ import precss from 'precss';
 import cssnext from 'postcss-cssnext';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import AssetsPlugin from 'assets-webpack-plugin';
-import initial from 'postcss-initial';
 import flexbox from 'postcss-flexbox';
 import magician from 'postcss-font-magician';
 import atImport from 'postcss-import';
+import stylelint from 'stylelint';
 
 import * as configs from '../config';
 
@@ -198,11 +198,11 @@ export default {
     configFile: '.eslintrc',
   },
   postcss: () => [
-    precss,
-    cssnext,
+    stylelint(),
     atImport({ addDependencyTo: webpack }),
-    initial(),
     magician(),
     flexbox(),
+    precss,
+    cssnext,
   ],
 };

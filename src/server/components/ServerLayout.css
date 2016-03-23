@@ -1,27 +1,32 @@
+@import "../../../node_modules/normalize.css/normalize.css";
+
 .html {
-	height: 100vh;
-	width: 100vw;
-	display: flex;
-	all: initial;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
 
-	* {
-		font-family: Roboto;
-	}
+  * {
+    font-family: Roboto;
+  }
 
-	h1, h2, h3, h4, h5, h6 {
-		font-weight: normal;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: normal;
+  }
 
-	body {
-		all: initial;
-		height: inherit;
-		width: inherit;
-		display: inherit;
+  body {
+    height: inherit;
+    width: inherit;
+    display: inherit;
 
-		> div:first-child {
-			height: inherit;
-			width: inherit;
-			display: inherit;
-		}
-	}
+    > div:first-child {
+      height: inherit;
+      width: inherit;
+      display: inherit;
+    }
+  }
 }

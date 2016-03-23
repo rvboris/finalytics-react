@@ -10,3 +10,5 @@ export { default as body } from './body';
 export { default as passport } from './passport';
 export { default as log } from './log';
 export { default as session } from './session';
+export { default as errorMessage } from './error-message';
+export { default as acceptLanguage } from './accept-language';

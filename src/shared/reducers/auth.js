@@ -1,6 +1,8 @@
 import Immutable from 'seamless-immutable';
 import { handleActions } from 'redux-actions';
 
+import config from '../config';
+
 const initialState = Immutable({
   isAuthenticated: false,
   token: null,
@@ -8,8 +10,7 @@ const initialState = Immutable({
   process: false,
   profile: {
     settings: {
-      locale: 'ru',
-      timezone: 'Europe/Moscow',
+      locale: config.defaultLang,
     },
   },
 });
@@ -41,6 +42,15 @@ export default handleActions({
       .set('profile', action.payload.data),
 
   GET_PROFILE_REJECTED: (state) => state.set('process', false),
+
+  SET_SETTINGS: (state) => state.set('process', true),
+
+  SET_SETTINGS_RESOLVED: (state, action) =>
+    state
+      .set('process', false)
+      .merge({ settings: action.payload.data }),
+
+  SET_SETTINGS_REJECTED: (state) => state.set('process', false),
 
   LOGOUT: (state) => state.set('process', true),
 

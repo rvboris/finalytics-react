@@ -37,6 +37,25 @@ export const getProfile = createAction('GET_PROFILE',
   })
 );
 
+export const getProfileResolved = createAction('GET_PROFILE_RESOLVED',
+  (profile) => ({ data: profile })
+);
+
+export const setSettings = createAction('SET_SETTINGS',
+  null,
+  (values) => ({
+    request: {
+      url: `${USER_API}/settings`,
+      method: 'post',
+      values,
+    },
+  })
+);
+
+export const setSettingsResolved = createAction('SET_SETTINGS_RESOLVED',
+  (settings) => ({ data: settings })
+);
+
 export const logout = createAction('LOGOUT',
   null,
   () => ({
@@ -61,6 +80,9 @@ export default {
   login,
   register,
   getProfile,
+  getProfileResolved,
+  setSettings,
+  setSettingsResolved,
   logout,
   setToken,
   removeToken,

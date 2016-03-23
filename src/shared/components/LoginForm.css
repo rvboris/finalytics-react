@@ -1,20 +1,20 @@
 .login {
-	padding: 20px;
-	display: inline-block;
-	text-align: center;
-	width: 320px;
+  padding: 20px;
+  display: inline-block;
+  text-align: center;
+  width: 320px;
 
-	.fields {
-		margin-bottom: 20px;
-	}
+  .fields {
+    margin-bottom: 20px;
+  }
 
-	.social {
-		margin-top: 30px;
-		box: horizontal space-around;
-	}
+  .social {
+    margin-top: 30px;
+    box: horizontal space-around;
+  }
 }
 
 .container {
-	box: vertical middle center;
-	height: inherit;
+  box: vertical middle center;
+  height: inherit;
 }

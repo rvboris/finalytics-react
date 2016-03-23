@@ -22,3 +22,4 @@ export const connect = () =>
   });
 
 export { default as UserModel } from './user';
+export { default as ExchangeRateModel } from './exchange-rate';

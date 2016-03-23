@@ -2,6 +2,7 @@ import { renderToString } from 'react-dom/server';
 import { RouterContext, match } from 'react-router';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
+import { pick } from 'lodash';
 import createLocation from 'history/lib/createLocation';
 import passport from 'koa-passport';
 import React from 'react';
@@ -17,18 +18,13 @@ const runRouter = (location, routes) =>
   new Promise((resolve) =>
     match({ routes, location }, (...args) => resolve(args)));
 
-const profileResolvedAction = (user) => ({
-  type: 'GET_PROFILE_RESOLVED',
-  payload: {
-    data: {
-      email: user.email,
-      settings: user.settings,
-    },
-  },
-});
+export default async(ctx, next) => {
+  if (ctx.request.url.startsWith('/api')) {
+    await next();
+    return;
+  }
 
-export default async(ctx, next) =>
-  passport.authenticate('jwt', async (user) => {
+  await passport.authenticate('jwt', async (user) => {
     const { token } = ctx.session;
 
     if (token && !user) {
@@ -41,11 +37,17 @@ export default async(ctx, next) =>
 
     const store = storeCreator();
 
-    store.dispatch(authActions.setUserAgent(ctx.request.headers['user-agent']));
+    const userAgent = ctx.request.headers['user-agent'];
+
+    if (userAgent) {
+      store.dispatch(authActions.setUserAgent(userAgent));
+    }
 
     if (token && user) {
       store.dispatch(authActions.setToken(token));
-      store.dispatch(profileResolvedAction(user));
+      store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings'])));
+    } else {
+      store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
     }
 
     const location = createLocation(ctx.request.url);
@@ -97,7 +99,7 @@ export default async(ctx, next) =>
     const layoutProps = {
       initialState: state,
       body: renderToString(initialView),
-      locale: state.auth.profile.settings.locale,
+      locale: ctx.language,
       title: 'koa-universal-react-redux',
       description: 'koa-universal-react-redux',
       assets: __ASSETS__,
@@ -105,3 +107,4 @@ export default async(ctx, next) =>
 
     ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout { ...layoutProps } />)}`;
   })(ctx, next);
+};
