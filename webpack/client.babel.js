@@ -28,7 +28,7 @@ entry.common = [
   'babel-polyfill',
   'bluebird',
   'reselect',
-  'immutable',
+  'seamless-immutable',
   'axios',
   'history',
 ];

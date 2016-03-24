@@ -4,7 +4,7 @@ import * as middlewares from './middlewares';
 import * as tasks from './tasks';
 import config from '../shared/config';
 import log, { error } from '../shared/log';
-import { connect } from './models';
+import { connect, initData } from './models';
 
 process.on('uncaughtException', error);
 
@@ -57,6 +57,7 @@ const initTasks = () => {
 (async () => {
   try {
     await connect();
+    await initData();
   } catch (e) {
     return;
   }

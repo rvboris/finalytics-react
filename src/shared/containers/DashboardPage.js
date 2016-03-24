@@ -26,7 +26,10 @@ class DashboardPage extends React.Component {
 
   initProfileSettings() {
     if (!this.props.profile.settings.timezone && __CLIENT__) {
-      this.props.dispatch(authActions.setSettings({ timezone: moment.tz.guess() }));
+      this.props.dispatch(authActions.setSettings({
+        timezone: moment.tz.guess(),
+        locale: 'auto',
+      }));
     }
   }
 
@@ -44,7 +47,7 @@ class DashboardPage extends React.Component {
             <FlatButton label="Отчеты" primary />
           </ToolbarGroup>
 
-          <ToolbarGroup float="right" lastChild={ true }>
+          <ToolbarGroup float="right" lastChild>
             <FlatButton label="Настройки" secondary />
             <FlatButton label="Выход" onTouchTap={ goToLogout(dispatch) } secondary />
           </ToolbarGroup>

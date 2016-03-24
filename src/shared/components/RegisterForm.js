@@ -130,13 +130,13 @@ let RegisterForm = (props) => {
         <form onSubmit={ onSubmit } noValidate>
           <div className={ styles.fields }>
             <div>
-              <TextField type="email" { ...email } />
+              <TextField id="register-email" type="email" { ...email } />
             </div>
             <div>
-              <TextField type="password" { ...password } />
+              <TextField id="register-password" type="password" { ...password } />
             </div>
             <div>
-              <TextField type="password" { ...repeatPassword } />
+              <TextField id="register-repeat-password" type="password" { ...repeatPassword } />
             </div>
           </div>
           <FlatButton

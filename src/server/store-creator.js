@@ -7,7 +7,6 @@ import createSagaMiddleware from 'redux-saga';
 
 import * as sagas from '../shared/sagas';
 import * as reducers from '../shared/reducers';
-import DevTools from '../shared/containers/DevTools';
 import * as middlewares from '../shared/middlewares';
 
 const middleware = [
@@ -19,10 +18,6 @@ const middleware = [
 const storeEnchancers = [
   applyMiddleware(...middleware),
 ];
-
-if (__DEVELOPMENT__) {
-  storeEnchancers.push(DevTools.instrument());
-}
 
 const reducer = combineReducers(Object.assign({}, reducers, { routing: routerReducer }));
 

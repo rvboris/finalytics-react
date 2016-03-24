@@ -54,7 +54,9 @@ export default handleActions({
 
   LOGOUT: (state) => state.set('process', true),
 
-  LOGOUT_RESOLVED: () => initialState,
+  LOGOUT_RESOLVED: (state) => initialState.merge({
+    settings: { locale: state.profile.settings.locale },
+  }),
 
   LOGOUT_REJECTED: (state) => state.set('process', false),
 

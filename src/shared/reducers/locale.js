@@ -15,7 +15,11 @@ const initialState = Immutable({
 });
 
 export default handleActions({
-  LOAD: (state, action) => langs[action.payload]
-    ? state.set('messages', langs[action.payload])
-    : state,
+  LOAD: (state, action) => {
+    if (langs[action.payload]) {
+      return state.set('messages', langs[action.payload]);
+    }
+
+    return state;
+  },
 }, initialState);

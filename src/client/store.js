@@ -10,14 +10,6 @@ import * as sagas from '../shared/sagas';
 import * as reducers from '../shared/reducers';
 import * as middlewares from '../shared/middlewares';
 
-let persistState;
-let DevTools;
-
-if (__DEVELOPMENT__) {
-  persistState = require('redux-devtools').persistState;
-  DevTools = require('../shared/containers/DevTools').default;
-}
-
 const initialState = Immutable(window.__INITIAL_STATE__);
 const reducer = combineReducers({ ...reducers, routing: routerReducer });
 
@@ -33,8 +25,7 @@ const storeEnchancers = [
 ];
 
 if (__DEVELOPMENT__) {
-  storeEnchancers.push(DevTools.instrument());
-  storeEnchancers.push(persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)));
+  storeEnchancers.push(window.devToolsExtension ? window.devToolsExtension() : f => f);
 }
 
 const store = createStore(reducer, initialState, compose(...storeEnchancers));

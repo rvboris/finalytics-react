@@ -11,16 +11,3 @@ render(
   </Provider>,
   document.body.childNodes[0]
 );
-
-if (__DEVELOPMENT__) {
-  const DevTools = require('../shared/containers/DevTools').default;
-
-  let debugElm = document.getElementById('debug');
-
-  if (!debugElm) {
-    debugElm = document.createElement('div');
-    document.body.appendChild(debugElm);
-  }
-
-  render(<DevTools store={store} />, debugElm);
-}

@@ -127,10 +127,10 @@ let LoginForm = (props) => {
         <form onSubmit={ onSubmit } noValidate>
           <div className={ styles.fields }>
             <div>
-              <TextField type="email" { ...email } />
+              <TextField id="login-email" type="email" { ...email } />
             </div>
             <div>
-              <TextField type="password" { ...password } />
+              <TextField id="login-password" type="password" { ...password } />
             </div>
           </div>
           <FlatButton

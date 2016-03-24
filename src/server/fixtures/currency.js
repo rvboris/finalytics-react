@@ -1,4 +1,4 @@
-G.CurrenciesFixtures = [
+export default [
   {
     'symbol': '$',
     'name': 'US Dollar',

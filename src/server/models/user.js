@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import isEmail from 'validator/lib/isEmail';
 import moment from 'moment';
+import { each } from 'lodash';
 
 import config from '../../shared/config';
 
@@ -113,7 +114,7 @@ model.pre('validate', function preValidate(next) {
 
   const providers = ['twitterId', 'googleId', 'facebookId'];
 
-  providers.forEach(provider => {
+  each(providers, provider => {
     if (!this[provider]) {
       this[provider] = undefined;
     }

@@ -1,5 +1,4 @@
-import { Job } from 'node-schedule';
-import human from 'human-to-cron';
+import later from 'later';
 import axios from 'axios';
 import money from 'money';
 
@@ -7,37 +6,33 @@ import log, { error } from '../../shared/log';
 import config from '../../shared/config';
 import { ExchangeRateModel } from '../models';
 
-const job = new Job('exchange-rates', async () => {
-  log('exchange rates updating');
+const shedule = later.parse.recur().every(3).hour();
 
-  let result;
+export default () =>
+  later.setInterval(async () => {
+    log('exchange rates updating');
 
-  try {
-    result = await axios.get(config.openexchangerates.url + config.openexchangerates.key);
-  } catch (e) {
-    error(e);
-    return;
-  }
+    let result;
 
-  try {
-    await ExchangeRateModel.remove({});
+    try {
+      result = await axios.get(config.openexchangerates.url + config.openexchangerates.key);
+    } catch (e) {
+      error(e);
+      return;
+    }
 
-    const rates = new ExchangeRateModel(result.data);
-    await rates.save();
+    try {
+      await ExchangeRateModel.remove({});
 
-    money.base = rates.base;
-    money.rates = rates.rates;
-  } catch (e) {
-    error(e);
-    return;
-  }
+      const rates = new ExchangeRateModel(result.data);
+      await rates.save();
 
-  log('exchange rates finished updating');
-});
+      money.base = rates.base;
+      money.rates = rates.rates;
+    } catch (e) {
+      error(e);
+      return;
+    }
 
-export default () => {
-  // Each 3 hours
-  job.schedule('0 0 */3 * * *');
-
-  return job;
-};
+    log('exchange rates finished updating');
+  }, shedule);
