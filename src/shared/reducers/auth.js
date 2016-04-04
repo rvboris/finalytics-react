@@ -39,7 +39,7 @@ export default handleActions({
   GET_PROFILE_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .set('profile', action.payload.data),
+      .merge({ profile: action.payload.data }),
 
   GET_PROFILE_REJECTED: (state) => state.set('process', false),
 
@@ -48,17 +48,25 @@ export default handleActions({
   SET_SETTINGS_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .merge({ settings: action.payload.data }),
+      .merge({ profile: { settings: action.payload.data } }, { deep: true }),
 
   SET_SETTINGS_REJECTED: (state) => state.set('process', false),
 
   LOGOUT: (state) => state.set('process', true),
 
-  LOGOUT_RESOLVED: (state) => initialState.merge({
-    settings: { locale: state.profile.settings.locale },
-  }),
+  LOGOUT_RESOLVED: (state) =>
+    initialState.setIn(['profile', 'settings', 'locale'], state.profile.settings.locale),
 
   LOGOUT_REJECTED: (state) => state.set('process', false),
+
+  SET_STATUS: (state) => state.set('process', true),
+
+  SET_STATUS_RESOLVED: (state, action) =>
+    state
+      .set('process', false)
+      .setIn(['profile', 'status'], action.payload.data.status),
+
+  SET_STATUS_REJECTED: (state) => state.set('process', false),
 
   SET_TOKEN: (state, action) =>
     state

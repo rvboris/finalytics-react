@@ -6,7 +6,7 @@ import { error } from '../../shared/log';
 const router = new Router();
 
 router.get('/profile', { jwt: true }, (ctx) => {
-  ctx.body = pick(ctx.user, ['email', 'settings']);
+  ctx.body = pick(ctx.user, ['email', 'settings', 'status']);
 });
 
 router.post('/settings', { jwt: true }, async (ctx) => {
@@ -29,6 +29,20 @@ router.post('/settings', { jwt: true }, async (ctx) => {
   }
 
   ctx.body = ctx.user.settings;
+});
+
+router.post('/status', { jwt: true }, async (ctx) => {
+  try {
+    ctx.user.status = ctx.request.body.status;
+    await ctx.user.save();
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  ctx.body = { status: ctx.request.body.status };
 });
 
 export default router;

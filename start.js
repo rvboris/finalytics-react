@@ -22,7 +22,11 @@ if (sh.env.NODE_ENV === 'development') {
       sh.exec('node build/server.js', Object.assign({}, execContext, { async: true }));
     });
   });
-} else {
+
+  return;
+}
+
+if (sh.env.NODE_ENV === 'production') {
   sh.exec(`node ${webpack} --progress --color --config ${clientConfig}`,
     Object.assign({}, execContext, { async: true }));
 
@@ -34,4 +38,6 @@ if (sh.env.NODE_ENV === 'development') {
       () => { sh.exec('node build/server.js', execContext); }
     );
   });
+
+  return;
 }

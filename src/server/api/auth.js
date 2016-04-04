@@ -1,20 +1,43 @@
 import Router from 'koa-66';
 import passport from 'koa-passport';
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
+import isEmail from 'validator/lib/isEmail';
 
 import { UserModel } from '../models';
 import { error } from '../../shared/log';
-import config from '../../shared/config';
 
 const router = new Router();
 
-const tokenKey = fs.readFileSync(`./keys/token-private-${config.env}.pem`);
+let tokenKey;
+
+if (__DEVELOPMENT__) {
+  tokenKey = require('../../keys/token-private-development.pem');
+} else {
+  tokenKey = require('../../keys/token-private-production.pem');
+}
 
 const getToken = (user) => jwt.sign({ id: user._id }, tokenKey, { expiresIn: '7 days' });
 
-const oauthHandler = (provider, options) => (ctx, next) =>
-  passport.authenticate(provider, options, (user) => {
+const oauthHandler = (provider, options) => async (ctx, next) => {
+  if (!ctx.request.body.email) {
+    ctx.status = 400;
+    ctx.body = { error: 'auth.login.error.email.required' };
+    return;
+  }
+
+  if (!isEmail(ctx.request.body.email)) {
+    ctx.status = 400;
+    ctx.body = { error: 'auth.login.error.email.invalid' };
+    return;
+  }
+
+  if (!ctx.request.body.password) {
+    ctx.status = 400;
+    ctx.body = { error: 'auth.login.error.password.required' };
+    return;
+  }
+
+  await passport.authenticate(provider, options, (user) => {
     if (!user) {
       ctx.session = null;
       ctx.status = 401;
@@ -27,6 +50,7 @@ const oauthHandler = (provider, options) => (ctx, next) =>
     ctx.session.token = token;
     ctx.redirect('/dashboard');
   })(ctx, next);
+};
 
 router.post('/login', oauthHandler('local'));
 
@@ -68,7 +92,7 @@ router.post('/register', async (ctx) => {
   const token = getToken(user);
 
   ctx.session.token = token;
-  ctx.body = { token };
+  ctx.status = 200;
 });
 
 router.post('/logout', { jwt: true }, (ctx) => {

@@ -1,24 +1,28 @@
 import mongoose from 'mongoose';
+import randomstring from 'randomstring';
+
 import config from '../../shared/config';
 import log, { error } from '../../shared/log';
 import { currencyFixture } from '../fixtures';
 import CurrencyModel from './currency';
 
-const dbURI = `mongodb://${config.db.hostname}/${config.db.name}`;
+const dbName = __TESTING__ ? `test-${randomstring.generate(5)}` : config.db.name;
+const dbURI = `mongodb://${config.db.hostname}/${dbName}`;
 
 export const connect = () =>
   mongoose.connect(dbURI).then(async () => {
     log(`mongoose default connection open to ${dbURI}`);
 
-    if (__DEVELOPMENT__) {
+    if (__DEVELOPMENT__ || __TESTING__) {
       log('mongoose drop database');
       await mongoose.connection.db.dropDatabase();
     }
 
-    process.on('SIGINT', () => {
-      mongoose.connection.close(() => {
-        log('mongoose default connection disconnected through app termination');
-      });
+    process.on('exit', async () => {
+      if (__TESTING__) {
+        log('mongoose drop test database');
+        await mongoose.connection.db.dropDatabase();
+      }
     });
   }, (err) => {
     error(`mongoose default connection error: ${err.message}`);
@@ -46,3 +50,6 @@ export const initData = async () => {
 export { default as UserModel } from './user';
 export { default as ExchangeRateModel } from './exchange-rate';
 export { default as CurrencyModel } from './currency';
+export { default as AccountModel } from './account';
+export { default as CategoryModel } from './category';
+export { default as OperationModel } from './operation';

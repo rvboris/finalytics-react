@@ -1,9 +1,11 @@
+import 'source-map-support/register';
+import 'babel-polyfill';
+
 import Koa from 'koa';
-import { each } from 'lodash';
 import * as middlewares from './middlewares';
 import * as tasks from './tasks';
 import config from '../shared/config';
-import log, { error } from '../shared/log';
+import { error } from '../shared/log';
 import { connect, initData } from './models';
 
 process.on('uncaughtException', error);
@@ -28,40 +30,19 @@ const createApp = () => {
   app.use(middlewares.router);
   app.use(middlewares.errorMessage);
 
-  const server = app.listen(config.port, () =>
-    log(`app is started on port ${config.port}`));
-
-  if (__DEVELOPMENT__) {
-    if (module.hot) {
-      module.hot.accept();
-
-      module.hot.dispose(() => {
-        server.close();
-      });
-
-      module.hot.addStatusHandler((status) => {
-        if (status !== 'abort') {
-          return;
-        }
-
-        setTimeout(() => process.exit(0), 0);
-      });
-    }
-  }
+  return app;
 };
 
-const initTasks = () => {
-  each(tasks, (task) => task());
-};
-
-(async () => {
+export default async () => {
   try {
     await connect();
     await initData();
   } catch (e) {
-    return;
+    error(e);
+    process.exit();
   }
 
-  createApp();
-  initTasks();
-})();
+  await Promise.all(Object.values(tasks).map((task) => task()));
+
+  return createApp();
+};

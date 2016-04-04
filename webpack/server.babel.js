@@ -6,6 +6,7 @@ import cssnext from 'postcss-cssnext';
 import magician from 'postcss-font-magician';
 import flexbox from 'postcss-flexbox';
 import atImport from 'postcss-import';
+import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 
 import * as configs from '../config';
@@ -39,9 +40,10 @@ const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies ||
   (dep, key) => `commonjs ${key}`);
 
 const env = process.env.NODE_ENV;
+const testing = process.env.TEST;
 const config = configs[env];
 
-const entry = ['../src/server/app'];
+const entry = ['../src/server/index'];
 
 const plugins = [
   new webpack.DefinePlugin({
@@ -51,6 +53,7 @@ const plugins = [
     __PRODUCTION__: env === 'production',
     __CONFIG__: JSON.stringify(config),
     __ASSETS__: JSON.stringify(assets),
+    __TESTING__: !!testing,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -92,6 +95,7 @@ export default {
     filename: 'server.js',
     hotUpdateMainFilename: '/server-hot/[hash].js',
     hotUpdateChunkFilename: '/server-hot/[id]-[hash].js',
+    libraryTarget: testing ? 'commonjs' : undefined,
   },
   module: {
     preLoaders: [
@@ -112,6 +116,7 @@ export default {
         test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
         loader: 'file-loader?name=assets/fonts/[sha512:hash:base64:7].[ext]',
       },
+      { test: /\.pem$/, loader: 'raw-loader' },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -149,6 +154,7 @@ export default {
   postcss: () => [
     stylelint(),
     atImport({ addDependencyTo: webpack }),
+    normalize,
     magician(),
     flexbox(),
     precss,

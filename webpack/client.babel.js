@@ -8,6 +8,7 @@ import AssetsPlugin from 'assets-webpack-plugin';
 import flexbox from 'postcss-flexbox';
 import magician from 'postcss-font-magician';
 import atImport from 'postcss-import';
+import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 
 import * as configs from '../config';
@@ -18,6 +19,7 @@ const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies ||
   (dep, key) => `commonjs ${key}`);
 
 const env = process.env.NODE_ENV;
+const testing = process.env.TEST;
 const config = configs[env];
 
 const entry = {};
@@ -54,6 +56,7 @@ const plugins = [
     __DEVELOPMENT__: env === 'development',
     __PRODUCTION__: env === 'production',
     __CONFIG__: JSON.stringify(configForClient),
+    __TESTING__: !!testing,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -200,6 +203,7 @@ export default {
   postcss: () => [
     stylelint(),
     atImport({ addDependencyTo: webpack }),
+    normalize,
     magician(),
     flexbox(),
     precss,

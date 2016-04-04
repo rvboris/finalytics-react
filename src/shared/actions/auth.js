@@ -76,6 +76,17 @@ export const setUserAgent = createAction('SET_USER_AGENT',
   (userAgent) => ({ userAgent })
 );
 
+export const setStatus = createAction('SET_STATUS',
+  null,
+  (status) => ({
+    request: {
+      url: `${USER_API}/status`,
+      method: 'post',
+      values: { status },
+    },
+  })
+);
+
 export default {
   login,
   register,
@@ -87,4 +98,5 @@ export default {
   setToken,
   removeToken,
   setUserAgent,
+  setStatus,
 };

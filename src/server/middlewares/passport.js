@@ -1,4 +1,3 @@
-import fs from 'fs';
 import randomstring from 'randomstring';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy } from 'passport-local';
@@ -12,7 +11,13 @@ import tokenExtractor from '../utils/token-extractor';
 import JwtStrategy from '../utils/jwt-strategy';
 import config from '../../shared/config';
 
-const tokenKey = fs.readFileSync(`./keys/token-private-${config.env}.pem`);
+let tokenKey;
+
+if (__DEVELOPMENT__) {
+  tokenKey = require('../../keys/token-private-development.pem');
+} else {
+  tokenKey = require('../../keys/token-private-production.pem');
+}
 
 const localStrategyOptions = {
   usernameField: 'email',

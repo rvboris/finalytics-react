@@ -1,11 +1,23 @@
 @font-face {
   font-family: social;
-  src: url("../fonts/social.eot?4xg3h3");
+  src: url("../fonts/social.eot");
   src:
-    url("../fonts/social.eot?4xg3h3#iefix") format("embedded-opentype"),
-    url("../fonts/social.ttf?4xg3h3") format("truetype"),
-    url("../fonts/social.woff?4xg3h3") format("woff"),
-    url("../fonts/social.svg?4xg3h3#social") format("svg");
+    url("../fonts/social.eot") format("embedded-opentype"),
+    url("../fonts/social.ttf") format("truetype"),
+    url("../fonts/social.woff") format("woff"),
+    url("../fonts/social.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: OpenSans;
+  src: url("../fonts/OpenSans-Regular.eot");
+  src:
+    url("../fonts/OpenSans-Regular.eot") format("embedded-opentype"),
+    url("../fonts/OpenSans-Regular.ttf") format("truetype"),
+    url("../fonts/OpenSans-Regular.woff") format("woff"),
+    url("../fonts/OpenSans-Regular.svg") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -22,6 +34,7 @@
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
 }
 
 .icon-google::before {

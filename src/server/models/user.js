@@ -2,15 +2,19 @@ import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import isEmail from 'validator/lib/isEmail';
 import moment from 'moment';
-import { each } from 'lodash';
 
+import { error } from '../../shared/log';
 import config from '../../shared/config';
+import accountFixture from '../fixtures/account';
+import CurrencyModel from './currency';
+import AccountModel from './account';
 
 const crypto = require('crypto');
 const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
+  status: { type: String, requied: true, enum: ['ready', 'init'] },
   googleId: { type: String, index: { unique: true, sparse: true } },
   facebookId: { type: String, index: { unique: true, sparse: true } },
   twitterId: { type: String, index: { unique: true, sparse: true } },
@@ -38,11 +42,12 @@ const model = new mongoose.Schema({
   },
   settings: {
     type: mongoose.Schema.Types.Mixed,
-    required: false,
+    required: true,
     default: {
       locale: config.defaultLang,
     },
   },
+  accounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Account' }],
 });
 
 const encryptionConfig = {
@@ -105,7 +110,7 @@ model.statics.encryptPassword = async function encryptPassword(txt) {
   return combined;
 };
 
-model.pre('validate', function preValidate(next) {
+model.pre('validate', async function preValidate(next) {
   if (!this.created) {
     this.created = moment.utc();
   }
@@ -114,11 +119,49 @@ model.pre('validate', function preValidate(next) {
 
   const providers = ['twitterId', 'googleId', 'facebookId'];
 
-  each(providers, provider => {
+  providers.forEach(provider => {
     if (!this[provider]) {
       this[provider] = undefined;
     }
   });
+
+  if (!this.settings.baseCurrency) {
+    const preferedCurrency = this.settings.locale === 'ru' ? 'RUB' : 'USD';
+
+    let currency;
+
+    try {
+      currency = await CurrencyModel.findOne({ code: preferedCurrency });
+      this.settings.baseCurrency = currency;
+    } catch (e) {
+      error(e);
+      return;
+    }
+
+    if (!this.accounts.length) {
+      let accounts = accountFixture[this.settings.locale] || accountFixture.ru;
+
+      accounts = accounts.map(account => {
+        const model = new AccountModel(account);
+        model.currency = currency;
+        model.save();
+        return model;
+      });
+
+      try {
+        accounts = await Promise.all(accounts);
+      } catch (e) {
+        error(e);
+        return;
+      }
+
+      this.accounts.push(...accounts);
+    }
+  }
+
+  if (!this.status) {
+    this.status = 'init';
+  }
 
   next();
 });

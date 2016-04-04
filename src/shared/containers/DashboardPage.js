@@ -9,7 +9,7 @@ import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
 import FlatButton from 'material-ui/lib/flat-button';
 
-import { authActions } from '../actions';
+import { authActions, categoryActions } from '../actions';
 
 const goToMain = (dispatch) => () => dispatch(push('/dashboard'));
 const goToLogout = (dispatch) => () => dispatch(push('/logout'));
@@ -20,16 +20,24 @@ class DashboardPage extends React.Component {
     profile: React.PropTypes.object.isRequired,
   }
 
+  static needs = [
+    categoryActions.load,
+  ];
+
   componentDidMount() {
-    this.initProfileSettings();
+    this.initProfile();
   }
 
-  initProfileSettings() {
-    if (!this.props.profile.settings.timezone && __CLIENT__) {
-      this.props.dispatch(authActions.setSettings({
+  async initProfile() {
+    console.log(this.props);
+
+    if (this.props.profile.status === 'init' && __CLIENT__) {
+      await this.props.dispatch(authActions.setSettings({
         timezone: moment.tz.guess(),
         locale: 'auto',
       }));
+
+      this.props.dispatch(authActions.setStatus('ready'));
     }
   }
 
@@ -57,5 +65,8 @@ class DashboardPage extends React.Component {
   }
 }
 
-const selector = createSelector(state => ({ profile: state.auth.profile }), state => state);
+const selector = createSelector(state => ({
+  profile: state.auth.profile,
+}), state => state);
+
 export default connect(selector)(DashboardPage);

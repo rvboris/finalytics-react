@@ -14,7 +14,8 @@
     "__CONFIG__": false,
     "__CLIENT__": false,
     "__SERVER__": false,
-    "__ASSETS__": false
+    "__ASSETS__": false,
+    "__TESTING__": false
   },
   "extends": "airbnb"
 }

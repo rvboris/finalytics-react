@@ -45,7 +45,7 @@ export default async(ctx, next) => {
 
     if (token && user) {
       store.dispatch(authActions.setToken(token));
-      store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings'])));
+      store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings', 'status'])));
     } else {
       store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
     }
