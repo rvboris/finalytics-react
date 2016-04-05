@@ -14,7 +14,7 @@ const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
-  status: { type: String, requied: true, enum: ['ready', 'init'] },
+  status: { type: String, required: true, enum: ['ready', 'init'] },
   googleId: { type: String, index: { unique: true, sparse: true } },
   facebookId: { type: String, index: { unique: true, sparse: true } },
   twitterId: { type: String, index: { unique: true, sparse: true } },

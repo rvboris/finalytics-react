@@ -60,6 +60,16 @@ test.serial('login', async t => {
   t.true(res.headers['set-cookie'][1].startsWith('koa.sid.sig'));
 });
 
+test.serial('login authorized', async t => {
+  const res = await request.post('/api/auth/login').send({
+    email: 'test@test.ru',
+    password: '12345678',
+  });
+
+  t.is(res.status, 302);
+  t.is(res.headers.location, '/dashboard');
+});
+
 test.serial('register local strategy exist', async t => {
   const res = await request.post('/api/auth/register').send({
     email: 'test@test.ru',
@@ -69,6 +79,29 @@ test.serial('register local strategy exist', async t => {
 
   t.is(res.status, 400);
   t.is(res.body.error, 'auth.register.error.email.unique');
+});
+
+test.serial('register local strategy authorized', async t => {
+  const res = await request.post('/api/auth/register').send({
+    email: 'test3@test3.ru',
+    password: '12345678',
+    repeatPassword: '12345678',
+  });
+
+  t.is(res.status, 200);
+  t.is(res.headers['set-cookie'].length, 2);
+  t.true(res.headers['set-cookie'][0].startsWith('koa.sid'));
+  t.true(res.headers['set-cookie'][1].startsWith('koa.sid.sig'));
+});
+
+test.serial('login again authorized', async t => {
+  const res = await request.post('/api/auth/login').send({
+    email: 'test3@test3.ru',
+    password: '12345678',
+  });
+
+  t.is(res.status, 302);
+  t.is(res.headers.location, '/dashboard');
 });
 
 test('register local strategy require email', async t => {

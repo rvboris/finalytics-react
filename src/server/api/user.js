@@ -42,7 +42,7 @@ router.post('/status', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = { status: ctx.request.body.status };
+  ctx.body = { status: ctx.user.status };
 });
 
 export default router;
