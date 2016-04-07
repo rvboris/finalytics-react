@@ -18,6 +18,7 @@ class DashboardPage extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     profile: React.PropTypes.object.isRequired,
+    category: React.PropTypes.object.isRequired,
   }
 
   static needs = [
@@ -36,6 +37,10 @@ class DashboardPage extends React.Component {
         timezone: moment.tz.guess(),
         locale: 'auto',
       }));
+
+      if (!this.props.category.data) {
+        await this.props.dispatch(categoryActions.load());
+      }
 
       this.props.dispatch(authActions.setStatus('ready'));
     }
@@ -67,6 +72,7 @@ class DashboardPage extends React.Component {
 
 const selector = createSelector(state => ({
   profile: state.auth.profile,
+  category: state.category,
 }), state => state);
 
 export default connect(selector)(DashboardPage);

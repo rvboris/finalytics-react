@@ -1,4 +1,5 @@
 export default {
+  'global.error.technical': 'Something went wrong, sorry',
   'auth.login.title': 'Login',
   'auth.login.email.hint': 'example@domain.com',
   'auth.login.email.floatHint': 'Enter your email',
@@ -29,5 +30,9 @@ export default {
   'auth.register.error.password.identical': 'Passwords must be identical',
   'auth.register.error.password.short': 'Password must be larger than 8 chars',
   'auth.logout.done': 'The logout is complete, return to the main page...',
-  'global.error.technical': 'Something went wrong, sorry',
+  'category.update.error.id.invalid': 'Invalid category id',
+  'category.update.error.params.invalid': 'Invalid parameters for updating the category',
+  'category.update.error.type.invalid': 'Invalid category type for the upgrade',
+  'category.update.error.notFound': 'Category not found',
+  'category.update.error.isSystem': 'Changing the service categories is prohibited',
 };

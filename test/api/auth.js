@@ -204,7 +204,7 @@ test('oauth google', async t => {
 test('oauth google callback', async t => {
   const res = await request.get('/api/auth/google/callback');
 
-  t.is(res.status, 400);
+  t.is(res.status, 302);
 });
 
 test('oauth facebook', async t => {
@@ -216,11 +216,11 @@ test('oauth facebook', async t => {
 test('oauth facebook callback', async t => {
   const res = await request.get('/api/auth/facebook/callback');
 
-  t.is(res.status, 400);
+  t.is(res.status, 302);
 });
 
 test('oauth twitter callback', async t => {
   const res = await request.get('/api/auth/twitter/callback');
 
-  t.is(res.status, 400);
+  t.is(res.status, 302);
 });

@@ -3,7 +3,8 @@ import { handleActions } from 'redux-actions';
 
 const initialState = Immutable({
   process: false,
-  categories: null,
+  _id: null,
+  data: null,
 });
 
 export default handleActions({
@@ -12,7 +13,7 @@ export default handleActions({
   LOAD_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .set('categories', action.payload.data.data)
+      .set('data', action.payload.data.data)
       .set('_id', action.payload.data._id),
 
   LOAD_REJECTED: (state) =>

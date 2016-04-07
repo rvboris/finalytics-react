@@ -19,22 +19,24 @@ if (__DEVELOPMENT__) {
 const getToken = (user) => jwt.sign({ id: user._id }, tokenKey, { expiresIn: '7 days' });
 
 const oauthHandler = (provider, options) => async (ctx, next) => {
-  if (!ctx.request.body.email) {
-    ctx.status = 400;
-    ctx.body = { error: 'auth.login.error.email.required' };
-    return;
-  }
+  if (provider === 'local') {
+    if (!ctx.request.body.email) {
+      ctx.status = 400;
+      ctx.body = { error: 'auth.login.error.email.required' };
+      return;
+    }
 
-  if (!isEmail(ctx.request.body.email)) {
-    ctx.status = 400;
-    ctx.body = { error: 'auth.login.error.email.invalid' };
-    return;
-  }
+    if (!isEmail(ctx.request.body.email)) {
+      ctx.status = 400;
+      ctx.body = { error: 'auth.login.error.email.invalid' };
+      return;
+    }
 
-  if (!ctx.request.body.password) {
-    ctx.status = 400;
-    ctx.body = { error: 'auth.login.error.password.required' };
-    return;
+    if (!ctx.request.body.password) {
+      ctx.status = 400;
+      ctx.body = { error: 'auth.login.error.password.required' };
+      return;
+    }
   }
 
   await passport.authenticate(provider, options, (user) => {
@@ -84,7 +86,7 @@ router.post('/register', async (ctx) => {
     }
 
     ctx.status = 500;
-    ctx.body = { error: 'global.error.technical' };
+    ctx.body = { error: e.message };
 
     return;
   }

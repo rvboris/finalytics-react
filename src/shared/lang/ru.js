@@ -1,4 +1,5 @@
 export default {
+  'global.error.technical': 'Что-то сломалось, извините',
   'auth.login.title': 'Вход',
   'auth.login.email.hint': 'example@domain.com',
   'auth.login.email.floatHint': 'Введите свой email адрес',
@@ -29,5 +30,9 @@ export default {
   'auth.register.error.password.identical': 'Пароли должны совпадать',
   'auth.register.error.password.short': 'Пароль должен быть не менее 8 символов',
   'auth.logout.done': 'Выход выполнен, возврат на главную страницу...',
-  'global.error.technical': 'Что-то сломалось, извините',
+  'category.update.error.id.invalid': 'Не верный id категории',
+  'category.update.error.params.invalid': 'Не допустимые параметры для обновления категории',
+  'category.update.error.type.invalid': 'Не допустимый тип для обновления категории',
+  'category.update.error.notFound': 'Категория не найдена',
+  'category.update.error.isSystem': 'Изменение службеных категорий запрещено',
 };

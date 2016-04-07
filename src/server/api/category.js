@@ -9,7 +9,7 @@ import { CategoryModel } from '../models';
 
 const router = new Router();
 
-router.post('/load', { jwt: true }, async (ctx) => {
+router.get('/load', { jwt: true }, async (ctx) => {
   const categoryData = categoryFixture[ctx.user.settings.locale] || categoryFixture.ru;
 
   const tree = new TreeModel();
@@ -38,6 +38,67 @@ router.post('/load', { jwt: true }, async (ctx) => {
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
+});
+
+router.post('/update', { jwt: true }, async (ctx) => {
+  const params = pick(ctx.request.body, '_id', 'name', 'type');
+
+  if (!params._id) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.update.error.id.invalid' };
+    return;
+  }
+
+  if (!params.name && !params.type) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.update.error.params.invalid' };
+    return;
+  }
+
+  if (params.type && ['income', 'expense', 'any'].indexOf(params.type) < 0) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.update.error.type.invalid' };
+    return;
+  }
+
+  const categoryModel = await CategoryModel.findOne({ user: ctx.user }, '_id data');
+
+  const tree = new TreeModel();
+  const categoryRoot = tree.parse(categoryModel.data);
+
+  const findedCategory = categoryRoot.first((node) => node.model._id.toString() === params._id);
+
+  if (!findedCategory) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.update.error.notFound' };
+    return;
+  }
+
+  if (findedCategory.model.system) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.update.error.isSystem' };
+    return;
+  }
+
+  if (params.name) {
+    findedCategory.model.name = params.name;
+    categoryModel.markModified('data');
+  }
+
+  if (params.type) {
+    findedCategory.model.type = params.type;
+    categoryModel.markModified('data');
+  }
+
+  try {
+    await categoryModel.save();
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+  }
+
+  ctx.body = categoryModel;
 });
 
 export default router;
