@@ -3,6 +3,7 @@ import test from 'ava';
 import TreeModel from 'tree-model';
 import mongoose from 'mongoose';
 import { sample, difference } from 'lodash';
+import randomstring from 'randomstring';
 
 let request;
 
@@ -16,7 +17,7 @@ test.before(async () => {
   });
 });
 
-test.serial('user load default categories', async (t) => {
+test.serial('load default', async (t) => {
   const res = await request.get('/api/category/load');
 
   t.is(res.status, 200);
@@ -31,7 +32,7 @@ test.serial('user load default categories', async (t) => {
   });
 });
 
-test.serial('user load categories', async (t) => {
+test.serial('load', async (t) => {
   await request.post('/api/user/status').send({ status: 'ready' });
 
   const res = await request.get('/api/category/load');
@@ -47,7 +48,7 @@ test.serial('user load categories', async (t) => {
   });
 });
 
-test.serial('user set category prop', async (t) => {
+test.serial('update', async (t) => {
   let res = await request.get('/api/category/load');
 
   let tree = new TreeModel();
@@ -61,11 +62,11 @@ test.serial('user set category prop', async (t) => {
   res = await request.post('/api/category/update').send({});
 
   t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.id.invalid');
+  t.is(res.body.error, 'category.update.error._id.required');
 
   res = await request.post('/api/category/update').send({
     _id: sample(systemCategoryList).model._id,
-    type: 'income',
+    name: randomstring.generate(8),
   });
 
   t.is(res.status, 400);
@@ -73,65 +74,26 @@ test.serial('user set category prop', async (t) => {
 
   res = await request.post('/api/category/update').send({
     _id: sample(systemCategoryList).model._id,
-    name: 'test',
+    test: randomstring.generate(8),
   });
 
   t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.isSystem');
-
-  res = await request.post('/api/category/update').send({
-    _id: sample(systemCategoryList).model._id,
-    system: 'test',
-  });
-
-  t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.params.invalid');
-
-  res = await request.post('/api/category/update').send({
-    _id: sample(systemCategoryList).model._id,
-    test: 'test',
-  });
-
-  t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.params.invalid');
-
-  res = await request.post('/api/category/update').send({
-    _id: sample(userCategoryList).model._id,
-    system: 'test',
-  });
-
-  t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.params.invalid');
-
-  res = await request.post('/api/category/update').send({
-    _id: sample(userCategoryList).model._id,
-    test: 'test',
-  });
-
-  t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.params.invalid');
+  t.is(res.body.error, 'category.update.error.name.required');
 
   res = await request.post('/api/category/update').send({
     _id: 'wrong id',
-    type: 'any',
+    name: randomstring.generate(8),
   });
 
   t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.notFound');
-
-  res = await request.post('/api/category/update').send({
-    _id: sample(userCategoryList).model._id,
-    type: 'wrong type',
-  });
-
-  t.is(res.status, 400);
-  t.is(res.body.error, 'category.update.error.type.invalid');
+  t.is(res.body.error, 'category.update.error._id.notFound');
 
   const categoryIdToCheck = sample(userCategoryList).model._id;
+  const nameToCheck = randomstring.generate(8);
 
   res = await request.post('/api/category/update').send({
     _id: categoryIdToCheck,
-    name: 'test',
+    name: nameToCheck,
   });
 
   t.is(res.status, 200);
@@ -146,8 +108,6 @@ test.serial('user set category prop', async (t) => {
 
   let checkNode = categoryRoot.first((node) => node.model._id.toString() === categoryIdToCheck);
 
-  const nameToCheck = 'test';
-
   t.is(checkNode.model.name, nameToCheck);
 
   res = await request.get('/api/category/load');
@@ -161,4 +121,110 @@ test.serial('user set category prop', async (t) => {
   checkNode = categoryRoot.first((node) => node.model._id.toString() === categoryIdToCheck);
 
   t.is(checkNode.model.name, nameToCheck);
+});
+
+test.serial('add', async (t) => {
+  let res = await request.get('/api/category/load');
+
+  let tree = new TreeModel();
+  let categoryRoot = tree.parse(res.body.data);
+
+  const categoryList = categoryRoot.all();
+
+  res = await request.post('/api/category/add').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error._id.required');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.params.required');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList).model._id,
+    newNode: {},
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.name.required');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList).model._id,
+    newNode: {
+      name: randomstring.generate(8),
+    },
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.type.required');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList).model._id,
+    newNode: {
+      name: randomstring.generate(8),
+      type: 'wrong type',
+    },
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.type.invalid');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList.filter(node => node.model.type === 'income')).model._id,
+    newNode: {
+      name: randomstring.generate(8),
+      type: 'expense',
+    },
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.type.parentInvalid');
+
+  res = await request.post('/api/category/add').send({
+    _id: sample(categoryList.filter(node => node.model.type === 'expense')).model._id,
+    newNode: {
+      name: randomstring.generate(8),
+      type: 'income',
+    },
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error.type.parentInvalid');
+
+  res = await request.post('/api/category/add').send({
+    _id: 'wrong id',
+    newNode: {
+      name: randomstring.generate(8),
+      type: 'income',
+    },
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.add.error._id.notFound');
+
+  const nameToCheck = randomstring.generate(8);
+  const parentToCheck = sample(categoryList).model;
+
+  res = await request.post('/api/category/add').send({
+    _id: parentToCheck._id,
+    newNode: {
+      name: nameToCheck,
+      type: parentToCheck.type,
+    },
+  });
+
+  t.is(res.status, 200);
+  t.true(mongoose.Types.ObjectId.isValid(res.body._id));
+
+  tree = new TreeModel();
+  categoryRoot = tree.parse(res.body.data);
+
+  const checkNode = categoryRoot.first((node) => node.model.name.toString() === nameToCheck);
+
+  t.is(checkNode.model.name, nameToCheck);
+  t.is(checkNode.model.type, parentToCheck.type);
+  t.is(checkNode.parent.model._id, parentToCheck._id);
 });

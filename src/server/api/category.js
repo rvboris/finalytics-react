@@ -13,7 +13,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
   const categoryData = categoryFixture[ctx.user.settings.locale] || categoryFixture.ru;
 
   const tree = new TreeModel();
-  const categoryRoot = tree.parse(categoryData);
+  const rootNode = tree.parse(categoryData);
 
   try {
     const categoryIsExists = (await CategoryModel.count({ user: ctx.user })) > 0;
@@ -21,7 +21,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
     let category;
 
     if (ctx.user.status === 'init' || !categoryIsExists) {
-      categoryRoot.walk((node) => {
+      rootNode.walk((node) => {
         node.model._id = mongoose.Types.ObjectId();
       });
 
@@ -41,54 +41,112 @@ router.get('/load', { jwt: true }, async (ctx) => {
 });
 
 router.post('/update', { jwt: true }, async (ctx) => {
-  const params = pick(ctx.request.body, '_id', 'name', 'type');
+  const params = pick(ctx.request.body, '_id', 'name');
 
   if (!params._id) {
     ctx.status = 400;
-    ctx.body = { error: 'category.update.error.id.invalid' };
+    ctx.body = { error: 'category.update.error._id.required' };
     return;
   }
 
-  if (!params.name && !params.type) {
+  if (!params.name) {
     ctx.status = 400;
-    ctx.body = { error: 'category.update.error.params.invalid' };
-    return;
-  }
-
-  if (params.type && ['income', 'expense', 'any'].indexOf(params.type) < 0) {
-    ctx.status = 400;
-    ctx.body = { error: 'category.update.error.type.invalid' };
+    ctx.body = { error: 'category.update.error.name.required' };
     return;
   }
 
   const categoryModel = await CategoryModel.findOne({ user: ctx.user }, '_id data');
 
   const tree = new TreeModel();
-  const categoryRoot = tree.parse(categoryModel.data);
+  const rootNode = tree.parse(categoryModel.data);
 
-  const findedCategory = categoryRoot.first((node) => node.model._id.toString() === params._id);
+  const resultNode = rootNode.first((node) => node.model._id.toString() === params._id);
 
-  if (!findedCategory) {
+  if (!resultNode) {
     ctx.status = 400;
-    ctx.body = { error: 'category.update.error.notFound' };
+    ctx.body = { error: 'category.update.error._id.notFound' };
     return;
   }
 
-  if (findedCategory.model.system) {
+  if (resultNode.model.system) {
     ctx.status = 400;
     ctx.body = { error: 'category.update.error.isSystem' };
     return;
   }
 
   if (params.name) {
-    findedCategory.model.name = params.name;
+    resultNode.model.name = params.name;
     categoryModel.markModified('data');
   }
 
-  if (params.type) {
-    findedCategory.model.type = params.type;
-    categoryModel.markModified('data');
+  try {
+    await categoryModel.save();
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
   }
+
+  ctx.body = categoryModel;
+});
+
+router.post('/add', { jwt: true }, async (ctx) => {
+  const { _id, newNode } = ctx.request.body;
+
+  if (!_id) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error._id.required' };
+    return;
+  }
+
+  if (!newNode) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error.params.required' };
+    return;
+  }
+
+  const { name, type } = newNode;
+
+  if (!name) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error.name.required' };
+    return;
+  }
+
+  if (!type) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error.type.required' };
+    return;
+  }
+
+  if (['income', 'expense', 'any'].indexOf(type) < 0) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error.type.invalid' };
+    return;
+  }
+
+  const categoryModel = await CategoryModel.findOne({ user: ctx.user }, '_id data');
+
+  const tree = new TreeModel();
+  const rootNode = tree.parse(categoryModel.data);
+
+  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+
+  if (!resultNode) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error._id.notFound' };
+    return;
+  }
+
+  if (resultNode.model.type !== 'any' && resultNode.model.type !== type) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.add.error.type.parentInvalid' };
+    return;
+  }
+
+  resultNode.addChild(tree.parse({ _id: mongoose.Types.ObjectId(), name, type }));
+
+  categoryModel.markModified('data');
 
   try {
     await categoryModel.save();

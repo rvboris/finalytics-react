@@ -2,6 +2,7 @@ import Router from 'koa-66';
 import passport from 'koa-passport';
 import jwt from 'jsonwebtoken';
 import isEmail from 'validator/lib/isEmail';
+import { pick } from 'lodash';
 
 import { UserModel } from '../models';
 import { error } from '../../shared/log';
@@ -19,20 +20,22 @@ if (__DEVELOPMENT__) {
 const getToken = (user) => jwt.sign({ id: user._id }, tokenKey, { expiresIn: '7 days' });
 
 const oauthHandler = (provider, options) => async (ctx, next) => {
+  const { email, password } = pick(ctx.request.body, 'email', 'password');
+
   if (provider === 'local') {
-    if (!ctx.request.body.email) {
+    if (!email) {
       ctx.status = 400;
       ctx.body = { error: 'auth.login.error.email.required' };
       return;
     }
 
-    if (!isEmail(ctx.request.body.email)) {
+    if (!isEmail(email)) {
       ctx.status = 400;
       ctx.body = { error: 'auth.login.error.email.invalid' };
       return;
     }
 
-    if (!ctx.request.body.password) {
+    if (!password) {
       ctx.status = 400;
       ctx.body = { error: 'auth.login.error.password.required' };
       return;
@@ -57,12 +60,12 @@ const oauthHandler = (provider, options) => async (ctx, next) => {
 router.post('/login', oauthHandler('local'));
 
 router.post('/register', async (ctx) => {
-  const user = new UserModel({ email: ctx.request.body.email });
+  const { email, password, repeatPassword }
+    = pick(ctx.request.body, 'email', 'password', 'repeatPassword');
 
-  const setPassword = await user.setPassword(
-    ctx.request.body.password,
-    ctx.request.body.repeatPassword
-  );
+  const user = new UserModel({ email });
+
+  const setPassword = await user.setPassword(password, repeatPassword);
 
   user.settings.locale = ctx.language;
 

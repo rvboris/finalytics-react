@@ -10,13 +10,13 @@ router.get('/profile', { jwt: true }, (ctx) => {
 });
 
 router.post('/settings', { jwt: true }, async (ctx) => {
-  const filteredObject = pick(ctx.request.body, ['locale', 'timezone']);
+  const params = pick(ctx.request.body, ['locale', 'timezone']);
 
-  if (filteredObject.locale === 'auto') {
-    filteredObject.locale = ctx.language;
+  if (params.locale === 'auto') {
+    params.locale = ctx.language;
   }
 
-  ctx.user.settings = assign(ctx.user.settings, filteredObject);
+  ctx.user.settings = assign(ctx.user.settings, params);
   ctx.user.markModified('settings');
 
   try {
