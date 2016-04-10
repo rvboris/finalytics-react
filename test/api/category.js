@@ -228,3 +228,132 @@ test.serial('add', async (t) => {
   t.is(checkNode.model.type, parentToCheck.type);
   t.is(checkNode.parent.model._id, parentToCheck._id);
 });
+
+test.serial('delete', async (t) => {
+  let res = await request.get('/api/category/load');
+
+  let tree = new TreeModel();
+  let categoryRoot = tree.parse(res.body.data);
+
+  const categoryList = categoryRoot.all();
+
+  const systemCategoryList = categoryList.filter((category) => category.model.system);
+  const userCategoryList = difference(categoryList, systemCategoryList);
+
+  res = await request.post('/api/category/delete').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.delete.error._id.required');
+
+  res = await request.post('/api/category/delete').send({
+    _id: 'wrong id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.delete.error._id.notFound');
+
+  res = await request.post('/api/category/delete').send({
+    _id: sample(systemCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.delete.error.isSystem');
+
+  const nodeIdToCheck = sample(userCategoryList).model._id;
+
+  res = await request.post('/api/category/delete').send({
+    _id: nodeIdToCheck,
+  });
+
+  t.is(res.status, 200);
+  t.true(mongoose.Types.ObjectId.isValid(res.body._id));
+
+  tree = new TreeModel();
+  categoryRoot = tree.parse(res.body.data);
+
+  const checkNode = categoryRoot.first((node) => node.model._id === nodeIdToCheck);
+
+  t.true(typeof checkNode === 'undefined');
+});
+
+test.serial('move', async (t) => {
+  let res = await request.get('/api/category/load');
+
+  let tree = new TreeModel();
+  let categoryRoot = tree.parse(res.body.data);
+
+  const categoryList = categoryRoot.all();
+
+  const systemCategoryList = categoryList.filter((category) => category.model.system);
+  const userCategoryList = difference(categoryList, systemCategoryList);
+
+  res = await request.post('/api/category/move').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error._id.required');
+
+  res = await request.post('/api/category/move').send({
+    _id: 'wrong id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error.to.required');
+
+  res = await request.post('/api/category/move').send({
+    _id: 'wrong id',
+    to: 'wrong id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error._id.notFound');
+
+  res = await request.post('/api/category/move').send({
+    _id: sample(systemCategoryList).model._id,
+    to: 'wrong id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error.isSystem');
+
+  res = await request.post('/api/category/move').send({
+    _id: sample(userCategoryList).model._id,
+    to: 'wrong id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error.to.notFound');
+
+  res = await request.post('/api/category/move').send({
+    _id: sample(userCategoryList.filter((node) => node.model.type === 'income')).model._id,
+    to: sample(userCategoryList.filter((node) => node.model.type === 'expense')).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error.type.parentInvalid');
+
+  res = await request.post('/api/category/move').send({
+    _id: sample(userCategoryList.filter((node) => node.model.type === 'expense')).model._id,
+    to: sample(userCategoryList.filter((node) => node.model.type === 'income')).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'category.move.error.type.parentInvalid');
+
+  const fromNode = sample(userCategoryList.filter((node) => node.model.type === 'expense'));
+  const toNode = sample(systemCategoryList.filter((node) => node.model.type === 'any'));
+
+  res = await request.post('/api/category/move').send({
+    _id: fromNode.model._id,
+    to: toNode.model._id,
+  });
+
+  t.is(res.status, 200);
+  t.true(mongoose.Types.ObjectId.isValid(res.body._id));
+
+  tree = new TreeModel();
+  categoryRoot = tree.parse(res.body.data);
+
+  const checkNode = categoryRoot.first((node) => node.model._id === fromNode.model._id);
+
+  t.is(checkNode.parent.model._id, toNode.model._id);
+});

@@ -16,7 +16,5 @@ export default handleActions({
       .set('data', action.payload.data.data)
       .set('_id', action.payload.data._id),
 
-  LOAD_REJECTED: (state) =>
-    state
-      .set('process', false),
+  LOAD_REJECTED: () => initialState,
 }, initialState);

@@ -41,5 +41,14 @@ export default {
   'category.add.error.type.required': 'Не указан тип категории',
   'category.add.error.type.invalid': 'Недопустимый тип категории',
   'category.add.error.type.parentInvalid': 'Тип родительской категории не соответствует новой',
-
+  'category.delete.error._id.required': 'Для удаления категории id обязателен',
+  'category.delete.error._id.notFound': 'Категория не найдена',
+  'category.delete.error.isSystem': 'Удаление службеных категорий запрещено',
+  'category.move.error._id.required': 'Требуется id перемещаемой категории',
+  'category.move.error.to.required': 'Требуется id родительской категории',
+  'category.move.error._id.notFound': 'Категория для перемещения не найдена',
+  'category.move.error.isSystem': 'Перемещение службеных категорий запрещено',
+  'category.move.error.to.notFound': 'Родительская категория не найдена',
+  'category.move.error.type.parentInvalid':
+    'Тип родительской категории не соответствует перемещаемой',
 };

@@ -41,4 +41,13 @@ export default {
   'category.add.error.type.required': 'Category type is required',
   'category.add.error.type.invalid': 'Invalid category type',
   'category.add.error.type.parentInvalid': 'Type of parent category does not correspond to the new',
+  'category.delete.error._id.required': 'To remove the category id is required',
+  'category.delete.error._id.notFound': 'Category not found',
+  'category.delete.error.isSystem': 'Removing the service categories is prohibited',
+  'category.move.error._id.required': 'Requires id moved category',
+  'category.move.error.to.required': 'Requires a parent category id',
+  'category.move.error._id.notFound': 'Category to move could not be found',
+  'category.move.error.isSystem': 'Moving service categories prohibited',
+  'category.move.error.to.notFound': 'Parent category not found',
+  'category.move.error.type.parentInvalid': 'Type of parent category does not match moved',
 };

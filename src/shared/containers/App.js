@@ -6,9 +6,6 @@ import { IntlProvider } from 'react-intl';
 
 import config from '../config';
 import styles from './App.css';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-
-injectTapEventPlugin();
 
 Promise.config({
   warnings: false,

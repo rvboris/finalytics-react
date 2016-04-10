@@ -136,7 +136,7 @@ let LoginForm = (props) => {
           <FlatButton
             type="button"
             disabled={ process }
-            onTouchTap={ onRegister }
+            onClick={ onRegister }
             label={ formatMessage(messages.registerButton) }
           />
           <FlatButton
@@ -152,17 +152,17 @@ let LoginForm = (props) => {
 
         <div className={ styles.social }>
           <IconButton
-            onTouchTap={ onGoogle }
+            onClick={ onGoogle }
             iconClassName={ `social ${fonts['icon-google']}` }
             tooltip="Google"
           />
           <IconButton
-            onTouchTap={ onFacebook }
+            onClick={ onFacebook }
             iconClassName={ `social ${fonts['icon-facebook']}` }
             tooltip="Facebook"
           />
           <IconButton
-            onTouchTap={ onTwitter }
+            onClick={ onTwitter }
             iconClassName={ `social ${fonts['icon-twitter']}` }
             tooltip="Twitter"
           />

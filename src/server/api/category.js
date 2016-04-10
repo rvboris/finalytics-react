@@ -159,4 +159,111 @@ router.post('/add', { jwt: true }, async (ctx) => {
   ctx.body = categoryModel;
 });
 
+router.post('/delete', { jwt: true }, async (ctx) => {
+  const { _id } = ctx.request.body;
+
+  if (!_id) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.delete.error._id.required' };
+    return;
+  }
+
+  const categoryModel = await CategoryModel.findOne({ user: ctx.user }, '_id data');
+
+  const tree = new TreeModel();
+  const rootNode = tree.parse(categoryModel.data);
+
+  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+
+  if (!resultNode) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.delete.error._id.notFound' };
+    return;
+  }
+
+  if (resultNode.model.system) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.delete.error.isSystem' };
+    return;
+  }
+
+  resultNode.drop();
+
+  categoryModel.markModified('data');
+
+  try {
+    await categoryModel.save();
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+  }
+
+  ctx.body = categoryModel;
+});
+
+router.post('/move', { jwt: true }, async (ctx) => {
+  const { _id, to } = ctx.request.body;
+
+  if (!_id) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error._id.required' };
+    return;
+  }
+
+  if (!to) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error.to.required' };
+    return;
+  }
+
+  const categoryModel = await CategoryModel.findOne({ user: ctx.user }, '_id data');
+
+  const tree = new TreeModel();
+  const rootNode = tree.parse(categoryModel.data);
+
+  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+
+  if (!resultNode) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error._id.notFound' };
+    return;
+  }
+
+  if (resultNode.model.system) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error.isSystem' };
+    return;
+  }
+
+  const toNode = rootNode.first((node) => node.model._id.toString() === to);
+
+  if (!toNode) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error.to.notFound' };
+    return;
+  }
+
+  if (toNode.model.type !== 'any' && toNode.model.type !== resultNode.model.type) {
+    ctx.status = 400;
+    ctx.body = { error: 'category.move.error.type.parentInvalid' };
+    return;
+  }
+
+  resultNode.drop();
+  toNode.addChild(resultNode);
+
+  categoryModel.markModified('data');
+
+  try {
+    await categoryModel.save();
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+  }
+
+  ctx.body = categoryModel;
+});
+
 export default router;
