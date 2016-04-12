@@ -8,8 +8,6 @@ import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
 import FlatButton from 'material-ui/lib/flat-button';
 
-import { categoryActions } from '../actions';
-
 const goToMain = (dispatch) => () => dispatch(push('/dashboard'));
 const goToLogout = (dispatch) => () => dispatch(push('/logout'));
 
@@ -36,10 +34,6 @@ dashboardPage.propTypes = {
   dispatch: React.PropTypes.func.isRequired,
   profile: React.PropTypes.object.isRequired,
 };
-
-dashboardPage.needs = [
-  categoryActions.load,
-];
 
 const profileSelector = (state) => state.auth.profile;
 

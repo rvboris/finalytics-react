@@ -51,11 +51,12 @@ test('user set status', async t => {
   let res = await request.post('/api/user/status').send({ status: 'wrong' });
 
   t.is(res.status, 500);
+  t.true(typeof res.body.error === 'string');
 
   res = await request.post('/api/user/status').send({});
 
-  t.is(res.status, 200);
-  t.is(res.body.status, 'init');
+  t.is(res.status, 500);
+  t.true(typeof res.body.error === 'string');
 
   res = await request.post('/api/user/status').send({ status: 'init' });
 

@@ -8,13 +8,13 @@ const initialState = Immutable({
 });
 
 export default handleActions({
-  LOAD: (state) => state.set('process', true),
+  CATEGORY_LOAD: (state) => state.set('process', true),
 
-  LOAD_RESOLVED: (state, action) =>
+  CATEGORY_LOAD_RESOLVED: (state, action) =>
     state
       .set('process', false)
       .set('data', action.payload.data.data)
       .set('_id', action.payload.data._id),
 
-  LOAD_REJECTED: () => initialState,
+  CATEGORY_LOAD_REJECTED: () => initialState,
 }, initialState);

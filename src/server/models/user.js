@@ -5,16 +5,14 @@ import moment from 'moment';
 
 import { error } from '../../shared/log';
 import config from '../../shared/config';
-import accountFixture from '../fixtures/account';
 import CurrencyModel from './currency';
-import AccountModel from './account';
 
 const crypto = require('crypto');
 const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
-  status: { type: String, required: true, enum: ['ready', 'init'] },
+  status: { type: String, required: true, enum: ['ready', 'init'], default: 'init' },
   googleId: { type: String, index: { unique: true, sparse: true } },
   facebookId: { type: String, index: { unique: true, sparse: true } },
   twitterId: { type: String, index: { unique: true, sparse: true } },
@@ -125,42 +123,18 @@ model.pre('validate', async function preValidate(next) {
     }
   });
 
-  if (!this.settings.baseCurrency) {
+  if (this.status === 'init') {
     const preferedCurrency = this.settings.locale === 'ru' ? 'RUB' : 'USD';
 
     let currency;
 
     try {
       currency = await CurrencyModel.findOne({ code: preferedCurrency });
-      this.settings.baseCurrency = currency;
+      this.settings.baseCurrency = currency._id;
     } catch (e) {
       error(e);
       return;
     }
-
-    if (!this.accounts.length) {
-      let accounts = accountFixture[this.settings.locale] || accountFixture.ru;
-
-      accounts = accounts.map(account => {
-        const model = new AccountModel(account);
-        model.currency = currency;
-        model.save();
-        return model;
-      });
-
-      try {
-        accounts = await Promise.all(accounts);
-      } catch (e) {
-        error(e);
-        return;
-      }
-
-      this.accounts.push(...accounts);
-    }
-  }
-
-  if (!this.status) {
-    this.status = 'init';
   }
 
   next();

@@ -1,9 +1,8 @@
 import moment from 'moment-timezone';
 import { takeEvery } from 'redux-saga';
-import { select, fork } from 'redux-saga/effects';
-import { put } from 'redux-saga/effects';
+import { select, fork, put, take } from 'redux-saga/effects';
 import { get } from 'lodash';
-import { authActions, localeActions, categoryActions } from '../actions';
+import { authActions, localeActions, categoryActions, accountActions } from '../actions';
 
 const prepareUser = function * prepareUser() {
   if (__CLIENT__) {
@@ -18,7 +17,27 @@ const prepareUser = function * prepareUser() {
       yield put(categoryActions.load());
     }
 
+    const accounts = yield select((state) => state.account.accounts);
+
+    if (!accounts) {
+      yield put(accountActions.load());
+    }
+  }
+};
+
+const onUserReady = function * userReady() {
+  const initUserActions = [
+    'AUTH_SET_SETTINGS_RESOLVED',
+    'CATEGORY_LOAD_RESOLVED',
+    'ACCOUNT_LOAD_RESOLVED',
+  ];
+
+  while (true) {
+    yield take(initUserActions);
+    yield take(initUserActions);
+    yield take(initUserActions);
     yield put(authActions.setStatus('ready'));
+    break;
   }
 };
 
@@ -42,13 +61,15 @@ const onSettings = function * onSettings(action) {
 export default function *() {
   const auth = yield select((state) => state.auth);
 
+  yield fork(onUserReady);
+
   if (auth.profile.status === 'init') {
     yield fork(prepareUser);
   }
 
   yield [
-    takeEvery(['LOGIN_RESOLVED', 'REGISTER_RESOLVED'], onAuth),
-    takeEvery('GET_PROFILE_RESOLVED', onProfile),
-    takeEvery('SET_SETTINGS_RESOLVED', onSettings),
+    takeEvery(['AUTH_LOGIN_RESOLVED', 'AUTH_REGISTER_RESOLVED'], onAuth),
+    takeEvery('AUTH_GET_PROFILE_RESOLVED', onProfile),
+    takeEvery('AUTH_SET_SETTINGS_RESOLVED', onSettings),
   ];
 }

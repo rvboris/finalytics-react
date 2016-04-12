@@ -15,7 +15,7 @@ const initialState = Immutable({
 });
 
 export default handleActions({
-  LOAD: (state, action) => {
+  LOCALE_LOAD: (state, action) => {
     if (langs[action.payload]) {
       return state.set('messages', langs[action.payload]);
     }

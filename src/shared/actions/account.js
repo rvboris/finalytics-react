@@ -2,13 +2,13 @@ import { createAction } from 'redux-actions';
 
 import config from '../config';
 
-const CATEGORY_API = `${config.apiUrl}/category`;
+const ACCOUNT_API = `${config.apiUrl}/account`;
 
-export const load = createAction('CATEGORY_LOAD',
+export const load = createAction('ACCOUNT_LOAD',
   null,
   () => ({
     request: {
-      url: `${CATEGORY_API}/load`,
+      url: `${ACCOUNT_API}/load`,
       method: 'get',
     },
   })

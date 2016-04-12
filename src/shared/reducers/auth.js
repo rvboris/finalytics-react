@@ -16,64 +16,64 @@ const initialState = Immutable({
 });
 
 export default handleActions({
-  LOGIN: (state) => state.set('process', true),
+  AUTH_LOGIN: (state) => state.set('process', true),
 
-  LOGIN_RESOLVED: (state) => state.set('process', false),
+  AUTH_LOGIN_RESOLVED: (state) => state.set('process', false),
 
-  LOGIN_REJECTED: (state) =>
+  AUTH_LOGIN_REJECTED: (state) =>
     state
       .set('process', false)
       .set('profile', initialState.profile),
 
-  REGISTER: (state) => state.set('process', true),
+  AUTH_LOGOUT: (state) => state.set('process', true),
 
-  REGISTER_RESOLVED: (state) => state.set('process', false),
+  AUTH_LOGOUT_RESOLVED: (state) =>
+    initialState.setIn(['profile', 'settings', 'locale'], state.profile.settings.locale),
 
-  REGISTER_REJECTED: (state) =>
+  AUTH_LOGOUT_REJECTED: (state) => state.set('process', false),
+
+  AUTH_REGISTER: (state) => state.set('process', true),
+
+  AUTH_REGISTER_RESOLVED: (state) => state.set('process', false),
+
+  AUTH_REGISTER_REJECTED: (state) =>
     state
       .set('process', false)
       .set('profile', initialState.profile),
 
-  GET_PROFILE: (state) => state.set('process', true),
+  AUTH_GET_PROFILE: (state) => state.set('process', true),
 
-  GET_PROFILE_RESOLVED: (state, action) =>
+  AUTH_GET_PROFILE_RESOLVED: (state, action) =>
     state
       .set('process', false)
       .merge({ profile: action.payload.data }),
 
-  GET_PROFILE_REJECTED: (state) => state.set('process', false),
+  AUTH_GET_PROFILE_REJECTED: (state) => state.set('process', false),
 
-  SET_SETTINGS: (state) => state.set('process', true),
+  AUTH_SET_SETTINGS: (state) => state.set('process', true),
 
-  SET_SETTINGS_RESOLVED: (state, action) =>
+  AUTH_SET_SETTINGS_RESOLVED: (state, action) =>
     state
       .set('process', false)
       .merge({ profile: { settings: action.payload.data } }, { deep: true }),
 
-  SET_SETTINGS_REJECTED: (state) => state.set('process', false),
+  AUTH_SET_SETTINGS_REJECTED: (state) => state.set('process', false),
 
-  LOGOUT: (state) => state.set('process', true),
+  AUTH_SET_STATUS: (state) => state.set('process', true),
 
-  LOGOUT_RESOLVED: (state) =>
-    initialState.setIn(['profile', 'settings', 'locale'], state.profile.settings.locale),
-
-  LOGOUT_REJECTED: (state) => state.set('process', false),
-
-  SET_STATUS: (state) => state.set('process', true),
-
-  SET_STATUS_RESOLVED: (state, action) =>
+  AUTH_SET_STATUS_RESOLVED: (state, action) =>
     state
       .set('process', false)
       .setIn(['profile', 'status'], action.payload.data.status),
 
-  SET_STATUS_REJECTED: (state) => state.set('process', false),
+  AUTH_SET_STATUS_REJECTED: (state) => state.set('process', false),
 
-  SET_TOKEN: (state, action) =>
+  AUTH_SET_TOKEN: (state, action) =>
     state
       .set('isAuthenticated', true)
       .set('token', action.payload.token),
 
-  SET_USER_AGENT: (state, action) =>
+  AUTH_SET_USER_AGENT: (state, action) =>
     state
       .set('userAgent', action.payload.userAgent),
 }, initialState);
