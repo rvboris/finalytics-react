@@ -7,7 +7,7 @@ test.before(async () => {
   request = await agent();
 
   await request.post('/api/auth/register').send({
-    email: 'test@test.ru',
+    email: 'test@user.ru',
     password: '12345678',
     repeatPassword: '12345678',
   });
@@ -17,7 +17,7 @@ test('user get profile', async t => {
   const res = await request.get('/api/user/profile');
 
   t.is(res.status, 200);
-  t.is(res.body.email, 'test@test.ru');
+  t.is(res.body.email, 'test@user.ru');
   t.is(res.body.status, 'init');
   t.true(typeof res.body.settings === 'object');
 });

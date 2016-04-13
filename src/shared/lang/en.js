@@ -35,7 +35,7 @@ export default {
   'category.update.error.name.required': 'Category name is required',
   'category.update.error.isSystem': 'Changing the service categories is prohibited',
   'category.add.error.params.required': 'Category params is required',
-  'category.add.error._id.required': 'Category is is required',
+  'category.add.error._id.required': 'Category id is required',
   'category.add.error._id.notFound': 'Category not found',
   'category.add.error.name.required': 'Category name is required',
   'category.add.error.type.required': 'Category type is required',
@@ -50,4 +50,7 @@ export default {
   'category.move.error.isSystem': 'Moving service categories prohibited',
   'category.move.error.to.notFound': 'Parent category not found',
   'category.move.error.type.parentInvalid': 'Type of parent category does not match moved',
+  'account.update.error._id.required': 'Account id is required',
+  'account.update.error._id.invalid': 'Invalid account id',
+  'account.update.error._id.notFound': 'Account not found with that id',
 };

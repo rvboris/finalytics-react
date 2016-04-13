@@ -51,4 +51,7 @@ export default {
   'category.move.error.to.notFound': 'Родительская категория не найдена',
   'category.move.error.type.parentInvalid':
     'Тип родительской категории не соответствует перемещаемой',
+  'account.update.error._id.required': 'Не указан id счета',
+  'account.update.error._id.invalid': 'Недопустимый id счета',
+  'account.update.error._id.notFound': 'Счет с таким id не найден',
 };

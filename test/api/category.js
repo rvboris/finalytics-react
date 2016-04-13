@@ -11,7 +11,7 @@ test.before(async () => {
   request = await agent();
 
   await request.post('/api/auth/register').send({
-    email: 'test@test.ru',
+    email: 'test@category.ru',
     password: '12345678',
     repeatPassword: '12345678',
   });
