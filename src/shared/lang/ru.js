@@ -54,4 +54,8 @@ export default {
   'account.update.error._id.required': 'Не указан id счета',
   'account.update.error._id.invalid': 'Недопустимый id счета',
   'account.update.error._id.notFound': 'Счет с таким id не найден',
+  'account.update.error.startBalance.invalid': 'Недопустимый начальный баланс',
+  'account.update.error.startBalance.positive': 'Начальный баланс может быть только отрицательным',
+  'account.update.error.startBalance.negative': 'Начальный баланс может быть только положительным',
+  'account.update.error.name.exist': 'Счет с таким именем уже существует',
 };

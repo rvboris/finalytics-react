@@ -53,4 +53,8 @@ export default {
   'account.update.error._id.required': 'Account id is required',
   'account.update.error._id.invalid': 'Invalid account id',
   'account.update.error._id.notFound': 'Account not found with that id',
+  'account.update.error.startBalance.invalid': 'Invalid start balance',
+  'account.update.error.startBalance.positive': 'The start balance can only be negative',
+  'account.update.error.startBalance.negative': 'The start balance can only be positive',
+  'account.update.error.name.exist': 'Account with the same name already exists',
 };
