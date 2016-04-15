@@ -251,7 +251,43 @@ router.post('/add', { jwt: true }, async (ctx) => {
 });
 
 router.post('/delete', { jwt: true }, async (ctx) => {
-  ctx.status = 200;
+  const { _id } = ctx.request.body;
+
+  if (!_id) {
+    ctx.status = 400;
+    ctx.body = { error: 'account.delete.error._id.required' };
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    ctx.status = 400;
+    ctx.body = { error: 'account.delete.error._id.invalid' };
+    return;
+  }
+
+  try {
+    let { accounts } = await UserModel.populate(ctx.user, 'accounts');
+
+    const account = accounts.find(account => account._id.toString() === _id);
+
+    if (!account) {
+      ctx.status = 400;
+      ctx.body = { error: 'account.delete.error._id.notFound' };
+      return;
+    }
+
+    account.remove();
+
+    await ctx.user.save();
+
+    accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
+
+    ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
+  } catch (e) {
+    error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+  }
 });
 
 export default router;
