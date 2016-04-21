@@ -16,11 +16,8 @@ const model = new mongoose.Schema({
 });
 
 model.pre('validate', async function preValidate(next) {
-  if (!this.created) {
-    this.created = moment.utc();
-  }
-
   this.updated = moment.utc();
+  this.balance = 0;
 
   next();
 });

@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
 
-import Toolbar from 'material-ui/lib/toolbar/toolbar';
-import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
-import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
-import FlatButton from 'material-ui/lib/flat-button';
+import Toolbar from 'material-ui/Toolbar/Toolbar';
+import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup';
+import ToolbarTitle from 'material-ui/Toolbar/ToolbarTitle';
+import FlatButton from 'material-ui/FlatButton';
 
 const goToMain = (dispatch) => () => dispatch(push('/dashboard'));
 const goToLogout = (dispatch) => () => dispatch(push('/logout'));

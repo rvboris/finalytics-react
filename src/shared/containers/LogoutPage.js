@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import CircularProgress from 'material-ui/lib/circular-progress';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import { authActions } from '../actions';
 import styles from './LogoutPage.css';

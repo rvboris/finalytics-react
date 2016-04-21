@@ -1,5 +1,5 @@
 import React from 'react';
-import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { IntlProvider } from 'react-intl';

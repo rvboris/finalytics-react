@@ -4,10 +4,10 @@ import { reduxForm } from 'redux-form';
 import { each, noop } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import FlatButton from 'material-ui/lib/flat-button';
-import IconButton from 'material-ui/lib/icon-button';
-import TextField from 'material-ui/lib/text-field';
-import Paper from 'material-ui/lib/paper';
+import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 
 import validationHandler from '../utils/validation-handler';
 import styles from './LoginForm.css';
