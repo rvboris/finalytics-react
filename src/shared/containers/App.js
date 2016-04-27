@@ -44,7 +44,7 @@ class App extends React.Component {
   render() {
     return (
       <ConnectedIntlProvider>
-        <div id="app" className={ styles.app }>{ this.props.children }</div>
+        <div id="app" className={styles.app}>{this.props.children}</div>
       </ConnectedIntlProvider>
     );
   }

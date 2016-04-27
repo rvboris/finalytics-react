@@ -11,13 +11,9 @@ import tokenExtractor from '../utils/token-extractor';
 import JwtStrategy from '../utils/jwt-strategy';
 import config from '../../shared/config';
 
-let tokenKey;
-
-if (__DEVELOPMENT__) {
-  tokenKey = require('../../keys/token-private-development.pem');
-} else {
-  tokenKey = require('../../keys/token-private-production.pem');
-}
+const tokenKey = __DEVELOPMENT__
+  ? require('../../keys/token-private-development.pem')
+  : require('../../keys/token-private-production.pem');
 
 const localStrategyOptions = {
   usernameField: 'email',

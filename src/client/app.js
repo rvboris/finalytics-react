@@ -4,11 +4,13 @@ import { Router } from 'react-router';
 import { Provider } from 'react-redux';
 
 import routes from '../shared/routes';
-import store, { history } from './store';
+import store, { history, runSaga } from './store';
+
+runSaga();
 
 render(
-  <Provider store={ store }>
-      <Router children={ routes(store) } history={ history } />
+  <Provider store={store}>
+    <Router children={routes(store)} history={history} />
   </Provider>,
   document.body.childNodes[0]
 );

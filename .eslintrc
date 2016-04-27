@@ -6,7 +6,8 @@
     "no-shadow": 0,
     "new-cap": 0,
     "no-console": 0,
-    "no-constant-condition": 0
+    "no-constant-condition": 0,
+    "no-underscore-dangle": 0
   },
   globals: {
     "__DEVELOPMENT__": false,

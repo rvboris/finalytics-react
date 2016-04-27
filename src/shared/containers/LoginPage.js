@@ -15,9 +15,9 @@ const loginPage = (props) => {
 
   return (
     <LoginForm
-      login = { login }
-      go = { go }
-      onSuccess={ onSuccess(props.dispatch) }
+      login={login}
+      go={go}
+      onSuccess={onSuccess(props.dispatch)}
     />
   );
 };

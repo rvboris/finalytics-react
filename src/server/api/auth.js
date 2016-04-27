@@ -9,13 +9,9 @@ import { error } from '../../shared/log';
 
 const router = new Router();
 
-let tokenKey;
-
-if (__DEVELOPMENT__) {
-  tokenKey = require('../../keys/token-private-development.pem');
-} else {
-  tokenKey = require('../../keys/token-private-production.pem');
-}
+const tokenKey = __DEVELOPMENT__
+  ? require('../../keys/token-private-development.pem')
+  : require('../../keys/token-private-production.pem');
 
 const getToken = (user) => jwt.sign({ id: user._id }, tokenKey, { expiresIn: '7 days' });
 

@@ -37,7 +37,7 @@ class LogoutPage extends React.Component {
     const { process } = this.props;
 
     return (
-      <div className={ styles.container }>
+      <div className={styles.container}>
         {
           process
             ? <CircularProgress size={2} />

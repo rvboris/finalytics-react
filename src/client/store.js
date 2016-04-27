@@ -13,15 +13,17 @@ import * as middlewares from '../shared/middlewares';
 const initialState = Immutable(window.__INITIAL_STATE__);
 const reducer = combineReducers({ ...reducers, routing: routerReducer });
 
-const middleware = [
+const sagaMiddleware = createSagaMiddleware();
+
+const sagaStoreEnhancer = [
+  sagaMiddleware,
+  routerMiddleware(browserHistory),
   ...values(middlewares),
   optimistPromiseMiddleware(),
-  routerMiddleware(browserHistory),
-  createSagaMiddleware(...values(sagas)),
 ];
 
 const storeEnchancers = [
-  applyMiddleware(...middleware),
+  applyMiddleware(...sagaStoreEnhancer),
 ];
 
 if (__DEVELOPMENT__) {
@@ -34,6 +36,6 @@ if (module.hot) {
   module.hot.accept('../shared/reducers', () => store.replaceReducer(reducers.default));
 }
 
-
 export default store;
 export const history = syncHistoryWithStore(browserHistory, store);
+export const runSaga = () => sagaMiddleware.run(...values(sagas));

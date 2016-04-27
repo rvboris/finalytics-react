@@ -32,11 +32,11 @@ const requireGuest = (store) => (nextState, replace) => {
 };
 
 export default (store) => (
-  <Route name="app" component={ App } path="/">
-    <IndexRoute component={ Home } />
-    <Route path="login" component={ LoginPage } onEnter={ requireGuest(store) } />
-    <Route path="logout" component={ LogoutPage } onEnter={ requireAuth(store) } />
-    <Route path="register" component={ RegisterPage } onEnter={ requireGuest(store) } />
-    <Route path="dashboard" component={ DashboardPage } onEnter={ requireAuth(store) } />
+  <Route name="app" component={App} path="/">
+    <IndexRoute component={Home} />
+    <Route path="login" component={LoginPage} onEnter={requireGuest(store)} />
+    <Route path="logout" component={LogoutPage} onEnter={requireAuth(store)} />
+    <Route path="register" component={RegisterPage} onEnter={requireGuest(store)} />
+    <Route path="dashboard" component={DashboardPage} onEnter={requireAuth(store)} />
   </Route>
 );

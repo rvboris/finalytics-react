@@ -14,8 +14,8 @@ const registerPage = (props) => {
 
   return (
     <RegisterForm
-      register = { action }
-      onSuccess={ onSuccess(props.dispatch) }
+      register={action}
+      onSuccess={onSuccess(props.dispatch)}
     />
   );
 };

@@ -15,7 +15,7 @@ const dashboardPage = (props) => (
   <div>
     <Toolbar>
       <ToolbarGroup float="left">
-        <ToolbarTitle text="Options" onTitleTouchTap={ goToMain(props.dispatch) } />
+        <ToolbarTitle text="Options" onTitleTouchTap={goToMain(props.dispatch)} />
         <FlatButton label="Обзор" primary />
         <FlatButton label="Операции" primary />
         <FlatButton label="Бюджет" primary />
@@ -24,7 +24,7 @@ const dashboardPage = (props) => (
 
       <ToolbarGroup float="right" lastChild>
         <FlatButton label="Настройки" secondary />
-        <FlatButton label="Выход" onClick={ goToLogout(props.dispatch) } secondary />
+        <FlatButton label="Выход" onClick={goToLogout(props.dispatch)} secondary />
       </ToolbarGroup>
     </Toolbar>
   </div>

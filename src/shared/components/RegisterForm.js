@@ -123,12 +123,12 @@ let RegisterForm = (props) => {
   };
 
   return (
-    <div className={ styles.container }>
-      <Paper className={ styles.register } zDepth={ 1 }>
+    <div className={styles.container}>
+      <Paper className={styles.register} zDepth={1}>
         <h3><FormattedMessage { ...messages.title } /></h3>
 
-        <form onSubmit={ onSubmit } noValidate>
-          <div className={ styles.fields }>
+        <form onSubmit={onSubmit} noValidate>
+          <div className={styles.fields}>
             <div>
               <TextField id="register-email" type="email" { ...email } />
             </div>
@@ -141,29 +141,30 @@ let RegisterForm = (props) => {
           </div>
           <FlatButton
             type="submit"
-            disabled={ process }
-            label={ process
-              ? formatMessage(messages.processButton)
-              : formatMessage(messages.button)
+            disabled={process}
+            label={
+              process
+                ? formatMessage(messages.processButton)
+                : formatMessage(messages.button)
             }
             primary
           />
         </form>
 
-        <div className={ styles.social }>
+        <div className={styles.social}>
           <IconButton
-            onClick={ onGoogle }
-            iconClassName={ `social ${fonts['icon-google']}` }
+            onClick={onGoogle}
+            iconClassName={`social ${fonts['icon-google']}`}
             tooltip="Google"
           />
           <IconButton
-            onClick={ onFacebook }
-            iconClassName={ `social ${fonts['icon-facebook']}` }
+            onClick={onFacebook}
+            iconClassName={`social ${fonts['icon-facebook']}`}
             tooltip="Facebook"
           />
           <IconButton
-            onClick={ onTwitter }
-            iconClassName={ `social ${fonts['icon-twitter']}` }
+            onClick={onTwitter}
+            iconClassName={`social ${fonts['icon-twitter']}`}
             tooltip="Twitter"
           />
         </div>
