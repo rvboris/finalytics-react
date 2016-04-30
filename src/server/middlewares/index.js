@@ -1,14 +1,14 @@
 export { default as hot } from './hot';
 export { default as errorHandler } from './error-handler';
-export { default as responseTime } from './response-time';
 export { default as helmet } from './helmet';
 export { default as etag } from './etag';
 export { default as assets } from './assets';
+export { default as ctxLog } from './ctx-log';
 export { default as renderer } from './renderer';
 export { default as router } from './router';
 export { default as body } from './body';
 export { default as passport } from './passport';
-export { default as log } from './log';
+export { default as httpLog } from './http-log';
 export { default as session } from './session';
 export { default as errorMessage } from './error-message';
 export { default as acceptLanguage } from './accept-language';

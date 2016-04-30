@@ -82,4 +82,7 @@ export default {
   'operation.add.error.amount.invalid': 'Недопустимая сумма',
   'operation.add.error.account.notFound': 'Счет не найден',
   'operation.add.error.category.notFound': 'Категория не найдена',
+  'operation.delete.error._id.required': 'Не указан id счета',
+  'operation.delete.error._id.invalid': 'Недопустимый id счета',
+  'operation.delete.error._id.notFound': 'Счет с таким id не найден',
 };

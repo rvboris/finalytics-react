@@ -1,7 +1,6 @@
 import acceptLanguage from 'accept-language';
 import { isArray, isEmpty, maxBy } from 'lodash';
 
-import { error } from '../../shared/log';
 import config from '../../shared/config';
 
 const languages = ['ru', 'en'];
@@ -21,7 +20,7 @@ export default async(ctx, next) => {
   try {
     parsed = acceptLanguage.parse(header);
   } catch (err) {
-    error(err);
+    ctx.log.error(err);
 
     await next();
     return;

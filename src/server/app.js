@@ -16,9 +16,9 @@ const createApp = () => {
   app.keys = config.sessionKeys;
 
   app.use(middlewares.errorHandler);
-  app.use(middlewares.responseTime);
   app.use(middlewares.hot);
-  app.use(middlewares.log);
+  app.use(middlewares.httpLog);
+  app.use(middlewares.ctxLog);
   app.use(middlewares.assets);
   app.use(middlewares.session);
   app.use(middlewares.passport);

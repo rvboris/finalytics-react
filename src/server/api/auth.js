@@ -5,7 +5,6 @@ import isEmail from 'validator/lib/isEmail';
 import { pick } from 'lodash';
 
 import { UserModel } from '../models';
-import { error } from '../../shared/log';
 
 const router = new Router();
 
@@ -74,7 +73,7 @@ router.post('/register', async (ctx) => {
   try {
     await user.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
 
     ctx.status = 400;
 

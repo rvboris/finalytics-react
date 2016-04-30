@@ -135,3 +135,42 @@ test.serial('add', async (t) => {
   t.true(typeof res.body === 'object');
   t.is(res.body.type, 'expense');
 });
+
+test.serial('delete', async (t) => {
+  let res = await request.post('/api/operation/delete').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.delete.error._id.required');
+
+  res = await request.post('/api/operation/delete').send({ _id: 'wrong' });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.delete.error._id.invalid');
+
+  res = await request.post('/api/operation/delete').send({ _id: mongoose.Types.ObjectId() });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.delete.error._id.notFound');
+
+  const { body: { accounts } } = await request.get('/api/account/load');
+
+  res = await request.get('/api/category/load');
+
+  const tree = new TreeModel();
+  const categoryRoot = tree.parse(res.body.data);
+  const categoryList = categoryRoot.all();
+  const incomeCategoryList = filter(categoryList, category => category.model.type === 'income');
+
+  res = await request.post('/api/operation/add').send({
+    created: moment.utc(),
+    account: sample(accounts)._id,
+    category: sample(incomeCategoryList).model._id,
+    amount: 10,
+  });
+
+  const operationToDelete = res.body;
+
+  res = await request.post('/api/operation/delete').send({ _id: operationToDelete._id });
+
+  t.is(res.status, 200);
+});

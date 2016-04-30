@@ -18,7 +18,7 @@ test.before(async () => {
 });
 
 test.serial('load default', async (t) => {
-  const res = await request.get('/api/category/load');
+  let res = await request.get('/api/category/load');
 
   t.is(res.status, 200);
   t.true(mongoose.Types.ObjectId.isValid(res.body._id));
@@ -30,12 +30,18 @@ test.serial('load default', async (t) => {
   categoryRoot.walk((node) => {
     t.true(mongoose.Types.ObjectId.isValid(node.model._id));
   });
+
+  const category = res.body;
+
+  res = await request.get('/api/category/load');
+
+  t.deepEqual(category, res.body);
 });
 
 test.serial('load', async (t) => {
   await request.post('/api/user/status').send({ status: 'ready' });
 
-  const res = await request.get('/api/category/load');
+  let res = await request.get('/api/category/load');
 
   t.is(res.status, 200);
   t.true(mongoose.Types.ObjectId.isValid(res.body._id));
@@ -46,6 +52,12 @@ test.serial('load', async (t) => {
   categoryRoot.walk((node) => {
     t.true(mongoose.Types.ObjectId.isValid(node.model._id));
   });
+
+  const category = res.body;
+
+  res = await request.get('/api/category/load');
+
+  t.deepEqual(category, res.body);
 });
 
 test.serial('update', async (t) => {

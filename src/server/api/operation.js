@@ -4,8 +4,7 @@ import big from 'big.js';
 import TreeModel from 'tree-model';
 import { pick } from 'lodash';
 
-import { OperationModel, UserModel, CategoryModel } from '../models';
-import { error } from '../../shared/log';
+import { OperationModel, CategoryModel } from '../models';
 
 const router = new Router();
 
@@ -54,21 +53,10 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  try {
-    const { accounts: [account] } = await UserModel.populate(ctx.user, {
-      path: 'accounts',
-      match: { _id: params.account },
-    });
-
-    if (!account) {
-      ctx.status = 400;
-      ctx.body = { error: 'operation.add.error.account.notFound' };
-      return;
-    }
-  } catch (e) {
-    error(e);
-    ctx.status = 500;
-    ctx.body = { error: e.message };
+  if (!ctx.user.accounts.find(account => account.toString() === params.account)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.add.error.account.notFound' };
+    return;
   }
 
   let amount;
@@ -100,7 +88,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
       return;
     }
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -108,13 +96,48 @@ router.post('/add', { jwt: true }, async (ctx) => {
   try {
     await operation.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
   }
 
   ctx.body = operation.toObject({ versionKey: false });
+});
+
+router.post('/delete', { jwt: true }, async (ctx) => {
+  const { _id } = ctx.request.body;
+
+  if (!_id) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.delete.error._id.required' };
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.delete.error._id.invalid' };
+    return;
+  }
+
+  try {
+    const operation = await OperationModel.findById(_id);
+
+    if (!operation) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.delete.error._id.notFound' };
+      return;
+    }
+
+    await operation.remove();
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  ctx.status = 200;
 });
 
 export default router;

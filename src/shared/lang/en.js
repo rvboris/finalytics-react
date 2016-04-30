@@ -81,4 +81,7 @@ export default {
   'operation.add.error.amount.invalid': 'Invalid amount',
   'operation.add.error.account.notFound': 'Account not found',
   'operation.add.error.category.notFound': 'Category not found',
+  'operation.delete.error._id.required': 'Account id is required',
+  'operation.delete.error._id.invalid': 'Invalid account id',
+  'operation.delete.error._id.notFound': 'Account not found with that id',
 };

@@ -8,7 +8,6 @@ import passport from 'koa-passport';
 import React from 'react';
 
 import * as sagas from '../../shared/sagas';
-import { error } from '../../shared/log';
 import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
@@ -71,7 +70,7 @@ export default async(ctx, next) => {
     }
 
     if (err) {
-      error(err);
+      ctx.log.error(err);
 
       ctx.status = 500;
       ctx.body = __DEVELOPMENT__ ? err.stack : err.message;

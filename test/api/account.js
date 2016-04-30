@@ -17,7 +17,7 @@ test.before(async () => {
 });
 
 test.serial('load default', async (t) => {
-  const res = await request.get('/api/account/load');
+  let res = await request.get('/api/account/load');
 
   t.is(res.status, 200);
   t.true(typeof res.body.accounts === 'object');
@@ -26,12 +26,18 @@ test.serial('load default', async (t) => {
   for (const { name } of res.body.accounts) {
     t.true(typeof name === 'string');
   }
+
+  const accounts = res.body.accounts;
+
+  res = await request.get('/api/account/load');
+
+  t.deepEqual(accounts, res.body.accounts);
 });
 
 test.serial('load', async (t) => {
   await request.post('/api/user/status').send({ status: 'ready' });
 
-  const res = await request.get('/api/account/load');
+  let res = await request.get('/api/account/load');
 
   t.is(res.status, 200);
   t.true(typeof res.body.accounts === 'object');
@@ -40,6 +46,12 @@ test.serial('load', async (t) => {
   for (const { name } of res.body.accounts) {
     t.true(typeof name === 'string');
   }
+
+  const accounts = res.body.accounts;
+
+  res = await request.get('/api/account/load');
+
+  t.deepEqual(accounts, res.body.accounts);
 });
 
 test.serial('add', async (t) => {

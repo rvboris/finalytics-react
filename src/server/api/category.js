@@ -4,7 +4,6 @@ import TreeModel from 'tree-model';
 import mongoose from 'mongoose';
 
 import categoryFixture from '../fixtures/category';
-import { error } from '../../shared/log';
 import { CategoryModel } from '../models';
 
 const router = new Router();
@@ -20,7 +19,9 @@ router.get('/load', { jwt: true }, async (ctx) => {
 
     let category;
 
-    if (ctx.user.status === 'init' || !categoryIsExists) {
+    if (ctx.user.status === 'ready' || categoryIsExists) {
+      category = await CategoryModel.findOne({ user: ctx.user }, '_id data');
+    } else {
       rootNode.walk((node) => {
         node.model._id = mongoose.Types.ObjectId();
       });
@@ -28,13 +29,11 @@ router.get('/load', { jwt: true }, async (ctx) => {
       category = new CategoryModel({ user: ctx.user, data: categoryData });
 
       await category.save();
-    } else {
-      category = await CategoryModel.findOne({ user: ctx.user }, '_id data');
     }
 
     ctx.body = pick(category, '_id', 'data');
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -82,7 +81,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
   try {
     await categoryModel.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -151,7 +150,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   try {
     await categoryModel.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -194,7 +193,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
   try {
     await categoryModel.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -258,7 +257,7 @@ router.post('/move', { jwt: true }, async (ctx) => {
   try {
     await categoryModel.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }

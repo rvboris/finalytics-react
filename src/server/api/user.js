@@ -1,8 +1,6 @@
 import Router from 'koa-66';
 import { pick, assign } from 'lodash';
 
-import { error } from '../../shared/log';
-
 const router = new Router();
 
 router.get('/profile', { jwt: true }, (ctx) => {
@@ -22,7 +20,7 @@ router.post('/settings', { jwt: true }, async (ctx) => {
   try {
     await ctx.user.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
@@ -36,7 +34,7 @@ router.post('/status', { jwt: true }, async (ctx) => {
     ctx.user.status = ctx.request.body.status;
     await ctx.user.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;

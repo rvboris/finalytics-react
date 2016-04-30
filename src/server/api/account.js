@@ -5,18 +5,17 @@ import big from 'big.js';
 
 import accountFixture from '../fixtures/account';
 import { AccountModel, UserModel, CurrencyModel } from '../models';
-import { error } from '../../shared/log';
 
 const router = new Router();
 
 router.get('/load', { jwt: true }, async (ctx) => {
   let accounts;
 
-  if (ctx.user.accounts.length && ctx.user.status === 'ready') {
+  if (ctx.user.accounts.length || ctx.user.status === 'ready') {
     try {
       accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
     } catch (e) {
-      error(e);
+      ctx.log.error(e);
       ctx.status = 500;
       ctx.body = { error: e.message };
       return;
@@ -39,7 +38,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
   try {
     accounts = await Promise.all(accounts);
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
@@ -50,7 +49,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
   try {
     await ctx.user.save();
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
@@ -125,7 +124,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -191,7 +190,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
       return;
     }
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
@@ -216,7 +215,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   try {
     accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
@@ -244,7 +243,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
@@ -284,7 +283,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
   } catch (e) {
-    error(e);
+    ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
   }
