@@ -7,7 +7,6 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import AssetsPlugin from 'assets-webpack-plugin';
 import flexbox from 'postcss-flexbox';
 import magician from 'postcss-font-magician';
-import atImport from 'postcss-import';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 
@@ -20,6 +19,7 @@ const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies ||
 
 const env = process.env.NODE_ENV;
 const testing = process.env.TEST;
+const e2e = process.env.E2E;
 const config = configs[env];
 
 const entry = {};
@@ -57,6 +57,7 @@ const plugins = [
     __PRODUCTION__: env === 'production',
     __CONFIG__: JSON.stringify(configForClient),
     __TESTING__: !!testing,
+    __E2E__: !!e2e,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -202,7 +203,6 @@ export default {
   },
   postcss: () => [
     stylelint(),
-    atImport({ addDependencyTo: webpack }),
     normalize,
     magician(),
     flexbox(),

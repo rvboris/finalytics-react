@@ -5,21 +5,13 @@ import precss from 'precss';
 import cssnext from 'postcss-cssnext';
 import magician from 'postcss-font-magician';
 import flexbox from 'postcss-flexbox';
-import atImport from 'postcss-import';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 
 import * as configs from '../config';
 
 const pkg = require('../package.json');
-
-let webpackAssets = {};
-
-try {
-  webpackAssets = require('../build/webpack-assets.json');
-} catch (e) {
-  console.error(e);
-}
+const webpackAssets = require('../build/webpack-assets.json');
 
 const assets = {
   scripts: [],
@@ -41,6 +33,7 @@ const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies ||
 
 const env = process.env.NODE_ENV;
 const testing = process.env.TEST;
+const e2e = process.env.E2E;
 const config = configs[env];
 
 const entry = ['../src/server/index'];
@@ -54,6 +47,7 @@ const plugins = [
     __CONFIG__: JSON.stringify(config),
     __ASSETS__: JSON.stringify(assets),
     __TESTING__: !!testing,
+    __E2E__: !!e2e,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -153,7 +147,6 @@ export default {
   },
   postcss: () => [
     stylelint(),
-    atImport({ addDependencyTo: webpack }),
     normalize,
     magician(),
     flexbox(),

@@ -14,6 +14,20 @@ export { default as app } from './app';
   const server = appInstance.listen(config.port, () =>
     log(`app is started on port ${config.port}`));
 
+  if (process.send) {
+    process.send({ cmd: 'started' });
+  }
+
+  process.on('message', (msg) => {
+    switch (msg.cmd) {
+      case 'stop':
+        server.close();
+        process.exit(0);
+        break;
+      default:
+    }
+  });
+
   if (__DEVELOPMENT__) {
     if (module.hot) {
       module.hot.accept();

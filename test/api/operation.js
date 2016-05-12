@@ -174,3 +174,219 @@ test.serial('delete', async (t) => {
 
   t.is(res.status, 200);
 });
+
+test.serial('update', async (t) => {
+  let res = await request.post('/api/operation/update').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error._id.required');
+
+  res = await request.post('/api/operation/update').send({ _id: 'wrong' });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error._id.invalid');
+
+  res = await request.post('/api/operation/update').send({
+    _id: mongoose.Types.ObjectId(),
+    created: 'wrong date',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.created.invalid');
+
+  res = await request.post('/api/operation/update').send({
+    _id: mongoose.Types.ObjectId(),
+    account: 'wrong account id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.account.invalid');
+
+  res = await request.post('/api/operation/update').send({
+    _id: mongoose.Types.ObjectId(),
+    category: 'wrong category id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalid');
+
+  res = await request.post('/api/operation/update').send({
+    _id: mongoose.Types.ObjectId(),
+    amount: 'wrong amount',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.amount.invalid');
+
+  res = await request.post('/api/operation/update').send({
+    _id: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error._id.notFound');
+
+  res = await request.get('/api/account/load');
+
+  const accounts = res.body.accounts;
+
+  res = await request.get('/api/category/load');
+
+  const tree = new TreeModel();
+  const categoryRoot = tree.parse(res.body.data);
+  const categoryList = categoryRoot.all();
+  const incomeCategoryList = filter(categoryList, category => category.model.type === 'income');
+  const expenseCategoryList = filter(categoryList, category => category.model.type === 'expense');
+  const anyCategoryList = filter(categoryList, category => category.model.type === 'any');
+
+  res = await request.post('/api/operation/add').send({
+    created: moment.utc(),
+    account: sample(accounts)._id,
+    category: sample(incomeCategoryList).model._id,
+    amount: 10,
+  });
+
+  let operationToUpdate = res.body;
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    account: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.account.notFound');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    category: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.notFound');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    category: sample(expenseCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: 100,
+    category: sample(expenseCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+    category: sample(incomeCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  const anyCategoryToCheck = sample(anyCategoryList).model;
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+    category: anyCategoryToCheck._id,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -10);
+  t.is(res.body.category, anyCategoryToCheck._id);
+
+  res = await request.post('/api/operation/add').send({
+    created: moment.utc(),
+    account: sample(accounts)._id,
+    category: sample(anyCategoryList).model._id,
+    amount: 10,
+  });
+
+  operationToUpdate = res.body;
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -10);
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+    category: sample(anyCategoryList).model._id,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -10);
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -10,
+    category: sample(incomeCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: 100,
+    category: sample(expenseCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    amount: -100,
+    category: sample(expenseCategoryList).model._id,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -100);
+
+  res = await request.post('/api/operation/update').send({
+    _id: operationToUpdate._id,
+    category: sample(incomeCategoryList).model._id,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.update.error.category.invalidType');
+
+  const paramsToCheck = {
+    _id: operationToUpdate._id,
+    category: sample(incomeCategoryList).model._id,
+    amount: 1000,
+    created: moment.utc(),
+    account: sample(accounts)._id,
+  };
+
+  res = await request.post('/api/operation/update').send(paramsToCheck);
+
+  t.is(res.status, 200);
+  t.is(res.body.category, paramsToCheck.category);
+  t.is(res.body.amount, paramsToCheck.amount);
+  t.is(moment(res.body.created).toISOString(), paramsToCheck.created.toISOString());
+  t.is(res.body.account, paramsToCheck.account);
+});
+
+test.serial('addTransfer', async (t) => {
+  
+});

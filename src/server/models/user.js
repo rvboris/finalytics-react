@@ -61,7 +61,7 @@ model.methods.authenticate = async function authenticate(txt) {
   const salt = this.password.slice(8, saltBytes + 8);
   const hash = this.password.toString('binary', saltBytes + 8);
 
-  const verify = await pbkdf2(txt, salt, iterations, hashBytes);
+  const verify = await pbkdf2(txt, salt, iterations, hashBytes, 'sha512');
 
   return verify.toString('binary') === hash;
 };
@@ -94,7 +94,8 @@ model.statics.encryptPassword = async function encryptPassword(txt) {
     txt,
     salt,
     encryptionConfig.iterations,
-    encryptionConfig.hashBytes
+    encryptionConfig.hashBytes,
+    'sha512'
   );
 
   const combined = new Buffer(hash.length + salt.length + 8);

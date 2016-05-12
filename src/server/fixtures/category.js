@@ -15,6 +15,12 @@ export default {
         system: true,
       },
       {
+        name: 'Перевод',
+        type: 'any',
+        transfer: true,
+        system: true,
+      },
+      {
         name: 'Зарплата',
         type: 'income',
       },

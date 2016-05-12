@@ -13,13 +13,15 @@ export const connect = () =>
   mongoose.connect(dbURI).then(async () => {
     log(`mongoose default connection open to ${dbURI}`);
 
-    if (__DEVELOPMENT__ || __TESTING__) {
+    const dropDatabase = __DEVELOPMENT__ || __TESTING__ || __E2E__;
+
+    if (dropDatabase) {
       log('mongoose drop database');
       await mongoose.connection.db.dropDatabase();
     }
 
     process.on('exit', async () => {
-      if (__TESTING__) {
+      if (dropDatabase) {
         log('mongoose drop test database');
         await mongoose.connection.db.dropDatabase();
       }

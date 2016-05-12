@@ -1,43 +1,47 @@
-const sh = require('shelljs');
+const cp = require('child_process');
+const fs = require('fs-extra');
 
 const webpack = 'node_modules/webpack/bin/webpack.js';
 const devServer = 'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
 const wait = 'node_modules/just-wait/bin/just-wait.js';
 const serverConfig = 'webpack/server.babel.js';
 const clientConfig = 'webpack/client.babel.js';
-const execContext = { env: sh.env };
+const execContext = { env: process.env, stdio: 'inherit' };
 
-sh.rm('-rf', 'build');
-sh.mkdir('-p', 'build/assets');
+fs.removeSync('build');
+fs.mkdirs('build/assets');
 
-if (sh.env.NODE_ENV === 'development') {
-  sh.exec(`node ${devServer} --config ${clientConfig}`,
-    Object.assign({}, execContext, { async: true }));
+if (process.env.NODE_ENV === 'development') {
+  const client = cp.exec(`node ${devServer} --config ${clientConfig}`, execContext);
 
-  sh.exec(`node ${wait} -p build/webpack-assets.json`, () => {
-    sh.exec(`node ${webpack} --watch --progress --color --config ${serverConfig}`,
-      Object.assign({}, execContext, { async: true }));
+  client.stdout.pipe(process.stdout);
+  client.stderr.pipe(process.stderr);
 
-    sh.exec(`node ${wait} -p build/server.js`, () => {
-      sh.exec('node build/server.js', Object.assign({}, execContext, { async: true }));
-    });
+  cp.execSync(`node ${wait} -p build/webpack-assets.json`);
+
+  const server =
+    cp.exec(`node ${webpack} --watch --progress --color --config ${serverConfig}`, execContext);
+
+  server.stdout.pipe(process.stdout);
+  server.stderr.pipe(process.stderr);
+
+  cp.exec(`node ${wait} -p build/server.js`).on('close', () => {
+    cp.execSync('node build/server.js', execContext);
   });
 
   return;
 }
 
-if (sh.env.NODE_ENV === 'production') {
-  sh.exec(`node ${webpack} --progress --color --config ${clientConfig}`,
-    Object.assign({}, execContext, { async: true }));
+if (process.env.NODE_ENV === 'production') {
+  cp.execSync(`node ${webpack} --progress --color --config ${clientConfig}`, execContext);
+  cp.execSync(`node ${webpack} --progress --color --config ${serverConfig}`);
 
-  sh.exec(`node ${wait} -t 120 -p build/webpack-assets.json`, () => {
-    sh.exec(`node ${webpack} --progress --color --config ${serverConfig}`,
-      Object.assign({}, execContext, { async: true }));
+  const server = cp.fork('build/server.js');
 
-    sh.exec(`node ${wait} -t 120 -p build/server.js`,
-      () => { sh.exec('node build/server.js', execContext); }
-    );
+  server.on('message', (msg) => {
+    if (msg.cmd === 'started' && process.env.E2E) {
+      cp.execSync('node test/nightwatch.js', execContext);
+      server.send({ cmd: 'stop' });
+    }
   });
-
-  return;
 }
