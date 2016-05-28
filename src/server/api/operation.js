@@ -2,7 +2,7 @@ import Router from 'koa-66';
 import mongoose from 'mongoose';
 import big from 'big.js';
 import TreeModel from 'tree-model';
-import { pick } from 'lodash';
+import { pick, isUndefined } from 'lodash';
 
 import { OperationModel, UserModel, CategoryModel } from '../models';
 
@@ -11,7 +11,7 @@ const router = new Router();
 router.post('/add', { jwt: true }, async (ctx) => {
   const params = pick(ctx.request.body, 'created', 'account', 'category', 'amount');
 
-  if (!params.created) {
+  if (isUndefined(params.created)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.add.error.created.required' };
     return;
@@ -23,7 +23,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.account) {
+  if (isUndefined(params.account)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.add.error.account.required' };
     return;
@@ -35,7 +35,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.category) {
+  if (isUndefined(params.category)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.add.error.category.required' };
     return;
@@ -47,7 +47,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.amount) {
+  if (isUndefined(params.amount)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.add.error.amount.required' };
     return;
@@ -131,7 +131,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
 router.post('/delete', { jwt: true }, async (ctx) => {
   const { _id } = ctx.request.body;
 
-  if (!_id) {
+  if (isUndefined(_id)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.delete.error._id.required' };
     return;
@@ -166,7 +166,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
 router.post('/update', { jwt: true }, async (ctx) => {
   const params = pick(ctx.request.body, '_id', 'created', 'account', 'category', 'amount');
 
-  if (!params._id) {
+  if (isUndefined(params._id)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.update.error._id.required' };
     return;
@@ -314,7 +314,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
   const params =
     pick(ctx.request.body, 'created', 'accountFrom', 'accountTo', 'amountFrom', 'amountTo');
 
-  if (!params.created) {
+  if (isUndefined(params.created)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.created.required' };
     return;
@@ -326,7 +326,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.accountFrom) {
+  if (isUndefined(params.accountFrom)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.accountFrom.required' };
     return;
@@ -338,7 +338,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.accountTo) {
+  if (isUndefined(params.accountTo)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.accountTo.required' };
     return;
@@ -356,13 +356,13 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!params.amountFrom) {
+  if (isUndefined(params.amountFrom)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.amountFrom.required' };
     return;
   }
 
-  if (!params.amountTo) {
+  if (isUndefined(params.amountTo)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.amountTo.required' };
     return;
@@ -377,8 +377,8 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
       populate: { path: 'currency' },
     });
 
-    accountFrom = accounts.find(account => account._id === params.accountFrom);
-    accountTo = accounts.find(account => account._id === params.accountTo);
+    accountFrom = accounts.find(account => account._id.toString() === params.accountFrom);
+    accountTo = accounts.find(account => account._id.toString() === params.accountTo);
 
     if (!accountFrom) {
       ctx.status = 400;

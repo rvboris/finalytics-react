@@ -1,16 +1,16 @@
 import webpack from 'webpack';
 import path from 'path';
-import { mapValues, merge, forEach } from 'lodash';
+import { forEach } from 'lodash';
 import precss from 'precss';
 import cssnext from 'postcss-cssnext';
 import magician from 'postcss-font-magician';
 import flexbox from 'postcss-flexbox';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
+import nodeExternals from 'webpack-node-externals';
 
 import * as configs from '../config';
 
-const pkg = require('../package.json');
 const webpackAssets = require('../build/webpack-assets.json');
 
 const assets = {
@@ -27,9 +27,6 @@ forEach(webpackAssets, (chunk) => {
     }
   });
 });
-
-const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies || []),
-  (dep, key) => `commonjs ${key}`);
 
 const env = process.env.NODE_ENV;
 const testing = process.env.TEST;
@@ -116,11 +113,11 @@ export default {
         exclude: /node_modules/,
         loader: 'babel',
         query: {
-          presets: ['es2015-node5', 'stage-3', 'react'],
+          presets: ['stage-0', 'react'],
           plugins: [
             [
-              'transform-class-properties',
-              'transform-es2015-classes',
+              'transform-es2015-modules-commonjs',
+              'transform-async-to-module-method',
               'react-transform',
               { transforms: reactTransforms },
             ],
@@ -129,7 +126,9 @@ export default {
       },
     ],
   },
-  externals,
+  externals: [nodeExternals({
+    whitelist: env === 'development' ? ['webpack/hot/poll?1000'] : [],
+  })],
   plugins,
   resolve: {
     modulesDirectories: [

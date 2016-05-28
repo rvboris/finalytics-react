@@ -182,6 +182,8 @@ export default {
           presets: ['es2015', 'stage-0', 'react'],
           plugins: [
             [
+              'transform-es2015-modules-commonjs',
+              'transform-async-to-module-method',
               'react-transform',
               { transforms: reactTransforms },
             ],

@@ -388,5 +388,157 @@ test.serial('update', async (t) => {
 });
 
 test.serial('addTransfer', async (t) => {
-  
+  let res = await request.post('/api/operation/addTransfer').send({});
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.created.required');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: 'wrong date',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.created.invalid');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountFrom.required');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: 'wrong account',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountFrom.invalid');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountTo.required');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: mongoose.Types.ObjectId(),
+    accountTo: 'wrong account',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountTo.invalid');
+
+  const accountEqual = mongoose.Types.ObjectId();
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accountEqual,
+    accountTo: accountEqual,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountTo.equal');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: mongoose.Types.ObjectId(),
+    accountTo: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountFrom.required');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: mongoose.Types.ObjectId(),
+    accountTo: mongoose.Types.ObjectId(),
+    amountFrom: 10,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountTo.required');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: mongoose.Types.ObjectId(),
+    accountTo: mongoose.Types.ObjectId(),
+    amountFrom: 10,
+    amountTo: 10,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountFrom.notFound');
+
+  res = await request.get('/api/account/load');
+
+  const accounts = res.body.accounts;
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: sample(accounts)._id,
+    accountTo: mongoose.Types.ObjectId(),
+    amountFrom: 10,
+    amountTo: 10,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.accountTo.notFound');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accounts[0]._id,
+    accountTo: accounts[1]._id,
+    amountFrom: 'wrong amount',
+    amountTo: 'wrong amount',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountFrom.invalid');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accounts[0]._id,
+    accountTo: accounts[1]._id,
+    amountFrom: 10,
+    amountTo: 'wrong amount',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountTo.invalid');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accounts[0]._id,
+    accountTo: accounts[1]._id,
+    amountFrom: 0,
+    amountTo: 10,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountFrom.positive');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accounts[0]._id,
+    accountTo: accounts[1]._id,
+    amountFrom: 10,
+    amountTo: 0,
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'operation.addTransfer.error.amountTo.positive');
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc(),
+    accountFrom: accounts[0]._id,
+    accountTo: accounts[1]._id,
+    amountFrom: 10,
+    amountTo: 10,
+  });
+
+  t.is(res.status, 200);
 });
