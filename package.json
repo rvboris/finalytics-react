@@ -7,9 +7,9 @@
     "dev": "cross-env NODE_ENV=development DEBUG=app:* node start.js",
     "prod": "cross-env NODE_ENV=production DEBUG=app:* node start.js",
     "test:prepare": "cross-env TEST=1 NODE_ENV=production node start.js",
-    "test:api": "npm run test:prepare && ava --tap | faucet",
-    "test:api:watch": "npm run test:prepare && ava --watch --tap | faucet",
-    "test:e2e": "cross-env E2E=1 NODE_ENV=production DEBUG=app:* node start.js",
+    "test:api": "npm run test:prepare && ava test/api/*.js --tap | faucet",
+    "test:api:watch": "npm run test:prepare && ava test/api/*.js --watch --tap | faucet",
+    "test:e2e": "cross-env E2E=1 NODE_ENV=production DEBUG=app:error node start.js",
     "test": "npm run test:api && npm run test:e2e",
     "pack": "nar create"
   },
@@ -17,9 +17,6 @@
     "money"
   ],
   "ava": {
-    "files": [
-      "test/api/*.js"
-    ],
     "source": [
       "src/*.js",
       "!build/**/*"
@@ -44,14 +41,14 @@
     "accept-language": "^2.0.16",
     "axios": "^0.11.1",
     "babel-loader": "^6.2.4",
-    "babel-polyfill": "^6.9.0",
+    "babel-polyfill": "^6.9.1",
     "big.js": "^3.1.3",
     "bluebird": "^3.4.0",
     "co": "^4.6.0",
     "cookies": "^0.6.1",
     "debug": "^2.2.0",
     "fs-extra": "^0.30.0",
-    "history": "^2.1.2",
+    "history": "^3.0.0",
     "jsonwebtoken": "^7.0.0",
     "koa": "^2.0.0-alpha.3",
     "koa-66": "^0.8.5",
@@ -93,7 +90,7 @@
     "seamless-immutable": "^6.1.0",
     "source-map-support": "^0.4.0",
     "tree-model": "^1.0.4",
-    "validator": "^5.2.0"
+    "validator": "^5.3.0"
   },
   "devDependencies": {
     "assets-webpack-plugin": "^3.4.0",
@@ -108,9 +105,10 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.9.0",
     "cross-env": "^1.0.8",
     "css-loader": "^0.23.1",
-    "eslint": "^2.11.0",
+    "eslint": "^2.11.1",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-loader": "^1.3.0",
     "eslint-plugin-import": "^1.8.1",
@@ -123,7 +121,7 @@
     "json-loader": "^0.5.4",
     "just-wait": "^1.0.5",
     "nar": "^0.3.37",
-    "nightwatch": "^0.9.0",
+    "nightmare": "^2.5.0",
     "npm-check-updates": "^2.6.5",
     "postcss-cssnext": "^2.5.2",
     "postcss-flexbox": "^1.0.2",

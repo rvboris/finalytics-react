@@ -40,7 +40,11 @@ if (process.env.NODE_ENV === 'production') {
 
   server.on('message', (msg) => {
     if (msg.cmd === 'started' && process.env.E2E) {
-      cp.execSync('node test/nightwatch.js', execContext);
+      execContext.env.context = msg.ctx;
+      execContext.env.startPoint = `http://${msg.ctx.hostname}:${msg.ctx.port}`;
+
+      cp.execSync('ava test/e2e/*.js --tap | faucet', execContext);
+
       server.send({ cmd: 'stop' });
     }
   });

@@ -41,6 +41,3 @@ src/keys
 # Config files
 config/development.js
 config/production.js
-
-# Binary files
-test/bin

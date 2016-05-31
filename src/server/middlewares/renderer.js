@@ -3,7 +3,7 @@ import { RouterContext, match } from 'react-router';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
 import { pick, values } from 'lodash';
-import createLocation from 'history/lib/createLocation';
+import createLocation from 'history/lib/createMemoryHistory';
 import passport from 'koa-passport';
 import React from 'react';
 

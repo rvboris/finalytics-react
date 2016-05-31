@@ -15,7 +15,7 @@ export { default as app } from './app';
     log(`app is started on port ${config.port}`));
 
   if (process.send) {
-    process.send({ cmd: 'started' });
+    process.send({ cmd: 'started', ctx: config });
   }
 
   process.on('message', (msg) => {
