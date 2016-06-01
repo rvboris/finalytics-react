@@ -8,6 +8,7 @@ import flexbox from 'postcss-flexbox';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 import nodeExternals from 'webpack-node-externals';
+import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 
 import * as configs from '../config';
 
@@ -28,14 +29,13 @@ forEach(webpackAssets, (chunk) => {
   });
 });
 
-const env = process.env.NODE_ENV;
-const testing = process.env.TEST;
-const e2e = process.env.E2E;
+const env = process.env.NODE_ENV || 'development';
 const config = configs[env];
 
 const entry = ['../src/server/index'];
 
 const plugins = [
+  new ProgressBarPlugin(),
   new webpack.DefinePlugin({
     __CLIENT__: false,
     __SERVER__: true,
@@ -43,8 +43,6 @@ const plugins = [
     __PRODUCTION__: env === 'production',
     __CONFIG__: JSON.stringify(config),
     __ASSETS__: JSON.stringify(assets),
-    __TESTING__: !!testing,
-    __E2E__: !!e2e,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -52,24 +50,7 @@ const plugins = [
   new webpack.ProvidePlugin({ Promise: 'bluebird' }),
 ];
 
-const reactTransforms = [
-  {
-    transform: 'react-transform-catch-errors',
-    imports: ['react', 'redbox-react'],
-  },
-];
-
-if (env === 'development') {
-  entry.unshift('webpack/hot/poll?1000');
-
-  plugins.push(new webpack.HotModuleReplacementPlugin());
-
-  reactTransforms.unshift({
-    transform: 'react-transform-hmr',
-    imports: ['react'],
-    locals: ['module'],
-  });
-} else {
+if (env === 'production') {
   plugins.push(new webpack.NoErrorsPlugin());
   plugins.push(new webpack.optimize.DedupePlugin());
 }
@@ -86,7 +67,7 @@ export default {
     filename: 'server.js',
     hotUpdateMainFilename: '/server-hot/[hash].js',
     hotUpdateChunkFilename: '/server-hot/[id]-[hash].js',
-    libraryTarget: testing ? 'commonjs' : undefined,
+    libraryTarget: 'commonjs',
   },
   module: {
     preLoaders: [
@@ -119,16 +100,21 @@ export default {
               'transform-es2015-modules-commonjs',
               'transform-async-to-module-method',
               'react-transform',
-              { transforms: reactTransforms },
+              {
+                transforms: [
+                  {
+                    transform: 'react-transform-catch-errors',
+                    imports: ['react', 'redbox-react'],
+                  },
+                ],
+              },
             ],
           ],
         },
       },
     ],
   },
-  externals: [nodeExternals({
-    whitelist: env === 'development' ? ['webpack/hot/poll?1000'] : [],
-  })],
+  externals: [nodeExternals()],
   plugins,
   resolve: {
     modulesDirectories: [

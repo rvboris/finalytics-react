@@ -8,35 +8,34 @@ const serverConfig = 'webpack/server.babel.js';
 const clientConfig = 'webpack/client.babel.js';
 const execContext = { env: process.env, stdio: 'inherit' };
 
-fs.removeSync('build');
-fs.mkdirs('build/assets');
-
 if (process.env.NODE_ENV === 'development') {
+  fs.removeSync('build');
+  fs.mkdirs('build/assets');
+
   const client = cp.exec(`node ${devServer} --config ${clientConfig}`, execContext);
 
   client.stdout.pipe(process.stdout);
   client.stderr.pipe(process.stderr);
 
   cp.execSync(`node ${wait} -p build/webpack-assets.json`);
-
-  const server =
-    cp.exec(`node ${webpack} --watch --progress --color --config ${serverConfig}`, execContext);
-
-  server.stdout.pipe(process.stdout);
-  server.stderr.pipe(process.stderr);
-
-  cp.exec(`node ${wait} -p build/server.js`).on('close', () => {
-    cp.execSync('node build/server.js', execContext);
-  });
+  cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
+  cp.fork('build/server.js').send({ cmd: 'start' });
 
   return;
 }
 
-if (process.env.NODE_ENV === 'production') {
-  cp.execSync(`node ${webpack} --progress --color --config ${clientConfig}`, execContext);
-  cp.execSync(`node ${webpack} --progress --color --config ${serverConfig}`);
+if (process.env.BUILD) {
+  fs.removeSync('build');
+  fs.mkdirs('build/assets');
 
+  cp.execSync(`node ${webpack} --config ${clientConfig}`, execContext);
+  cp.execSync(`node ${webpack} --config ${serverConfig}`);
+}
+
+if (!process.env.BUILD) {
   const server = cp.fork('build/server.js');
+
+  server.send({ cmd: 'start' });
 
   server.on('message', (msg) => {
     if (msg.cmd === 'started' && process.env.E2E) {

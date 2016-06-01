@@ -4,13 +4,13 @@
   "description": "simple finance managment system",
   "main": "start.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development DEBUG=app:* node start.js",
-    "prod": "cross-env NODE_ENV=production DEBUG=app:* node start.js",
-    "test:prepare": "cross-env TEST=1 NODE_ENV=production node start.js",
-    "test:api": "npm run test:prepare && ava test/api/*.js --tap | faucet",
-    "test:api:watch": "npm run test:prepare && ava test/api/*.js --watch --tap | faucet",
-    "test:e2e": "cross-env E2E=1 NODE_ENV=production DEBUG=app:error node start.js",
+    "build": "cross-env BUILD=1 NODE_ENV=production DEBUG=app:* node start.js",
+    "start": "cross-env NODE_ENV=production DEBUG=app:* node start.js",
     "test": "npm run test:api && npm run test:e2e",
+    "test:api": "cross-env TEST=1 ava test/api/*.js --tap | faucet",
+    "test:api:watch": "cross-env TEST=1 ava test/api/*.js --watch --tap | faucet",
+    "test:e2e": "cross-env E2E=1 NODE_ENV=production DEBUG=app:error node start.js",
+    "dev": "cross-env BUILD=1 NODE_ENV=development DEBUG=app:* node start.js",
     "pack": "nar create"
   },
   "keywords": [
@@ -129,6 +129,7 @@
     "postcss-loader": "^0.9.1",
     "postcss-normalize": "^0.3.0",
     "precss": "^1.4.0",
+    "progress-bar-webpack-plugin": "^1.8.0",
     "raw-loader": "^0.5.1",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",

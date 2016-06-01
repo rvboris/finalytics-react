@@ -9,6 +9,7 @@ import flexbox from 'postcss-flexbox';
 import magician from 'postcss-font-magician';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
+import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 
 import * as configs from '../config';
 
@@ -17,9 +18,7 @@ const pkg = require('../package.json');
 const externals = mapValues(merge(pkg.dependencies || [], pkg.devDependencies || []),
   (dep, key) => `commonjs ${key}`);
 
-const env = process.env.NODE_ENV;
-const testing = process.env.TEST;
-const e2e = process.env.E2E;
+const env = process.env.NODE_ENV || 'development';
 const config = configs[env];
 
 const entry = {};
@@ -50,14 +49,13 @@ const configForClient = omit(config, [
 ]);
 
 const plugins = [
+  new ProgressBarPlugin(),
   new webpack.DefinePlugin({
     __CLIENT__: true,
     __SERVER__: false,
     __DEVELOPMENT__: env === 'development',
     __PRODUCTION__: env === 'production',
     __CONFIG__: JSON.stringify(configForClient),
-    __TESTING__: !!testing,
-    __E2E__: !!e2e,
     'process.env': {
       NODE_ENV: JSON.stringify(env),
     },
@@ -66,28 +64,13 @@ const plugins = [
   new ExtractTextPlugin('styles.css'),
   new AssetsPlugin({
     path: 'build',
-    prettyPrint: true,
+    prettyPrint: false,
   }),
   new webpack.ProvidePlugin({ Promise: 'bluebird' }),
 ];
 
-const reactTransforms = [
-  {
-    transform: 'react-transform-catch-errors',
-    imports: ['react', 'redbox-react'],
-  },
-];
-
 if (env === 'development') {
   entry.app.unshift(`webpack-dev-server/client?http://${config.hostname}:${config.hotPort}`);
-
-  plugins.push(new webpack.HotModuleReplacementPlugin());
-
-  reactTransforms.unshift({
-    transform: 'react-transform-hmr',
-    imports: ['react'],
-    locals: ['module'],
-  });
 } else {
   entry.common = entry.common.filter(item => item.indexOf('devtools') < 0);
 
@@ -130,10 +113,9 @@ if (env === 'development') {
 export default {
   devServer: {
     publicPath,
-    hot: true,
+    hot: false,
     inline: true,
-    lazy: false,
-    quiet: true,
+    quiet: false,
     noInfo: false,
     headers: { 'Access-Control-Allow-Origin': '*' },
     stats: { colors: true },
@@ -185,7 +167,14 @@ export default {
               'transform-es2015-modules-commonjs',
               'transform-async-to-module-method',
               'react-transform',
-              { transforms: reactTransforms },
+              {
+                transforms: [
+                  {
+                    transform: 'react-transform-catch-errors',
+                    imports: ['react', 'redbox-react'],
+                  },
+                ],
+              },
             ],
           ],
         },

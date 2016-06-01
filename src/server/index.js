@@ -5,44 +5,29 @@ import log from '../shared/log';
 export { default as app } from './app';
 
 (async () => {
-  if (__TESTING__) {
-    return;
-  }
+  let server;
+  let appInstance;
 
-  const appInstance = await app();
-
-  const server = appInstance.listen(config.port, () =>
-    log(`app is started on port ${config.port}`));
-
-  if (process.send) {
-    process.send({ cmd: 'started', ctx: config });
-  }
-
-  process.on('message', (msg) => {
+  process.on('message', async (msg) => {
     switch (msg.cmd) {
       case 'stop':
-        server.close();
+        if (server) {
+          server.close();
+        }
+
         process.exit(0);
+        break;
+      case 'start':
+        appInstance = await app();
+
+        server = appInstance.listen(config.port, () =>
+          log(`app is started on port ${config.port}`));
+
+        if (process.send) {
+          process.send({ cmd: 'started', ctx: config });
+        }
         break;
       default:
     }
   });
-
-  if (__DEVELOPMENT__) {
-    if (module.hot) {
-      module.hot.accept();
-
-      module.hot.dispose(() => {
-        server.close();
-      });
-
-      module.hot.addStatusHandler((status) => {
-        if (status !== 'abort') {
-          return;
-        }
-
-        setTimeout(() => process.exit(0), 0);
-      });
-    }
-  }
 })();

@@ -1,19 +1,23 @@
 import mongoose from 'mongoose';
 import randomstring from 'randomstring';
+import { get } from 'lodash';
 
 import config from '../../shared/config';
 import log, { error } from '../../shared/log';
 import { currencyFixture } from '../fixtures';
 import CurrencyModel from './currency';
 
-const dbName = __TESTING__ ? `test-${randomstring.generate(5)}` : config.db.name;
+const dbName = get(process, 'env.TEST') || get(process, 'env.E2E')
+  ? `test-${randomstring.generate(5)}`
+  : config.db.name;
+
 const dbURI = `mongodb://${config.db.hostname}/${dbName}`;
 
 export const connect = () =>
   mongoose.connect(dbURI).then(async () => {
     log(`mongoose default connection open to ${dbURI}`);
 
-    const dropDatabase = __DEVELOPMENT__ || __TESTING__ || __E2E__;
+    const dropDatabase = __DEVELOPMENT__ || get(process, 'env.TEST') || get(process, 'env.E2E');
 
     if (dropDatabase) {
       log('mongoose drop database');
