@@ -1,33 +1,50 @@
+import { get } from 'lodash';
+
 import app from './app';
 import config from '../shared/config';
-import log from '../shared/log';
+import log, { error } from '../shared/log';
 
 export { default as app } from './app';
 
+process.on('uncaughtException', error);
+
 (async () => {
-  let server;
-  let appInstance;
+  if (get(process, 'env.TEST', false)) {
+    log('test mode');
+    return;
+  }
 
-  process.on('message', async (msg) => {
-    switch (msg.cmd) {
-      case 'stop':
-        if (server) {
-          server.close();
-        }
+  const appInstance = await app();
+  const server = appInstance.listen(config.port, () =>
+    log(`app-${appInstance.instance} is started on port ${config.port}`));
 
-        process.exit(0);
-        break;
-      case 'start':
-        appInstance = await app();
+  if (process.send) {
+    process.send({ cmd: 'started', ctx: config });
+  }
 
-        server = appInstance.listen(config.port, () =>
-          log(`app is started on port ${config.port}`));
+  const stop = () => {
+    log('stop signal');
 
-        if (process.send) {
-          process.send({ cmd: 'started', ctx: config });
-        }
-        break;
-      default:
+    if (appInstance) {
+      log('cleanup');
+      appInstance.shutdown();
+    }
+
+    if (server) {
+      log('close server');
+      server.close();
+    }
+
+    log('exit');
+
+    process.exit(0);
+  };
+
+  process.on('message', (msg) => {
+    if (msg === 'shutdown') {
+      stop();
     }
   });
+
+  process.on('SIGINT', stop);
 })();

@@ -1,4 +1,3 @@
-export { default as hot } from './hot';
 export { default as errorHandler } from './error-handler';
 export { default as helmet } from './helmet';
 export { default as etag } from './etag';

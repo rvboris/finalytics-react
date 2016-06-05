@@ -1,0 +1,16 @@
+{
+  "apps" : [
+    {
+      "name": "fb",
+      "script": "./build/server.js",
+      "watch": false,
+      "env": {
+        "NODE_ENV": "production",
+        "DEBUG": "app:*"
+      },
+      "instances": 4,
+      "exec_mode": "cluster",
+      "min_uptime": 5000,
+    }
+  ]
+}

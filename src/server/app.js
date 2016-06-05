@@ -6,17 +6,24 @@ import * as middlewares from './middlewares';
 import * as tasks from './tasks';
 import config from '../shared/config';
 import { error } from '../shared/log';
-import { connect, initData } from './models';
+import { connect, disconnect, initData } from './models';
+import { get } from 'lodash';
 
-process.on('uncaughtException', error);
-
-const createApp = () => {
+const createApp = (instance, jobs) => {
   const app = new Koa();
 
   app.keys = config.sessionKeys;
+  app.instance = instance;
+
+  app.shutdown = () => {
+    disconnect();
+
+    if (jobs.length) {
+      jobs.forEach((job) => job.cancel());
+    }
+  };
 
   app.use(middlewares.errorHandler);
-  app.use(middlewares.hot);
   app.use(middlewares.httpLog);
   app.use(middlewares.ctxLog);
   app.use(middlewares.assets);
@@ -42,7 +49,8 @@ export default async () => {
     process.exit();
   }
 
-  await Promise.all(Object.values(tasks).map((task) => task()));
+  const instance = parseInt(get(process, 'env.pm_id', 0), 10);
+  const jobs = instance === 0 ? await Promise.all(Object.values(tasks).map((task) => task())) : [];
 
-  return createApp();
+  return createApp(instance, jobs);
 };

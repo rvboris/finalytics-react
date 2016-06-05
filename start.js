@@ -17,9 +17,9 @@ if (process.env.NODE_ENV === 'development') {
   client.stdout.pipe(process.stdout);
   client.stderr.pipe(process.stderr);
 
-  cp.execSync(`node ${wait} -p build/webpack-assets.json`);
+  cp.execSync(`node ${wait} -p build/webpack-assets.json`, execContext);
   cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
-  cp.fork('build/server.js').send({ cmd: 'start' });
+  cp.fork('build/server.js');
 
   return;
 }
@@ -28,14 +28,15 @@ if (process.env.BUILD) {
   fs.removeSync('build');
   fs.mkdirs('build/assets');
 
+  console.log('---------------client build---------------');
   cp.execSync(`node ${webpack} --config ${clientConfig}`, execContext);
-  cp.execSync(`node ${webpack} --config ${serverConfig}`);
+
+  console.log('---------------server build---------------');
+  cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
 }
 
 if (!process.env.BUILD) {
   const server = cp.fork('build/server.js');
-
-  server.send({ cmd: 'start' });
 
   server.on('message', (msg) => {
     if (msg.cmd === 'started' && process.env.E2E) {
@@ -44,7 +45,11 @@ if (!process.env.BUILD) {
 
       cp.execSync('ava test/e2e/*.js --tap | faucet', execContext);
 
-      server.send({ cmd: 'stop' });
+      server.send('shutdown');
     }
+  });
+
+  server.on('exit', () => {
+    process.exit(0);
   });
 }

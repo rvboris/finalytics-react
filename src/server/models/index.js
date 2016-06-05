@@ -38,6 +38,10 @@ export const connect = () =>
     }
   });
 
+export const disconnect = () => {
+  mongoose.disconnect();
+};
+
 export const initData = async () => {
   log('mongoose load initital data');
 
