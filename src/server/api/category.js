@@ -84,6 +84,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   ctx.body = categoryModel;
@@ -153,6 +154,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   ctx.body = categoryModel;
@@ -196,6 +198,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   ctx.body = categoryModel;
@@ -260,6 +263,7 @@ router.post('/move', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   ctx.body = categoryModel;

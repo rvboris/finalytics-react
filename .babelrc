@@ -1,19 +1,21 @@
+// Modified stage-0
+
 {
-  "presets": ["stage-0", "react"],
   "plugins": [
     [
-      "transform-es2015-modules-commonjs",
       "transform-async-to-module-method",
-      "react-transform",
       {
-        "transforms": [
-          {
-            "transform": "react-transform-catch-errors",
-            "imports": ["react", "redbox-react"],
-          }
-        ]
-      }
-    ]
+        "module": "bluebird-co",
+        "method": "coroutine",
+      },
+    ],
+    "transform-es2015-modules-commonjs",
+    "transform-export-extensions",
+    "transform-do-expressions",
+    "transform-exponentiation-operator",
+    "syntax-trailing-function-commas",
+    "transform-object-rest-spread",
+    "transform-class-properties",
   ],
   "ignore": ["build/server.js"]
 }

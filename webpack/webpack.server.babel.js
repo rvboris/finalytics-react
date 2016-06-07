@@ -32,7 +32,11 @@ forEach(webpackAssets, (chunk) => {
 const env = process.env.NODE_ENV || 'development';
 const config = configs[env];
 
-const entry = ['../src/server/index'];
+const entry = [
+  'babel-polyfill',
+  'source-map-support/register',
+  '../src/server/index',
+];
 
 const plugins = [
   new ProgressBarPlugin(),
@@ -94,11 +98,25 @@ export default {
         exclude: /node_modules/,
         loader: 'babel',
         query: {
-          presets: ['stage-0', 'react'],
+          cacheDirectory: true,
+          babelrc: false,
+          presets: ['react'],
           plugins: [
             [
-              'transform-es2015-modules-commonjs',
               'transform-async-to-module-method',
+              {
+                module: 'bluebird-co',
+                method: 'coroutine',
+              },
+            ],
+            'transform-do-expressions',
+            'transform-exponentiation-operator',
+            'syntax-trailing-function-commas',
+            'transform-object-rest-spread',
+            'transform-class-properties',
+            'transform-export-extensions',
+            'transform-es2015-modules-commonjs',
+            [
               'react-transform',
               {
                 transforms: [

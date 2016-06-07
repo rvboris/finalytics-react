@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const webpack = 'node_modules/webpack/bin/webpack.js';
 const devServer = 'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
 const wait = 'node_modules/just-wait/bin/just-wait.js';
-const serverConfig = 'webpack/server.babel.js';
-const clientConfig = 'webpack/client.babel.js';
+const serverConfig = 'webpack/webpack.server.babel.js';
+const clientConfig = 'webpack/webpack.client.babel.js';
 const execContext = { env: process.env, stdio: 'inherit' };
 
 if (process.env.NODE_ENV === 'development') {

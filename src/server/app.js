@@ -1,6 +1,3 @@
-import 'source-map-support/register';
-import 'babel-polyfill';
-
 import Koa from 'koa';
 import * as middlewares from './middlewares';
 import * as tasks from './tasks';

@@ -73,6 +73,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   let amount;
@@ -114,6 +115,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   try {
@@ -125,7 +127,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = operation.toObject({ versionKey: false });
+  ctx.body = operation.toObject({ versionKey: false, depopulate: true });
 });
 
 router.post('/delete', { jwt: true }, async (ctx) => {
@@ -259,6 +261,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
       ctx.log.error(e);
       ctx.status = 500;
       ctx.body = { error: e.message };
+      return;
     }
   }
 
@@ -304,10 +307,10 @@ router.post('/update', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
-  ctx.body = operation.toObject({ versionKey: false });
-  ctx.body.account = ctx.body.account._id;
+  ctx.body = operation.toObject({ versionKey: false, depopulate: true });
 });
 
 router.post('/addTransfer', { jwt: true }, async (ctx) => {
@@ -395,6 +398,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   let amountFrom;
@@ -441,7 +445,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
   const operationTo = new OperationModel();
 
   operationTo.type = 'income';
-  operationTo.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+  operationTo.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
   operationTo.user = ctx.user;
   operationTo.created = params.created;
   operationTo.account = accountTo;
@@ -459,6 +463,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
+    return;
   }
 
   try {
@@ -475,8 +480,214 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
   }
 
   ctx.body = {
-    operationFrom: operationFrom.toObject({ versionKey: false }),
-    operationTo: operationTo.toObject({ versionKey: false }),
+    operationFrom: operationFrom.toObject({ versionKey: false, depopulate: true }),
+    operationTo: operationTo.toObject({ versionKey: false, depopulate: true }),
+  };
+});
+
+router.post('/updateTransfer', { jwt: true }, async (ctx) => {
+  const params =
+    pick(ctx.request.body, '_id', 'created', 'accountFrom', 'accountTo', 'amountFrom', 'amountTo');
+
+  if (isUndefined(params._id)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error._id.required' };
+    return;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(params._id)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error._id.invalid' };
+    return;
+  }
+
+  if (!isUndefined(params.created) && isNaN(Date.parse(params.created))) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.created.invalid' };
+    return;
+  }
+
+  if (!isUndefined(params.accountFrom) && !mongoose.Types.ObjectId.isValid(params.accountFrom)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.accountFrom.invalid' };
+    return;
+  }
+
+  if (!isUndefined(params.accountTo) && !mongoose.Types.ObjectId.isValid(params.accountTo)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.accountTo.invalid' };
+    return;
+  }
+
+  if ((!isUndefined(params.accountFrom) && !isUndefined(params.accountTo)) &&
+    (params.accountFrom === params.accountTo)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.accountTo.equal' };
+    return;
+  }
+
+  let accountFrom;
+  let accountTo;
+
+  if (params.accountFrom || params.accountTo) {
+    try {
+      const { accounts } = await UserModel.populate(ctx.user, {
+        path: 'accounts',
+        populate: { path: 'currency' },
+      });
+
+      if (!isUndefined(params.accountFrom)) {
+        accountFrom = accounts.find(account => account._id.toString() === params.accountFrom);
+
+        if (!accountFrom) {
+          ctx.status = 400;
+          ctx.body = { error: 'operation.updateTransfer.error.accountFrom.notFound' };
+          return;
+        }
+      }
+
+      if (!isUndefined(params.accountTo)) {
+        accountTo = accounts.find(account => account._id.toString() === params.accountTo);
+
+        if (!accountTo) {
+          ctx.status = 400;
+          ctx.body = { error: 'operation.updateTransfer.error.accountTo.notFound' };
+          return;
+        }
+      }
+    } catch (e) {
+      ctx.log.error(e);
+      ctx.status = 500;
+      ctx.body = { error: e.message };
+      return;
+    }
+  }
+
+  let amountFrom;
+  let amountTo;
+
+  if (!isUndefined(params.amountFrom)) {
+    try {
+      amountFrom = big(params.amountFrom);
+    } catch (e) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.updateTransfer.error.amountFrom.invalid' };
+      return;
+    }
+  }
+
+  if (!isUndefined(params.amountTo)) {
+    try {
+      amountTo = big(params.amountTo);
+    } catch (e) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.updateTransfer.error.amountTo.invalid' };
+      return;
+    }
+  }
+
+  if (!isUndefined(params.amountFrom) && amountFrom.lte(0)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.amountFrom.positive' };
+    return;
+  }
+
+  if (!isUndefined(params.amountFrom)) {
+    amountFrom = amountFrom.times(-1);
+  }
+
+  if (!isUndefined(params.amountTo) && amountTo.lte(0)) {
+    ctx.status = 400;
+    ctx.body = { error: 'operation.updateTransfer.error.amountTo.positive' };
+    return;
+  }
+
+  let operation;
+  let operationFrom;
+  let operationTo;
+
+  try {
+    operation = await OperationModel.findById(params._id).populate({
+      path: 'account',
+      populate: { path: 'currency' },
+    });
+
+    if (!operation) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
+      return;
+    }
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  if (operation.type === 'expense') {
+    operationFrom = operation;
+  } else {
+    operationTo = operation;
+  }
+
+  try {
+    operation = await OperationModel.findById(operation.groupTo).populate({
+      path: 'account',
+      populate: { path: 'currency' },
+    });
+
+    if (!operation) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
+      return;
+    }
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  if (operation.type === 'expense') {
+    operationFrom = operation;
+  } else {
+    operationTo = operation;
+  }
+
+  if (!isUndefined(params.amountFrom)) {
+    operationFrom.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+  }
+
+  if (!isUndefined(params.created)) {
+    operationFrom.created = params.created;
+    operationTo.created = params.created;
+  }
+
+  if (!isUndefined(params.accountFrom)) {
+    operationFrom.account = accountFrom;
+  }
+
+  if (!isUndefined(params.amountTo)) {
+    operationTo.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
+  }
+
+  if (!isUndefined(params.accountTo)) {
+    operationTo.account = accountTo;
+  }
+
+  try {
+    await operationFrom.save();
+    await operationTo.save();
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  ctx.body = {
+    operationFrom: operationFrom.toObject({ versionKey: false, depopulate: true }),
+    operationTo: operationTo.toObject({ versionKey: false, depopulate: true }),
   };
 });
 

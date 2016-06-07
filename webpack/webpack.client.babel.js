@@ -161,11 +161,24 @@ export default {
         exclude: /node_modules/,
         loader: 'babel',
         query: {
-          presets: ['es2015', 'stage-0', 'react'],
+          babelrc: false,
+          presets: ['es2015', 'react'],
           plugins: [
             [
-              'transform-es2015-modules-commonjs',
               'transform-async-to-module-method',
+              {
+                module: 'bluebird-co',
+                method: 'coroutine',
+              },
+            ],
+            'transform-do-expressions',
+            'transform-exponentiation-operator',
+            'syntax-trailing-function-commas',
+            'transform-object-rest-spread',
+            'transform-class-properties',
+            'transform-export-extensions',
+            'transform-es2015-modules-commonjs',
+            [
               'react-transform',
               {
                 transforms: [

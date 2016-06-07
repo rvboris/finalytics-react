@@ -1,3 +1,4 @@
+
 import Router from 'koa-66';
 import mongoose from 'mongoose';
 import { pick, merge } from 'lodash';
@@ -93,6 +94,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
       try {
         startBalance = big(params.startBalance);
       } catch (e) {
+        ctx.log.error(e);
         ctx.status = 400;
         ctx.body = { error: 'account.update.error.startBalance.invalid' };
         return;
@@ -161,6 +163,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     try {
       big(params.order);
     } catch (e) {
+      ctx.log.error(e);
       ctx.status = 400;
       ctx.body = { error: 'account.add.error.order.invalid' };
       return;
@@ -170,6 +173,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   try {
     params.startBalance = big(params.startBalance);
   } catch (e) {
+    ctx.log.error(e);
     ctx.status = 400;
     ctx.body = { error: 'account.add.error.startBalance.invalid' };
     return;
