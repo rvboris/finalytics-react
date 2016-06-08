@@ -10,6 +10,7 @@ export const createLogger = (wildcard = '') => {
     error: logger(`app:error${wildcard}`),
     debug: logger(`app:debug${wildcard}`),
     request: logger(`app:request${wildcard}`),
+    task: logger(`app:task${wildcard}`),
   };
 };
 
@@ -21,3 +22,4 @@ export const info = defaultLogger.info;
 export const error = defaultLogger.error;
 export const debug = defaultLogger.debug;
 export const request = defaultLogger.request;
+export const task = defaultLogger.task;

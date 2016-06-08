@@ -1,11 +1,9 @@
-import { get } from 'lodash';
-import mongoose from 'mongoose';
+import uuid from 'uuid';
 import { createLogger } from '../../shared/log';
 
-export default async(ctx, next) => {
-  const token = get(ctx, 'session.token');
-
-  ctx.log = token ? createLogger(mongoose.Types.ObjectId()) : createLogger();
+export default (appInstance) => async(ctx, next) => {
+  ctx.session.uuid = uuid.v4();
+  ctx.log = createLogger(`${appInstance}:${ctx.session.uuid}`);
 
   await next();
 };

@@ -2,7 +2,7 @@ import Router from 'koa-66';
 import mongoose from 'mongoose';
 import big from 'big.js';
 import TreeModel from 'tree-model';
-import { pick, isUndefined } from 'lodash';
+import { get, pick, isUndefined, isArray, isBoolean, groupBy } from 'lodash';
 
 import { OperationModel, UserModel, CategoryModel } from '../models';
 
@@ -689,6 +689,140 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
     operationFrom: operationFrom.toObject({ versionKey: false, depopulate: true }),
     operationTo: operationTo.toObject({ versionKey: false, depopulate: true }),
   };
+});
+
+router.get('/list', { jwt: true }, async (ctx) => {
+  const params = pick(ctx.request.body, 'account', 'type', 'category', 'amountFrom',
+      'amountTo', 'dateFrom', 'dateTo', 'transfer', 'paginate');
+
+  const query = { user: ctx.user };
+
+  if (isArray(params.account)) {
+    if (params.account.find(account => !mongoose.Types.ObjectId.isValid(account))) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.account.invalid' };
+      return;
+    }
+
+    query.account = { $in: params.account };
+  }
+
+  if (!isUndefined(params.type)) {
+    if (!['income', 'expense'].includes(params.type)) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.type.invalid' };
+      return;
+    }
+
+    query.type = params.type;
+  }
+
+  if (isArray(params.account)) {
+    if (params.category.find(category => !mongoose.Types.ObjectId.isValid(category))) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.category.invalid' };
+      return;
+    }
+
+    query.category = { $in: params.category };
+  }
+
+  let amountFrom;
+
+  if (!isUndefined(params.amountFrom)) {
+    try {
+      amountFrom = big(params.amountFrom);
+    } catch (e) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.amountFrom.invalid' };
+      return;
+    }
+
+    if (amountFrom) {
+      query.amount = { $gte: parseFloat(amountFrom.toFixed(2)) };
+    }
+  }
+
+  let amountTo;
+
+  if (!isUndefined(params.amountTo)) {
+    try {
+      amountTo = big(params.amountTo);
+    } catch (e) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.amountTo.invalid' };
+      return;
+    }
+
+    if (amountTo) {
+      if (!query.amount) {
+        query.amount = {};
+      }
+
+      query.amount.$lte = parseFloat(amountTo.toFixed(2));
+    }
+  }
+
+  if (!isUndefined(params.dateFrom)) {
+    if (isNaN(Date.parse(params.dateFrom))) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.dateFrom.invalid' };
+      return;
+    }
+
+    query.created = { $gte: params.dateFrom };
+  }
+
+  if (!isUndefined(params.dateTo)) {
+    if (isNaN(Date.parse(params.dateTo))) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.dateTo.invalid' };
+      return;
+    }
+
+    if (!query.created) {
+      query.created = {};
+    }
+
+    query.created.$lte = params.dateTo;
+  }
+
+  if (!isUndefined(params.transfer)) {
+    if (!isBoolean(params.transfer)) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.transfer.invalid' };
+      return;
+    }
+
+    query.groupTo = { $exists: true };
+  }
+
+  let operations;
+
+  const skip = parseInt(get(params, 'paginate.skip', 0), 10) || 0;
+  let limit = parseInt(get(params, 'paginate.limit', 30), 10) || 30;
+
+  limit = limit > 50 ? 50 : limit;
+
+  const fields = ['_id', 'type', 'created', 'account', 'category', 'amount', 'groupTo'];
+
+  try {
+    operations = await OperationModel
+      .find(query, fields.join(' '))
+      .sort({ created: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  operations = groupBy(operations, (operation) => operation._id === operation.groupTo);
+
+  ctx.body = operations;
 });
 
 export default router;

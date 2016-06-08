@@ -26,7 +26,6 @@ const entry = {};
 entry.common = [
   ...Object.keys(externals)
     .filter(depName => depName.startsWith('react') || depName.startsWith('redux')),
-  'babel-polyfill',
   'bluebird',
   'reselect',
   'seamless-immutable',
@@ -35,7 +34,7 @@ entry.common = [
 ];
 
 entry.app = [
-  '../src/client/app.js',
+  '../src/client/bootstrap.js',
   '../src/server/components/ServerLayout.css',
 ];
 
@@ -66,7 +65,6 @@ const plugins = [
     path: 'build',
     prettyPrint: false,
   }),
-  new webpack.ProvidePlugin({ Promise: 'bluebird' }),
 ];
 
 if (env === 'development') {
@@ -116,7 +114,7 @@ export default {
     hot: false,
     inline: true,
     quiet: false,
-    noInfo: false,
+    noInfo: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     stats: { colors: true },
     host: config.hostname,
@@ -161,16 +159,12 @@ export default {
         exclude: /node_modules/,
         loader: 'babel',
         query: {
+          cacheDirectory: true,
           babelrc: false,
           presets: ['es2015', 'react'],
           plugins: [
-            [
-              'transform-async-to-module-method',
-              {
-                module: 'bluebird-co',
-                method: 'coroutine',
-              },
-            ],
+            'transform-async-to-generator',
+            'transform-strict-mode',
             'transform-do-expressions',
             'transform-exponentiation-operator',
             'syntax-trailing-function-commas',
@@ -178,6 +172,13 @@ export default {
             'transform-class-properties',
             'transform-export-extensions',
             'transform-es2015-modules-commonjs',
+            [
+              'transform-runtime',
+              {
+                polyfill: true,
+                regenerator: true,
+              },
+            ],
             [
               'react-transform',
               {

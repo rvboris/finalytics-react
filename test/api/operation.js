@@ -759,3 +759,10 @@ test.serial('updateTransfer', async (t) => {
   t.is(res.body.operationFrom.type, 'expense');
   t.is(res.body.operationTo.type, 'income');
 });
+
+test.serial('list', async (t) => {
+  const res = await request.get('/api/operation/list');
+
+  t.is(res.status, 200);
+  console.log(res.body);
+});

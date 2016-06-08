@@ -33,9 +33,8 @@ const env = process.env.NODE_ENV || 'development';
 const config = configs[env];
 
 const entry = [
-  'babel-polyfill',
   'source-map-support/register',
-  '../src/server/index',
+  '../src/server/bootstrap',
 ];
 
 const plugins = [
@@ -51,7 +50,6 @@ const plugins = [
       NODE_ENV: JSON.stringify(env),
     },
   }),
-  new webpack.ProvidePlugin({ Promise: 'bluebird' }),
 ];
 
 if (env === 'production') {
@@ -102,13 +100,8 @@ export default {
           babelrc: false,
           presets: ['react'],
           plugins: [
-            [
-              'transform-async-to-module-method',
-              {
-                module: 'bluebird-co',
-                method: 'coroutine',
-              },
-            ],
+            'transform-async-to-generator',
+            'transform-strict-mode',
             'transform-do-expressions',
             'transform-exponentiation-operator',
             'syntax-trailing-function-commas',
@@ -116,6 +109,13 @@ export default {
             'transform-class-properties',
             'transform-export-extensions',
             'transform-es2015-modules-commonjs',
+            [
+              'transform-runtime',
+              {
+                polyfill: true,
+                regenerator: true,
+              },
+            ],
             [
               'react-transform',
               {

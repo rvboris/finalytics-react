@@ -1,5 +1,6 @@
 const cp = require('child_process');
 const fs = require('fs-extra');
+const debug = require('debug')('process');
 
 const webpack = 'node_modules/webpack/bin/webpack.js';
 const devServer = 'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
@@ -12,13 +13,19 @@ if (process.env.NODE_ENV === 'development') {
   fs.removeSync('build');
   fs.mkdirs('build/assets');
 
+  debug('---------------starting client dev server---------------');
   const client = cp.exec(`node ${devServer} --config ${clientConfig}`, execContext);
 
   client.stdout.pipe(process.stdout);
   client.stderr.pipe(process.stderr);
 
   cp.execSync(`node ${wait} -p build/webpack-assets.json`, execContext);
+
+  debug('---------------server build start---------------');
   cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
+  debug('---------------server build end---------------');
+
+  debug('---------------starting server---------------');
   cp.fork('build/server.js');
 
   return;
@@ -28,14 +35,17 @@ if (process.env.BUILD) {
   fs.removeSync('build');
   fs.mkdirs('build/assets');
 
-  console.log('---------------client build---------------');
+  debug('---------------client build start---------------');
   cp.execSync(`node ${webpack} --config ${clientConfig}`, execContext);
+  debug('---------------client build end---------------');
 
-  console.log('---------------server build---------------');
+  debug('---------------server build start---------------');
   cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
+  debug('---------------server build end---------------');
 }
 
 if (!process.env.BUILD) {
+  debug('---------------starting server---------------');
   const server = cp.fork('build/server.js');
 
   server.on('message', (msg) => {
@@ -43,13 +53,16 @@ if (!process.env.BUILD) {
       execContext.env.context = msg.ctx;
       execContext.env.startPoint = `http://${msg.ctx.hostname}:${msg.ctx.port}`;
 
+      debug('---------------e2e tests start---------------');
       cp.execSync('ava test/e2e/*.js --tap | faucet', execContext);
+      debug('---------------e2e tests end---------------');
 
       server.send('shutdown');
     }
   });
 
   server.on('exit', () => {
+    debug('---------------stop server---------------');
     process.exit(0);
   });
 }

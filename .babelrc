@@ -1,21 +1,14 @@
-// Modified stage-0
-
 {
   "plugins": [
-    [
-      "transform-async-to-module-method",
-      {
-        "module": "bluebird-co",
-        "method": "coroutine",
-      },
-    ],
-    "transform-es2015-modules-commonjs",
-    "transform-export-extensions",
+    "transform-async-to-generator",
+    "transform-strict-mode",
     "transform-do-expressions",
     "transform-exponentiation-operator",
     "syntax-trailing-function-commas",
     "transform-object-rest-spread",
     "transform-class-properties",
+    "transform-export-extensions",
+    "transform-es2015-modules-commonjs"
   ],
   "ignore": ["build/server.js"]
 }

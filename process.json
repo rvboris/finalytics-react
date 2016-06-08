@@ -6,7 +6,7 @@
       "watch": false,
       "env": {
         "NODE_ENV": "production",
-        "DEBUG": "app:*"
+        "DEBUG": "app:*,-app:debug"
       },
       "instances": 4,
       "exec_mode": "cluster",

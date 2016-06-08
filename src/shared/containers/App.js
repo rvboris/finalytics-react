@@ -7,13 +7,6 @@ import { IntlProvider } from 'react-intl';
 import config from '../config';
 import styles from './App.css';
 
-Promise.config({
-  warnings: false,
-  longStackTraces: true,
-  cancellation: true,
-  monitoring: true,
-});
-
 const intlSelector = createSelector(state => ({
   messages: state.locale.messages,
   defaultLocale: config.defaultLang,

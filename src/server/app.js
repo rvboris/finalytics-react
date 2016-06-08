@@ -20,11 +20,11 @@ const createApp = (instance, jobs) => {
     }
   };
 
-  app.use(middlewares.errorHandler);
-  app.use(middlewares.httpLog);
-  app.use(middlewares.ctxLog);
   app.use(middlewares.assets);
   app.use(middlewares.session);
+  app.use(middlewares.ctxLog(app.instance));
+  app.use(middlewares.errorHandler);
+  app.use(middlewares.httpLog);
   app.use(middlewares.passport);
   app.use(middlewares.helmet);
   app.use(middlewares.etag);

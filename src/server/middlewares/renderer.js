@@ -3,7 +3,6 @@ import { RouterContext, match } from 'react-router';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
 import { pick, values } from 'lodash';
-import createLocation from 'history/lib/createMemoryHistory';
 import passport from 'koa-passport';
 import React from 'react';
 
@@ -36,7 +35,6 @@ export default async(ctx, next) => {
     }
 
     const store = storeCreator();
-
     const userAgent = ctx.request.headers['user-agent'];
 
     if (userAgent) {
@@ -50,14 +48,12 @@ export default async(ctx, next) => {
       store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
     }
 
-    const location = createLocation(ctx.request.url);
-
     let err;
     let redirect;
     let renderProps;
 
     try {
-      [err, redirect, renderProps] = await runRouter(location, routes(store));
+      [err, redirect, renderProps] = await runRouter(ctx.request.url, routes(store));
     } catch (e) {
       err = e;
     }

@@ -2,7 +2,7 @@ import axios from 'axios';
 import money from 'money';
 import schedule from 'node-schedule';
 
-import log, { error } from '../../shared/log';
+import { task, error } from '../../shared/log';
 import config from '../../shared/config';
 import { ExchangeRateModel } from '../models';
 
@@ -11,8 +11,10 @@ rule.hour = new schedule.Range(0, 24, 3);
 
 export default () =>
   new Promise(async (resolve) => {
+    task('shedule exchange rates updates');
+
     const job = schedule.scheduleJob(rule, async () => {
-      log('exchange rates updating');
+      task('exchange rates updating');
 
       let result;
 
@@ -36,7 +38,7 @@ export default () =>
         return;
       }
 
-      log('exchange rates finished updating');
+      task('exchange rates finished updating');
 
       resolve(job);
     });
