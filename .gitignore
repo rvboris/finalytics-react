@@ -41,3 +41,7 @@ src/keys
 # Config files
 config/development.js
 config/production.js
+
+# Webpack stats
+webpack/client-stats.html
+webpack/server-stats.html

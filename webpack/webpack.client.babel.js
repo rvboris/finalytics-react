@@ -10,6 +10,8 @@ import magician from 'postcss-font-magician';
 import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
+import Visualizer from 'webpack-visualizer-plugin';
+import LodashModuleReplacementPlugin from 'lodash-webpack-plugin';
 
 import * as configs from '../config';
 
@@ -31,6 +33,9 @@ entry.common = [
   'seamless-immutable',
   'axios',
   'history',
+  'moment',
+  'moment-timezone',
+  'bluebird',
 ];
 
 entry.app = [
@@ -48,6 +53,7 @@ const configForClient = omit(config, [
 ]);
 
 const plugins = [
+  new LodashModuleReplacementPlugin(),
   new ProgressBarPlugin(),
   new webpack.DefinePlugin({
     __CLIENT__: true,
@@ -60,6 +66,7 @@ const plugins = [
     },
   }),
   new webpack.optimize.CommonsChunkPlugin({ name: 'common' }),
+  new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|ru)$/),
   new ExtractTextPlugin('styles.css'),
   new AssetsPlugin({
     path: 'build',
@@ -67,11 +74,10 @@ const plugins = [
   }),
 ];
 
-if (env === 'development') {
-  entry.app.unshift(`webpack-dev-server/client?http://${config.hostname}:${config.hotPort}`);
-} else {
+if (env === 'production') {
   entry.common = entry.common.filter(item => item.indexOf('devtools') < 0);
 
+  plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
   plugins.push(new webpack.optimize.DedupePlugin());
   plugins.push(new webpack.optimize.UglifyJsPlugin({
     compress: {
@@ -97,6 +103,7 @@ if (env === 'development') {
     },
   }));
 
+  plugins.push(new Visualizer({ filename: '../../webpack/client-stats.html' }));
   plugins.push(new webpack.NoErrorsPlugin());
 }
 
@@ -163,6 +170,7 @@ export default {
           babelrc: false,
           presets: ['es2015', 'react'],
           plugins: [
+            'lodash',
             'transform-async-to-generator',
             'transform-strict-mode',
             'transform-do-expressions',

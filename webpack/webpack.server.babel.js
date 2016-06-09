@@ -9,6 +9,8 @@ import normalize from 'postcss-normalize';
 import stylelint from 'stylelint';
 import nodeExternals from 'webpack-node-externals';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
+import Visualizer from 'webpack-visualizer-plugin';
+import LodashModuleReplacementPlugin from 'lodash-webpack-plugin';
 
 import * as configs from '../config';
 
@@ -38,6 +40,9 @@ const entry = [
 ];
 
 const plugins = [
+  new LodashModuleReplacementPlugin(),
+  new webpack.dependencies.LabeledModulesPlugin(),
+  new Visualizer({ filename: '../webpack/server-stats.html' }),
   new ProgressBarPlugin(),
   new webpack.DefinePlugin({
     __CLIENT__: false,
@@ -100,6 +105,7 @@ export default {
           babelrc: false,
           presets: ['react'],
           plugins: [
+            'lodash',
             'transform-async-to-generator',
             'transform-strict-mode',
             'transform-do-expressions',
