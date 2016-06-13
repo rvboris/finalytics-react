@@ -28,18 +28,16 @@ const entry = {};
 entry.common = [
   ...Object.keys(externals)
     .filter(depName => depName.startsWith('react') || depName.startsWith('redux')),
-  'bluebird',
   'reselect',
   'seamless-immutable',
   'axios',
   'history',
   'moment',
-  'moment-timezone',
-  'bluebird',
+  'money',
 ];
 
 entry.app = [
-  '../src/client/bootstrap.js',
+  '../src/client/app.js',
   '../src/server/components/ServerLayout.css',
 ];
 
@@ -210,6 +208,10 @@ export default {
       'node_modules',
     ],
     extensions: ['', '.json', '.js'],
+    alias: {
+      react: env === 'production' ? 'react-lite' : 'react',
+      'react-dom': env === 'production' ? 'react-lite' : 'react',
+    },
   },
   eslint: {
     configFile: '.eslintrc',

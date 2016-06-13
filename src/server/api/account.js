@@ -80,7 +80,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
       populate: { path: 'currency' },
     });
 
-    const account = accounts.find(account => account._id.toString() === params._id);
+    const account = accounts.find(account => account._id.equals(params._id));
 
     if (!account) {
       ctx.status = 400;
@@ -271,7 +271,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
   try {
     let { accounts } = await UserModel.populate(ctx.user, 'accounts');
 
-    const account = accounts.find(account => account._id.toString() === _id);
+    const account = accounts.find(account => account._id.equals(_id));
 
     if (!account) {
       ctx.status = 400;

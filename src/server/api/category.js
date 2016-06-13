@@ -59,7 +59,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
   const tree = new TreeModel();
   const rootNode = tree.parse(categoryModel.data);
 
-  const resultNode = rootNode.first((node) => node.model._id.toString() === params._id);
+  const resultNode = rootNode.first((node) => node.model._id.equals(params._id));
 
   if (!resultNode) {
     ctx.status = 400;
@@ -130,7 +130,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   const tree = new TreeModel();
   const rootNode = tree.parse(categoryModel.data);
 
-  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+  const resultNode = rootNode.first((node) => node.model._id.equals(_id));
 
   if (!resultNode) {
     ctx.status = 400;
@@ -174,7 +174,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
   const tree = new TreeModel();
   const rootNode = tree.parse(categoryModel.data);
 
-  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+  const resultNode = rootNode.first((node) => node.model._id.equals(_id));
 
   if (!resultNode) {
     ctx.status = 400;
@@ -224,7 +224,7 @@ router.post('/move', { jwt: true }, async (ctx) => {
   const tree = new TreeModel();
   const rootNode = tree.parse(categoryModel.data);
 
-  const resultNode = rootNode.first((node) => node.model._id.toString() === _id);
+  const resultNode = rootNode.first((node) => node.model._id.equals(_id));
 
   if (!resultNode) {
     ctx.status = 400;
@@ -238,7 +238,7 @@ router.post('/move', { jwt: true }, async (ctx) => {
     return;
   }
 
-  const toNode = rootNode.first((node) => node.model._id.toString() === to);
+  const toNode = rootNode.first((node) => node.model._id.equals(to));
 
   if (!toNode) {
     ctx.status = 400;

@@ -63,3 +63,4 @@ export { default as CurrencyModel } from './currency';
 export { default as AccountModel } from './account';
 export { default as CategoryModel } from './category';
 export { default as OperationModel } from './operation';
+export { default as TransferModel } from './transfer';

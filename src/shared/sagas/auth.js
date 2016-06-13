@@ -1,4 +1,3 @@
-import moment from 'moment-timezone';
 import { takeLatest } from 'redux-saga';
 import { select, fork, put, take } from 'redux-saga/effects';
 import { get } from 'lodash';
@@ -7,7 +6,7 @@ import { authActions, localeActions, categoryActions, accountActions } from '../
 const prepareUser = function * prepareUser() {
   if (__CLIENT__) {
     yield put(authActions.setSettings({
-      timezone: moment.tz.guess(),
+      timezone: new Date().getTimezoneOffset(),
       locale: 'auto',
     }));
 

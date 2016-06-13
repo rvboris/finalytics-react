@@ -2,11 +2,19 @@ import Router from 'koa-66';
 import mongoose from 'mongoose';
 import big from 'big.js';
 import TreeModel from 'tree-model';
-import { get, pick, isUndefined, isArray, isBoolean, groupBy } from 'lodash';
+import { pick, isUndefined, isArray, mapValues, remove, sortBy } from 'lodash';
 
-import { OperationModel, UserModel, CategoryModel } from '../models';
+import { OperationModel, UserModel, CategoryModel, TransferModel } from '../models';
 
 const router = new Router();
+
+const publicFields =
+  ['_id', 'account', 'type', 'category', 'amount', 'balance', 'created'];
+
+const filterProps = (operation) => {
+  operation = pick(operation, ...publicFields);
+  return mapValues(operation, (prop) => (prop._id ? prop._id.toString() : prop));
+};
 
 router.post('/add', { jwt: true }, async (ctx) => {
   const params = pick(ctx.request.body, 'created', 'account', 'category', 'amount');
@@ -98,7 +106,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     const rootNode = tree.parse(categoryData);
 
     const categoryNode = rootNode
-      .first(node => node.model._id.toString() === params.category);
+      .first(node => node.model._id.equals(params.category));
 
     if (!categoryNode) {
       ctx.status = 400;
@@ -127,7 +135,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = operation.toObject({ versionKey: false, depopulate: true });
+  ctx.body = filterProps(operation);
 });
 
 router.post('/delete', { jwt: true }, async (ctx) => {
@@ -234,7 +242,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
     rootNode = tree.parse(categoryModel.data);
 
     category = rootNode.first((node) =>
-      node.model._id.toString() === operation.category.toString()).model;
+      node.model._id.equals(operation.category)).model;
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -280,7 +288,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
   }
 
   if (params.category) {
-    const categoryNode = rootNode.first((node) => node.model._id.toString() === params.category);
+    const categoryNode = rootNode.first((node) => node.model._id.equals(params.category));
 
     if (!categoryNode) {
       ctx.status = 400;
@@ -310,7 +318,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = operation.toObject({ versionKey: false, depopulate: true });
+  ctx.body = filterProps(operation);
 });
 
 router.post('/addTransfer', { jwt: true }, async (ctx) => {
@@ -380,8 +388,8 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
       populate: { path: 'currency' },
     });
 
-    accountFrom = accounts.find(account => account._id.toString() === params.accountFrom);
-    accountTo = accounts.find(account => account._id.toString() === params.accountTo);
+    accountFrom = accounts.find(account => account._id.equals(params.accountFrom));
+    accountTo = accounts.find(account => account._id.equals(params.accountTo));
 
     if (!accountFrom) {
       ctx.status = 400;
@@ -466,12 +474,18 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
+  const transfer = new TransferModel();
+
+  operationFrom.transfer = transfer;
+  operationTo.transfer = transfer;
+
   try {
     await operationFrom.save();
-    operationTo.groupTo = operationFrom;
     await operationTo.save();
-    operationFrom.groupTo = operationTo;
-    await operationFrom.save();
+
+    transfer.operations.push(operationFrom, operationTo);
+
+    await transfer.save();
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -480,8 +494,8 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
   }
 
   ctx.body = {
-    operationFrom: operationFrom.toObject({ versionKey: false, depopulate: true }),
-    operationTo: operationTo.toObject({ versionKey: false, depopulate: true }),
+    operationFrom: filterProps(operationFrom),
+    operationTo: filterProps(operationTo),
   };
 });
 
@@ -537,7 +551,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
       });
 
       if (!isUndefined(params.accountFrom)) {
-        accountFrom = accounts.find(account => account._id.toString() === params.accountFrom);
+        accountFrom = accounts.find(account => account._id.equals(params.accountFrom));
 
         if (!accountFrom) {
           ctx.status = 400;
@@ -547,7 +561,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
       }
 
       if (!isUndefined(params.accountTo)) {
-        accountTo = accounts.find(account => account._id.toString() === params.accountTo);
+        accountTo = accounts.find(account => account._id.equals(params.accountTo));
 
         if (!accountTo) {
           ctx.status = 400;
@@ -631,7 +645,19 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   try {
-    operation = await OperationModel.findById(operation.groupTo).populate({
+    const transfer = await TransferModel
+      .findOne({ operations: { $in: [operation._id] } });
+
+    if (!transfer) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
+      return;
+    }
+
+    const transferOperationId =
+      transfer.operations.find(transferOperation => !transferOperation.equals(operation._id));
+
+    operation = await OperationModel.findById(transferOperationId).populate({
       path: 'account',
       populate: { path: 'currency' },
     });
@@ -686,19 +712,39 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   ctx.body = {
-    operationFrom: operationFrom.toObject({ versionKey: false, depopulate: true }),
-    operationTo: operationTo.toObject({ versionKey: false, depopulate: true }),
+    operationFrom: filterProps(operationFrom),
+    operationTo: filterProps(operationTo),
   };
 });
 
 router.get('/list', { jwt: true }, async (ctx) => {
-  const params = pick(ctx.request.body, 'account', 'type', 'category', 'amountFrom',
-      'amountTo', 'dateFrom', 'dateTo', 'transfer', 'paginate');
+  const params = pick(ctx.request.query, 'account', 'type', 'category', 'amountFrom',
+      'amountTo', 'dateFrom', 'dateTo', 'skip', 'limit');
 
   const query = { user: ctx.user };
 
-  if (isArray(params.account)) {
-    if (params.account.find(account => !mongoose.Types.ObjectId.isValid(account))) {
+  let transferCategoryId;
+  let isTransferCategory = false;
+
+  try {
+    const { data: categoryData } = await CategoryModel.findOne({ user: ctx.user }, 'data');
+    const tree = new TreeModel();
+    const rootNode = tree.parse(categoryData);
+
+    transferCategoryId = rootNode.first(node => node.model.transfer === true).model._id.toString();
+  } catch (e) {
+    ctx.log.error(e);
+    ctx.status = 500;
+    ctx.body = { error: e.message };
+    return;
+  }
+
+  if (!isUndefined(params.account)) {
+    if (!isArray(params.account)) {
+      params.account = [params.account];
+    }
+
+    if (params.account.some(account => !mongoose.Types.ObjectId.isValid(account))) {
       ctx.status = 400;
       ctx.body = { error: 'operation.list.error.account.invalid' };
       return;
@@ -717,8 +763,14 @@ router.get('/list', { jwt: true }, async (ctx) => {
     query.type = params.type;
   }
 
-  if (isArray(params.account)) {
-    if (params.category.find(category => !mongoose.Types.ObjectId.isValid(category))) {
+  if (!isUndefined(params.category)) {
+    if (!isArray(params.category)) {
+      params.category = [params.category];
+    }
+
+    isTransferCategory = params.category.includes(transferCategoryId);
+
+    if (params.category.some(category => !mongoose.Types.ObjectId.isValid(category))) {
       ctx.status = 400;
       ctx.body = { error: 'operation.list.error.category.invalid' };
       return;
@@ -787,32 +839,89 @@ router.get('/list', { jwt: true }, async (ctx) => {
     query.created.$lte = params.dateTo;
   }
 
-  if (!isUndefined(params.transfer)) {
-    if (!isBoolean(params.transfer)) {
+  if (!isUndefined(params.skip)) {
+    params.skip = parseInt(params.skip, 10);
+
+    if (isNaN(params.skip)) {
       ctx.status = 400;
-      ctx.body = { error: 'operation.list.error.transfer.invalid' };
+      ctx.body = { error: 'operation.list.error.skip.invalid' };
       return;
     }
 
-    query.groupTo = { $exists: true };
+    params.skip = params.skip < 0 ? 0 : params.skip;
+  } else {
+    params.skip = 0;
+  }
+
+  if (!isUndefined(params.limit)) {
+    params.limit = parseInt(params.limit, 10);
+
+    if (isNaN(params.limit)) {
+      ctx.status = 400;
+      ctx.body = { error: 'operation.list.error.limit.invalid' };
+      return;
+    }
+
+    params.limit = params.limit <= 0 ? 1 : params.limit;
+    params.limit = params.limit > 200 ? 200 : params.limit;
+  } else {
+    params.limit = 50;
   }
 
   let operations;
-
-  const skip = parseInt(get(params, 'paginate.skip', 0), 10) || 0;
-  let limit = parseInt(get(params, 'paginate.limit', 30), 10) || 30;
-
-  limit = limit > 50 ? 50 : limit;
-
-  const fields = ['_id', 'type', 'created', 'account', 'category', 'amount', 'groupTo'];
+  let transfers;
+  let total;
+  let totalTransfers;
 
   try {
     operations = await OperationModel
-      .find(query, fields.join(' '))
-      .sort({ created: -1 })
-      .skip(skip)
-      .limit(limit)
+      .find(query, publicFields.join(' '))
+      .skip(params.skip)
+      .limit(params.limit * 2)
+      .sort({ created: 1 })
       .lean();
+
+    if (!operations) {
+      ctx.body = { operations: [], total: 0 };
+      return;
+    }
+
+    total = await OperationModel.count(query);
+    totalTransfers = await OperationModel.count(Object.assign(query, {
+      transfer: { $exists: true },
+    }));
+
+    transfers = (await TransferModel
+      .find({ operations: { $in: operations } })
+      .populate('operations')) || [];
+
+    transfers = transfers.map(transfer => transfer.operations.map(filterProps));
+
+    if (isTransferCategory) {
+      operations = [];
+    }
+
+    remove(operations, operation => transfers
+      .some(transfer => transfer
+        .some(transferOperation => operation._id.equals(transferOperation._id))));
+
+    operations = operations.map(filterProps);
+
+    if ((isUndefined(params.type) && isUndefined(params.category)) || isTransferCategory) {
+      operations.push(...transfers);
+    }
+
+    operations = sortBy(operations, (operation) => {
+      if (isArray(operation)) {
+        return new Date(operation[0].created);
+      }
+
+      return new Date(operation.created);
+    }).reverse();
+
+    if (operations.length > params.limit) {
+      operations.splice(0, operations.length - params.limit);
+    }
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -820,9 +929,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
     return;
   }
 
-  operations = groupBy(operations, (operation) => operation._id === operation.groupTo);
-
-  ctx.body = operations;
+  ctx.body = { operations, total: total - Math.floor(totalTransfers / 2) };
 });
 
 export default router;

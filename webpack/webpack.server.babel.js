@@ -44,6 +44,7 @@ const plugins = [
   new webpack.dependencies.LabeledModulesPlugin(),
   new Visualizer({ filename: '../webpack/server-stats.html' }),
   new ProgressBarPlugin(),
+  new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|ru)$/),
   new webpack.DefinePlugin({
     __CLIENT__: false,
     __SERVER__: true,
