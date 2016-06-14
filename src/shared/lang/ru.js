@@ -138,4 +138,14 @@ export default {
   'operation.updateTransfer.error.amountFrom.positive': 'Начальная сумма должна быть больше 0',
   'operation.updateTransfer.error.amountTo.invalid': 'Недопустимая конечная сумма',
   'operation.updateTransfer.error.amountTo.positive': 'Конечная сумма должна быть больше 0',
+
+  'operation.list.error.account.invalid': 'Недопустимый аккаунт',
+  'operation.list.error.type.invalid': 'Недопустимый тип операции',
+  'operation.list.error.category.invalid': 'Недопустимая категория',
+  'operation.list.error.amountFrom.invalid': 'Недопустимая начальная сумма',
+  'operation.list.error.amountTo.invalid': 'Недопустимая конечная сумма',
+  'operation.list.error.dateFrom.invalid': 'Недопустимая начальная дата',
+  'operation.list.error.dateTo.invalid': 'Недопустимая конечная дата',
+  'operation.list.error.skip.invalid': 'Недопустимые параметры постраничной навигации',
+  'operation.list.error.limit.invalid': 'Недопустимые параметры постраничной навигации',
 };

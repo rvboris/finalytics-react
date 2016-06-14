@@ -1,4 +1,4 @@
-import randomstring from 'randomstring';
+import Chance from 'chance';
 import passport from 'koa-passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
@@ -106,7 +106,8 @@ const oauthHandler = (provider) => async (accessToken, refreshToken, profile, cb
       return;
     }
 
-    const password = randomstring.generate(8);
+    const chance = new Chance();
+    const password = chance.string({ length: 8 });
 
     user = new UserModel({ [`${provider}Id`]: profile.id });
     user.email = emails.length ? emails[0] : `no-email-${profile.id}@${provider}.com`;

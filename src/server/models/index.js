@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import randomstring from 'randomstring';
+import Chance from 'chance';
 import { get } from 'lodash';
 
 import config from '../../shared/config';
@@ -7,14 +7,22 @@ import log, { error } from '../../shared/log';
 import { currencyFixture } from '../fixtures';
 import CurrencyModel from './currency';
 
+const chance = new Chance();
+
 const dbName = get(process, 'env.TEST') || get(process, 'env.E2E')
-  ? `test-${randomstring.generate(5)}`
+  ? `test-${chance.word({ syllables: 3 })}`
   : config.db.name;
 
 const dbURI = `mongodb://${config.db.hostname}/${dbName}`;
 
+const connectOptions = {
+  promiseLibrary: Promise,
+};
+
+mongoose.Promise = Promise;
+
 export const connect = () =>
-  mongoose.connect(dbURI).then(async () => {
+  mongoose.connect(dbURI, connectOptions).then(async () => {
     log(`mongoose default connection open to ${dbURI}`);
 
     const dropDatabase = __DEVELOPMENT__ || get(process, 'env.TEST') || get(process, 'env.E2E');

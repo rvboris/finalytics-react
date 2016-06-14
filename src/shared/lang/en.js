@@ -139,4 +139,14 @@ export default {
   'operation.updateTransfer.error.amountFrom.positive': 'Source amount must be bigger than 0',
   'operation.updateTransfer.error.amountTo.invalid': 'Invalid destination amount',
   'operation.updateTransfer.error.amountTo.positive': 'Destination amount must be bigger than 0',
+
+  'operation.list.error.account.invalid': 'Invalid account',
+  'operation.list.error.type.invalid': 'Invalid type of operation',
+  'operation.list.error.category.invalid': 'Invalid category',
+  'operation.list.error.amountFrom.invalid': 'Invalid start amount',
+  'operation.list.error.amountTo.invalid': 'Invalid end amount',
+  'operation.list.error.dateFrom.invalid': 'Invalid start date',
+  'operation.list.error.dateTo.invalid': 'Invalid end date',
+  'operation.list.error.skip.invalid': 'Invalid paging params',
+  'operation.list.error.limit.invalid': 'Invalid paging params',
 };

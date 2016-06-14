@@ -3,11 +3,13 @@ import test from 'ava';
 import TreeModel from 'tree-model';
 import mongoose from 'mongoose';
 import { sample, difference } from 'lodash';
-import randomstring from 'randomstring';
+import Chance from 'chance';
 
 let request;
+let chance;
 
 test.before(async () => {
+  chance = new Chance();
   request = await agent();
 
   await request.post('/api/auth/register').send({
@@ -78,7 +80,7 @@ test.serial('update', async (t) => {
 
   res = await request.post('/api/category/update').send({
     _id: sample(systemCategoryList).model._id,
-    name: randomstring.generate(8),
+    name: chance.string({ length: 8 }),
   });
 
   t.is(res.status, 400);
@@ -86,7 +88,7 @@ test.serial('update', async (t) => {
 
   res = await request.post('/api/category/update').send({
     _id: sample(systemCategoryList).model._id,
-    test: randomstring.generate(8),
+    test: chance.string({ length: 8 }),
   });
 
   t.is(res.status, 400);
@@ -94,14 +96,14 @@ test.serial('update', async (t) => {
 
   res = await request.post('/api/category/update').send({
     _id: 'wrong id',
-    name: randomstring.generate(8),
+    name: chance.string({ length: 8 }),
   });
 
   t.is(res.status, 400);
   t.is(res.body.error, 'category.update.error._id.notFound');
 
   const categoryIdToCheck = sample(userCategoryList).model._id;
-  const nameToCheck = randomstring.generate(8);
+  const nameToCheck = chance.string({ length: 8 });
 
   res = await request.post('/api/category/update').send({
     _id: categoryIdToCheck,
@@ -166,7 +168,7 @@ test.serial('add', async (t) => {
   res = await request.post('/api/category/add').send({
     _id: sample(categoryList).model._id,
     newNode: {
-      name: randomstring.generate(8),
+      name: chance.string({ length: 8 }),
     },
   });
 
@@ -176,7 +178,7 @@ test.serial('add', async (t) => {
   res = await request.post('/api/category/add').send({
     _id: sample(categoryList).model._id,
     newNode: {
-      name: randomstring.generate(8),
+      name: chance.string({ length: 8 }),
       type: 'wrong type',
     },
   });
@@ -187,7 +189,7 @@ test.serial('add', async (t) => {
   res = await request.post('/api/category/add').send({
     _id: sample(categoryList.filter(node => node.model.type === 'income')).model._id,
     newNode: {
-      name: randomstring.generate(8),
+      name: chance.string({ length: 8 }),
       type: 'expense',
     },
   });
@@ -198,7 +200,7 @@ test.serial('add', async (t) => {
   res = await request.post('/api/category/add').send({
     _id: sample(categoryList.filter(node => node.model.type === 'expense')).model._id,
     newNode: {
-      name: randomstring.generate(8),
+      name: chance.string({ length: 8 }),
       type: 'income',
     },
   });
@@ -209,7 +211,7 @@ test.serial('add', async (t) => {
   res = await request.post('/api/category/add').send({
     _id: 'wrong id',
     newNode: {
-      name: randomstring.generate(8),
+      name: chance.string({ length: 8 }),
       type: 'income',
     },
   });
@@ -217,7 +219,7 @@ test.serial('add', async (t) => {
   t.is(res.status, 400);
   t.is(res.body.error, 'category.add.error._id.notFound');
 
-  const nameToCheck = randomstring.generate(8);
+  const nameToCheck = chance.string({ length: 8 });
   const parentToCheck = sample(categoryList).model;
 
   res = await request.post('/api/category/add').send({

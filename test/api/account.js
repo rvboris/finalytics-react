@@ -1,12 +1,14 @@
 import agent from '../agent';
 import test from 'ava';
 import mongoose from 'mongoose';
-import randomstring from 'randomstring';
+import Chance from 'chance';
 import { sample } from 'lodash';
 
 let request;
+let chance;
 
 test.before(async () => {
+  chance = new Chance();
   request = await agent();
 
   await request.post('/api/auth/register').send({
@@ -250,7 +252,7 @@ test.serial('update', async (t) => {
   t.is(updatedAccount.order, accountToCheck.order);
 
   accountToCheck = sample(accounts);
-  const nameToCheck = randomstring.generate(8);
+  const nameToCheck = chance.string({ length: 8 });
 
   res = await request.post('/api/account/update').send({
     _id: accountToCheck._id,
