@@ -2,14 +2,14 @@ import Router from 'koa-66';
 import mongoose from 'mongoose';
 import big from 'big.js';
 import TreeModel from 'tree-model';
-import { pick, isUndefined, isArray, mapValues, remove, sortBy } from 'lodash';
+import { pick, isUndefined, isArray, mapValues } from 'lodash';
 
-import { OperationModel, UserModel, CategoryModel, TransferModel } from '../models';
+import { OperationModel, UserModel, CategoryModel } from '../models';
 
 const router = new Router();
 
 const publicFields =
-  ['_id', 'account', 'type', 'category', 'amount', 'balance', 'created'];
+  ['_id', 'account', 'type', 'category', 'amount', 'balance', 'created', 'transfer'];
 
 const filterProps = (operation) => {
   operation = pick(operation, ...publicFields);
@@ -434,29 +434,23 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  amountFrom = amountFrom.times(-1);
-
   if (amountTo.lte(0)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.addTransfer.error.amountTo.positive' };
     return;
   }
 
-  const operationFrom = new OperationModel();
+  const operation = new OperationModel();
 
-  operationFrom.type = 'expense';
-  operationFrom.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
-  operationFrom.user = ctx.user;
-  operationFrom.created = params.created;
-  operationFrom.account = accountFrom;
-
-  const operationTo = new OperationModel();
-
-  operationTo.type = 'income';
-  operationTo.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
-  operationTo.user = ctx.user;
-  operationTo.created = params.created;
-  operationTo.account = accountTo;
+  operation.type = 'expense';
+  operation.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+  operation.user = ctx.user;
+  operation.created = params.created;
+  operation.account = accountFrom;
+  operation.transfer = {
+    account: accountTo,
+    amount: amountTo,
+  };
 
   try {
     const { data: categoryData } = await CategoryModel.findOne({ user: ctx.user }, 'data');
@@ -465,27 +459,16 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
 
     const categoryNode = rootNode.first(node => node.model.transfer === true);
 
-    operationFrom.category = categoryNode.model._id;
-    operationTo.category = categoryNode.model._id;
+    operation.category = categoryNode.model._id;
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
   }
-
-  const transfer = new TransferModel();
-
-  operationFrom.transfer = transfer;
-  operationTo.transfer = transfer;
 
   try {
-    await operationFrom.save();
-    await operationTo.save();
-
-    transfer.operations.push(operationFrom, operationTo);
-
-    await transfer.save();
+    await operation.save();
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -493,10 +476,7 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = {
-    operationFrom: filterProps(operationFrom),
-    operationTo: filterProps(operationTo),
-  };
+  ctx.body = filterProps(operation.toObject({ depopulate: true, version: false }));
 });
 
 router.post('/updateTransfer', { jwt: true }, async (ctx) => {
@@ -606,10 +586,6 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  if (!isUndefined(params.amountFrom)) {
-    amountFrom = amountFrom.times(-1);
-  }
-
   if (!isUndefined(params.amountTo) && amountTo.lte(0)) {
     ctx.status = 400;
     ctx.body = { error: 'operation.updateTransfer.error.amountTo.positive' };
@@ -617,8 +593,6 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   let operation;
-  let operationFrom;
-  let operationTo;
 
   try {
     operation = await OperationModel.findById(params._id).populate({
@@ -626,7 +600,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
       populate: { path: 'currency' },
     });
 
-    if (!operation) {
+    if (!operation || (operation && !operation.transfer)) {
       ctx.status = 400;
       ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
       return;
@@ -636,74 +610,30 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
     ctx.status = 500;
     ctx.body = { error: e.message };
     return;
-  }
-
-  if (operation.type === 'expense') {
-    operationFrom = operation;
-  } else {
-    operationTo = operation;
-  }
-
-  try {
-    const transfer = await TransferModel
-      .findOne({ operations: { $in: [operation._id] } });
-
-    if (!transfer) {
-      ctx.status = 400;
-      ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
-      return;
-    }
-
-    const transferOperationId =
-      transfer.operations.find(transferOperation => !transferOperation.equals(operation._id));
-
-    operation = await OperationModel.findById(transferOperationId).populate({
-      path: 'account',
-      populate: { path: 'currency' },
-    });
-
-    if (!operation) {
-      ctx.status = 400;
-      ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
-      return;
-    }
-  } catch (e) {
-    ctx.log.error(e);
-    ctx.status = 500;
-    ctx.body = { error: e.message };
-    return;
-  }
-
-  if (operation.type === 'expense') {
-    operationFrom = operation;
-  } else {
-    operationTo = operation;
   }
 
   if (!isUndefined(params.amountFrom)) {
-    operationFrom.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+    operation.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
   }
 
   if (!isUndefined(params.created)) {
-    operationFrom.created = params.created;
-    operationTo.created = params.created;
+    operation.created = params.created;
   }
 
   if (!isUndefined(params.accountFrom)) {
-    operationFrom.account = accountFrom;
+    operation.account = accountFrom;
   }
 
   if (!isUndefined(params.amountTo)) {
-    operationTo.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
+    operation.transfer.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
   }
 
   if (!isUndefined(params.accountTo)) {
-    operationTo.account = accountTo;
+    operation.transfer.account = accountTo;
   }
 
   try {
-    await operationFrom.save();
-    await operationTo.save();
+    await operation.save();
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -711,10 +641,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = {
-    operationFrom: filterProps(operationFrom),
-    operationTo: filterProps(operationTo),
-  };
+  ctx.body = filterProps(operation.toObject({ depopulate: true, version: false }));
 });
 
 router.get('/list', { jwt: true }, async (ctx) => {
@@ -722,16 +649,18 @@ router.get('/list', { jwt: true }, async (ctx) => {
       'amountTo', 'dateFrom', 'dateTo', 'skip', 'limit');
 
   const query = { user: ctx.user };
+  const transferQuery = { user: ctx.user, transfer: {} };
 
   let transferCategoryId;
-  let isTransferCategory = false;
 
   try {
     const { data: categoryData } = await CategoryModel.findOne({ user: ctx.user }, 'data');
     const tree = new TreeModel();
     const rootNode = tree.parse(categoryData);
 
-    transferCategoryId = rootNode.first(node => node.model.transfer === true).model._id.toString();
+    const categoryNode = rootNode.first(node => node.model.transfer === true);
+
+    transferCategoryId = categoryNode.model._id.toString();
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -751,6 +680,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
     }
 
     query.account = { $in: params.account };
+    transferQuery.transfer.account = { $in: params.account };
   }
 
   if (!isUndefined(params.type)) {
@@ -761,6 +691,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
     }
 
     query.type = params.type;
+    query.transfer = { $exists: false };
   }
 
   if (!isUndefined(params.category)) {
@@ -768,7 +699,9 @@ router.get('/list', { jwt: true }, async (ctx) => {
       params.category = [params.category];
     }
 
-    isTransferCategory = params.category.includes(transferCategoryId);
+    if (!params.category.includes(transferCategoryId)) {
+      query.transfer = { $exists: false };
+    }
 
     if (params.category.some(category => !mongoose.Types.ObjectId.isValid(category))) {
       ctx.status = 400;
@@ -792,6 +725,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
 
     if (amountFrom) {
       query.amount = { $gte: parseFloat(amountFrom.toFixed(2)) };
+      transferQuery.transfer.amount = query.amount;
     }
   }
 
@@ -811,7 +745,12 @@ router.get('/list', { jwt: true }, async (ctx) => {
         query.amount = {};
       }
 
+      if (!transferQuery.transfer.amount) {
+        transferQuery.transfer.amount = {};
+      }
+
       query.amount.$lte = parseFloat(amountTo.toFixed(2));
+      transferQuery.transfer.amount.$lte = query.amount.$lte;
     }
   }
 
@@ -865,20 +804,18 @@ router.get('/list', { jwt: true }, async (ctx) => {
     params.limit = params.limit <= 0 ? 1 : params.limit;
     params.limit = params.limit > 200 ? 200 : params.limit;
   } else {
-    params.limit = 50;
+    params.limit = 30;
   }
 
   let operations;
-  let transfers;
   let total;
-  let totalTransfers;
 
   try {
     operations = await OperationModel
-      .find(query, publicFields.join(' '))
+      .find({ $or: [query, transferQuery] })
       .skip(params.skip)
-      .limit(params.limit * 2)
-      .sort({ created: 1 })
+      .limit(params.limit)
+      .sort({ created: -1 })
       .lean();
 
     if (!operations) {
@@ -886,42 +823,9 @@ router.get('/list', { jwt: true }, async (ctx) => {
       return;
     }
 
-    total = await OperationModel.count(query);
-    totalTransfers = await OperationModel.count(Object.assign(query, {
-      transfer: { $exists: true },
-    }));
-
-    transfers = (await TransferModel
-      .find({ operations: { $in: operations } })
-      .populate('operations')) || [];
-
-    transfers = transfers.map(transfer => transfer.operations.map(filterProps));
-
-    if (isTransferCategory) {
-      operations = [];
-    }
-
-    remove(operations, operation => transfers
-      .some(transfer => transfer
-        .some(transferOperation => operation._id.equals(transferOperation._id))));
+    total = await OperationModel.count({ $or: [query, transferQuery] });
 
     operations = operations.map(filterProps);
-
-    if ((isUndefined(params.type) && isUndefined(params.category)) || isTransferCategory) {
-      operations.push(...transfers);
-    }
-
-    operations = sortBy(operations, (operation) => {
-      if (isArray(operation)) {
-        return new Date(operation[0].created);
-      }
-
-      return new Date(operation.created);
-    }).reverse();
-
-    if (operations.length > params.limit) {
-      operations.splice(0, operations.length - params.limit);
-    }
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -929,7 +833,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = { operations, total: total - Math.floor(totalTransfers / 2) };
+  ctx.body = { operations, total };
 });
 
 export default router;

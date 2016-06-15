@@ -9,7 +9,12 @@ const model = new mongoose.Schema({
   amount: { type: Number, required: true },
   balance: { type: Number, required: true },
   dayBalance: { type: Number },
-  transfer: { type: mongoose.Schema.Types.ObjectId, ref: 'Transfer' },
+  transfer: {
+    account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account', required: false },
+    amount: { type: Number, required: false },
+    balance: { type: Number, required: false },
+    dayBalance: { type: Number },
+  },
   meta: { type: mongoose.Schema.Types.Mixed },
   created: { type: Date, required: true },
   updated: { type: Date, required: true },
