@@ -5,7 +5,10 @@ import moment from 'moment';
 
 import { error } from '../../shared/log';
 import config from '../../shared/config';
+
 import CurrencyModel from './currency';
+import AccountModel from './account';
+import CategoryModel from './category';
 
 const crypto = require('crypto');
 const randomBytes = Promise.promisify(crypto.randomBytes);
@@ -136,6 +139,18 @@ model.pre('validate', async function preValidate(next) {
       error(e);
       return;
     }
+  }
+
+  next();
+});
+
+model.pre('remove', async function preRemove(next) {
+  try {
+    await AccountModel.remove({ _id: { $in: this.accounts } });
+    await CategoryModel.remove({ user: this });
+  } catch (e) {
+    next(e);
+    return;
   }
 
   next();

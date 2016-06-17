@@ -1,1 +1,1 @@
-export { default as currencyFixture } from './currency.js';
+export { default as currencyFixture } from './currency';

@@ -3,7 +3,7 @@ import Chance from 'chance';
 import { get } from 'lodash';
 
 import config from '../../shared/config';
-import log, { error } from '../../shared/log';
+import log, { error, db } from '../../shared/log';
 import { currencyFixture } from '../fixtures';
 import CurrencyModel from './currency';
 
@@ -20,6 +20,10 @@ const connectOptions = {
 };
 
 mongoose.Promise = Promise;
+
+mongoose.set('debug', (coll, method, query, doc, options) => {
+  db(`${coll}.${method}(${JSON.stringify(query)}, ${JSON.stringify(options)});`);
+});
 
 export const connect = () =>
   mongoose.connect(dbURI, connectOptions).then(async () => {

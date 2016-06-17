@@ -8,6 +8,7 @@ export default {
         name: 'Без категории',
         type: 'any',
         system: true,
+        blank: true,
       },
       {
         name: 'Корректировка',

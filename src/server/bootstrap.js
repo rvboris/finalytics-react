@@ -1,4 +1,4 @@
-require('babel-runtime/core-js/promise').default = require('bluebird');
+global.Promise = require('babel-runtime/core-js/promise').default = require('bluebird');
 
 Promise.config({
   warnings: false,
@@ -7,6 +7,6 @@ Promise.config({
   monitoring: true,
 });
 
-const index = require('./index.js');
+const index = require('./index');
 
 export const app = index.app;

@@ -649,7 +649,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
       'amountTo', 'dateFrom', 'dateTo', 'skip', 'limit');
 
   const query = { user: ctx.user };
-  const transferQuery = { user: ctx.user, transfer: {} };
+  const transferQuery = {};
 
   let transferCategoryId;
 
@@ -680,7 +680,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
     }
 
     query.account = { $in: params.account };
-    transferQuery.transfer.account = { $in: params.account };
+    transferQuery['transfer.account'] = { $in: params.account };
   }
 
   if (!isUndefined(params.type)) {
@@ -725,7 +725,7 @@ router.get('/list', { jwt: true }, async (ctx) => {
 
     if (amountFrom) {
       query.amount = { $gte: parseFloat(amountFrom.toFixed(2)) };
-      transferQuery.transfer.amount = query.amount;
+      transferQuery['transfer.amount'] = query.amount;
     }
   }
 
@@ -745,12 +745,12 @@ router.get('/list', { jwt: true }, async (ctx) => {
         query.amount = {};
       }
 
-      if (!transferQuery.transfer.amount) {
-        transferQuery.transfer.amount = {};
+      if (!transferQuery['transfer.amount']) {
+        transferQuery['transfer.amount'] = {};
       }
 
       query.amount.$lte = parseFloat(amountTo.toFixed(2));
-      transferQuery.transfer.amount.$lte = query.amount.$lte;
+      transferQuery['transfer.amount'].$lte = query.amount.$lte;
     }
   }
 
@@ -806,6 +806,8 @@ router.get('/list', { jwt: true }, async (ctx) => {
   } else {
     params.limit = 30;
   }
+
+  Object.assign(transferQuery, query);
 
   let operations;
   let total;

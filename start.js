@@ -32,16 +32,23 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 if (process.env.BUILD) {
-  fs.removeSync('build');
-  fs.mkdirs('build/assets');
+  if (process.env.CLIENT) {
+    fs.removeSync('build/assets');
+    fs.removeSync('build/webpack-assets.json');
+    fs.mkdirs('build/assets');
 
-  debug('---------------client build start---------------');
-  cp.execSync(`node ${webpack} --config ${clientConfig}`, execContext);
-  debug('---------------client build end---------------');
+    debug('---------------client build start---------------');
+    cp.execSync(`node ${webpack} --config ${clientConfig}`, execContext);
+    debug('---------------client build end---------------');
+  }
 
-  debug('---------------server build start---------------');
-  cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
-  debug('---------------server build end---------------');
+  if (process.env.SERVER) {
+    fs.removeSync('build/server.js');
+
+    debug('---------------server build start---------------');
+    cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
+    debug('---------------server build end---------------');
+  }
 }
 
 if (!process.env.BUILD) {
