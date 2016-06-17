@@ -13,7 +13,7 @@ test.before(async () => {
   });
 });
 
-test('user get profile', async t => {
+test.serial('user get profile', async (t) => {
   const res = await request.get('/api/user/profile');
 
   t.is(res.status, 200);
@@ -22,7 +22,7 @@ test('user get profile', async t => {
   t.true(typeof res.body.settings === 'object');
 });
 
-test('user set settings', async t => {
+test.serial('user set settings', async (t) => {
   let res = await request.post('/api/user/settings').send({ test: 1 });
 
   t.true(typeof res.body.locale === 'string');
@@ -47,7 +47,7 @@ test('user set settings', async t => {
   t.is(res.status, 200);
 });
 
-test('user set status', async t => {
+test.serial('user set status', async (t) => {
   let res = await request.post('/api/user/status').send({ status: 'wrong' });
 
   t.is(res.status, 500);
@@ -67,4 +67,13 @@ test('user set status', async t => {
 
   t.is(res.status, 200);
   t.is(res.body.status, 'ready');
+});
+
+
+test.serial('user delete', async (t) => {
+  let res = await request.post('/api/user/delete');
+  t.is(res.status, 200);
+
+  res = await request.post('/api/user/delete');
+  t.is(res.status, 403);
 });

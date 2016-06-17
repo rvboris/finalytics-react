@@ -103,7 +103,7 @@ export default async(ctx, next) => {
       assets: __ASSETS__,
     };
 
-    ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout { ...layoutProps } />)}`;
+    ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
 
     store.close();
   })(ctx, next);

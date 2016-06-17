@@ -125,18 +125,18 @@ let RegisterForm = (props) => {
   return (
     <div className={styles.container}>
       <Paper className={styles.register} zDepth={1}>
-        <h3><FormattedMessage { ...messages.title } /></h3>
+        <h3><FormattedMessage {...messages.title} /></h3>
 
         <form onSubmit={onSubmit} noValidate>
           <div className={styles.fields}>
             <div>
-              <TextField id="register-email" type="email" { ...email } />
+              <TextField id="register-email" type="email" {...email} />
             </div>
             <div>
-              <TextField id="register-password" type="password" { ...password } />
+              <TextField id="register-password" type="password" {...password} />
             </div>
             <div>
-              <TextField id="register-repeat-password" type="password" { ...repeatPassword } />
+              <TextField id="register-repeat-password" type="password" {...repeatPassword} />
             </div>
           </div>
           <FlatButton

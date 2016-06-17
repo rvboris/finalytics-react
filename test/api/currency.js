@@ -13,7 +13,7 @@ test.before(async () => {
   });
 });
 
-test('load', async t => {
+test('load', async (t) => {
   const res = await request.get('/api/currency/load');
 
   t.is(res.status, 200);

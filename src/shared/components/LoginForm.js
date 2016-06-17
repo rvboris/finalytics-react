@@ -122,15 +122,15 @@ let LoginForm = (props) => {
   return (
     <div className={styles.container}>
       <Paper className={styles.login} zDepth={1}>
-        <h3><FormattedMessage { ...messages.title } /></h3>
+        <h3><FormattedMessage {...messages.title} /></h3>
 
         <form onSubmit={onSubmit} noValidate>
           <div className={styles.fields}>
             <div>
-              <TextField id="login-email" type="email" { ...email } />
+              <TextField id="login-email" type="email" {...email} />
             </div>
             <div>
-              <TextField id="login-password" type="password" { ...password } />
+              <TextField id="login-password" type="password" {...password} />
             </div>
           </div>
           <FlatButton

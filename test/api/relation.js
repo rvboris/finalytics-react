@@ -130,7 +130,3 @@ test.serial('remove category', async (t) => {
 
   t.is(operationToCheck.category, blankCategoryId);
 });
-
-test.serial('remove user', async (t) => {
-
-});

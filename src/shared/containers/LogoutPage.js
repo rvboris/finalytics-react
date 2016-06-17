@@ -41,7 +41,7 @@ class LogoutPage extends React.Component {
         {
           process
             ? <CircularProgress size={2} />
-            : <h1><FormattedMessage { ...messages.done } /></h1>
+            : <h1><FormattedMessage {...messages.done} /></h1>
         }
       </div>
     );
