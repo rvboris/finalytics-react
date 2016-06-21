@@ -948,8 +948,8 @@ test.serial('addTransfer', async (t) => {
   t.is(moment(res.body.created).toISOString(), paramsToCheck.created.toISOString());
   t.is(res.body.account, paramsToCheck.accountFrom);
   t.is(res.body.amount, paramsToCheck.amountFrom);
-  t.is(res.body.type, 'expense');
-  t.is(res.body.transfer.amount, paramsToCheck.amountTo);
+  t.is(res.body.type, 'transfer');
+  t.is(res.body.transfer.amount, -paramsToCheck.amountTo);
   t.is(res.body.transfer.account, paramsToCheck.accountTo);
 });
 
@@ -1095,8 +1095,8 @@ test.serial('updateTransfer', async (t) => {
   t.is(res.body.account, paramsToCheck.accountFrom);
   t.is(res.body.amount, paramsToCheck.amountFrom);
   t.is(res.body.transfer.account, paramsToCheck.accountTo);
-  t.is(res.body.transfer.amount, paramsToCheck.amountTo);
-  t.is(res.body.type, 'expense');
+  t.is(res.body.transfer.amount, -paramsToCheck.amountTo);
+  t.is(res.body.type, 'transfer');
 
   paramsToCheck = {
     _id: transferToUpdate._id,
@@ -1114,7 +1114,7 @@ test.serial('updateTransfer', async (t) => {
   t.is(moment(res.body.created).toISOString(), paramsToCheck.created.toISOString());
   t.is(res.body.account, paramsToCheck.accountFrom);
   t.is(res.body.transfer.account, paramsToCheck.accountTo);
-  t.is(res.body.transfer.amount, paramsToCheck.amountTo);
+  t.is(res.body.transfer.amount, -paramsToCheck.amountTo);
   t.is(res.body.amount, paramsToCheck.amountFrom);
-  t.is(res.body.type, 'expense');
+  t.is(res.body.type, 'transfer');
 });

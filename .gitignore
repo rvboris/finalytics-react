@@ -45,3 +45,6 @@ config/production.js
 # Webpack stats
 webpack/client-stats.html
 webpack/server-stats.html
+
+#Idea
+.idea

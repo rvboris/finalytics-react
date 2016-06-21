@@ -61,7 +61,7 @@ if (!process.env.BUILD) {
       execContext.env.startPoint = `http://${msg.ctx.hostname}:${msg.ctx.port}`;
 
       debug('---------------e2e tests start---------------');
-      cp.execSync('ava test/e2e/*.js --tap | faucet', execContext);
+      cp.execSync('ava test/e2e/*.js --tap | tap-summary', execContext);
       debug('---------------e2e tests end---------------');
 
       server.send('shutdown');

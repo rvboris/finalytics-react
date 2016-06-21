@@ -99,6 +99,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   operation.type = amount.gt(0) ? 'income' : 'expense';
   operation.amount = parseFloat(amount.toFixed(account.currency.decimalDigits));
   operation.user = ctx.user;
+  operation.created = params.created;
 
   try {
     const { data: categoryData } = await CategoryModel.findOne({ user: ctx.user }, 'data');
@@ -442,14 +443,14 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
 
   const operation = new OperationModel();
 
-  operation.type = 'expense';
+  operation.type = 'transfer';
   operation.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
   operation.user = ctx.user;
   operation.created = params.created;
   operation.account = accountFrom;
   operation.transfer = {
     account: accountTo,
-    amount: amountTo,
+    amount: -parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits)),
   };
 
   try {
@@ -625,7 +626,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   if (!isUndefined(params.amountTo)) {
-    operation.transfer.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
+    operation.transfer.amount = -parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
   }
 
   if (!isUndefined(params.accountTo)) {
@@ -691,7 +692,6 @@ router.get('/list', { jwt: true }, async (ctx) => {
     }
 
     query.type = params.type;
-    query.transfer = { $exists: false };
   }
 
   if (!isUndefined(params.category)) {
