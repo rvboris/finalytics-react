@@ -121,6 +121,7 @@ test.serial('update operation date', async (t) => {
   });
 
   t.is(res.status, 200);
+  t.is(res.body.balance, 600);
 
   res = await request.get('/api/operation/list');
 
@@ -305,15 +306,63 @@ test.serial('update account start balance', async (t) => {
   t.is(res.status, 200);
   t.is(res.body.accounts[2].startBalance, 500);
   t.is(res.body.accounts[2].currentBalance, 600);
+
+  res = await request.get('/api/operation/list').query({ account: accountToUpdate._id });
+
+  t.is(res.status, 200);
+  t.is(res.body.operations[0].balance, 600);
 });
 
-// test.serial('remove account', async (t) => {
+test.serial('remove account', async (t) => {
+  let res = await request.get('/api/account/load');
 
-// });
+  t.is(res.status, 200);
 
-// test.serial('add transfer operation', async (t) => {
+  const accountToDelete = res.body.accounts[2];
 
-// });
+  res = await request.get('/api/operation/list');
+
+  t.is(res.status, 200);
+  t.is(res.body.total, 1);
+
+  res = await request.post('/api/account/delete').send({ _id: accountToDelete._id });
+
+  t.is(res.status, 200);
+
+  res = await request.get('/api/operation/list');
+
+  t.is(res.status, 200);
+  t.is(res.body.total, 0);
+});
+
+test.serial('add transfer operation', async (t) => {
+  let res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+
+  const accountFrom = res.body.accounts[0];
+  const accountTo = res.body.accounts[1];
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc('2016-03-10'),
+    accountFrom: accountFrom._id,
+    accountTo: accountTo._id,
+    amountFrom: 100,
+    amountTo: 200,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.balance, -100);
+  t.is(res.body.amount, -100);
+  t.is(res.body.transfer.balance, 200);
+  t.is(res.body.transfer.amount, 200);
+
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts[0].currentBalance, -100);
+  t.is(res.body.accounts[1].currentBalance, 200);
+});
 
 // test.serial('insert transfer operation amount', async (t) => {
 

@@ -64,8 +64,13 @@ model.post('save', async function postSave(account, next) {
       const user = await UserModel
         .findOne({ accounts: { $in: [account._id] } }, '_id');
 
+      const query = { user: user._id, account: account._id };
+      const transferQuery = { 'transfer.account': account._id };
+
+      Object.assign(transferQuery, query);
+
       const firstOperation = await OperationModel
-        .findOne({ user: user._id, account: account._id }, 'created')
+        .findOne({ $or: [query, transferQuery] }, 'created')
         .sort({ created: 1 });
 
       const fromDate = firstOperation ? firstOperation.created : account.created;

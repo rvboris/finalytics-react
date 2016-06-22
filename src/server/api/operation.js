@@ -311,7 +311,8 @@ router.post('/update', { jwt: true }, async (ctx) => {
   }
 
   try {
-    operation = await operation.save();
+    await operation.save();
+    operation = await OperationModel.findById(params._id);
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -444,13 +445,13 @@ router.post('/addTransfer', { jwt: true }, async (ctx) => {
   const operation = new OperationModel();
 
   operation.type = 'transfer';
-  operation.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+  operation.amount = -parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
   operation.user = ctx.user;
   operation.created = params.created;
   operation.account = accountFrom;
   operation.transfer = {
     account: accountTo,
-    amount: -parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits)),
+    amount: parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits)),
   };
 
   try {
@@ -614,7 +615,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   if (!isUndefined(params.amountFrom)) {
-    operation.amount = parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
+    operation.amount = -parseFloat(amountFrom.toFixed(accountFrom.currency.decimalDigits));
   }
 
   if (!isUndefined(params.created)) {
@@ -626,7 +627,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   }
 
   if (!isUndefined(params.amountTo)) {
-    operation.transfer.amount = -parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
+    operation.transfer.amount = parseFloat(amountTo.toFixed(accountTo.currency.decimalDigits));
   }
 
   if (!isUndefined(params.accountTo)) {
@@ -635,6 +636,7 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
 
   try {
     await operation.save();
+    operation = await OperationModel.findById(params._id);
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;

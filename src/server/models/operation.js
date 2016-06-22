@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import big from 'big.js';
+import { get } from 'lodash';
 
 import AccountModel from './account';
 
@@ -20,6 +21,10 @@ const model = new mongoose.Schema({
   created: { type: Date, required: true },
   updated: { type: Date, required: true },
 });
+
+model.methods.isTransfer = function isTransfer() {
+  return this.transfer.account && this.transfer.amount;
+};
 
 model.statics.calcBalance = async (accountId, amount) => {
   const account = await AccountModel.findById(accountId).populate('currency');
@@ -53,24 +58,46 @@ model.statics.balanceCorrection = async (userId, accountId, fromDate, startBalan
 
   currentBalance = big(currentBalance);
 
-  const operationsToUpdate = await OperationModel.find({
+  const query = {
     created: {
       $gte: fromDate,
     },
     account: accountId,
     user: userId,
-  }, '_id amount').sort({ created: 1 });
+  };
+
+  const transferQuery = {
+    transfer: {
+      account: accountId,
+    },
+  };
+
+  Object.assign(transferQuery, query);
+
+  const operationsToUpdate = await OperationModel.find({
+    $or: [query, transferQuery],
+  }, '_id amount transfer').sort({ created: 1 });
 
   operationsToUpdate.forEach(async (operation) => {
     currentBalance = currentBalance.plus(operation.amount);
 
-    operation.balance = parseFloat(currentBalance.toFixed(currency.decimalDigits));
+    if (operation.isTransfer() && operation.transfer.account.equal(accountId)) {
+      operation.transfer.balance = parseFloat(currentBalance.toFixed(currency.decimalDigits));
 
-    await OperationModel.findByIdAndUpdate(operation._id, {
-      $set: {
-        balance: parseFloat(currentBalance.toFixed(currency.decimalDigits)),
-      },
-    });
+      await OperationModel.findByIdAndUpdate(operation._id, {
+        $set: {
+          'transfer.balance': parseFloat(currentBalance.toFixed(currency.decimalDigits)),
+        },
+      });
+    } else {
+      operation.balance = parseFloat(currentBalance.toFixed(currency.decimalDigits));
+
+      await OperationModel.findByIdAndUpdate(operation._id, {
+        $set: {
+          balance: parseFloat(currentBalance.toFixed(currency.decimalDigits)),
+        },
+      });
+    }
   });
 
   await AccountModel.findByIdAndUpdate(accountId, {
@@ -91,7 +118,7 @@ model.pre('validate', async function preValidate(next) {
     try {
       this.balance = await model.statics.calcBalance(this.account, this.amount);
 
-      if (this.transfer.amount && this.transfer.account) {
+      if (this.isTransfer()) {
         this.transfer.balance =
           await model.statics.calcBalance(this.transfer.account, this.transfer.amount);
       }
@@ -111,47 +138,63 @@ model.pre('save', function preSave(next) {
 });
 
 model.post('save', async function postSave(operation, next) {
-  const wasNew = operation.wasNew;
-
-  operation = operation.toObject({ depopulate: true, version: false });
+  const op = operation.toObject({ depopulate: true, version: false });
 
   try {
-    if (wasNew) {
-      const operationsAfter = await mongoose.model('Operation').count({
+    if (operation.wasNew) {
+      const newer = await mongoose.model('Operation').count({
         created: {
-          $gt: operation.created,
+          $gt: op.created,
         },
-        account: operation.account,
-        user: operation.user,
+        account: op.account,
+        user: op.user,
       });
 
-      if (operationsAfter > 0) {
-        await model.statics
-          .balanceCorrection(operation.user, operation.account, operation.created);
+      if (newer) {
+        await model.statics.balanceCorrection(op.user, op.account, op.created);
+
+        if (operation.isTransfer()) {
+          await model.statics.balanceCorrection(op.user, op.transfer.account, op.created);
+        }
       } else {
-        await AccountModel
-          .update({ _id: operation.account }, { currentBalance: operation.balance });
+        await AccountModel.update({ _id: op.account }, { currentBalance: op.balance });
+
+        if (operation.isTransfer()) {
+          await AccountModel
+            .update({ _id: op.transfer.account }, { currentBalance: op.transfer.balance });
+        }
       }
 
       next();
       return;
     }
 
-    if (operation.amount === this._original.amount
-        && operation.created === this._original.created
-        && operation.account === this._original.account) {
+    const transferUpdated = operation.isTransfer()
+        && get(op, 'transfer.account') === get(this._original, 'transfer.account')
+        && get(op, 'transfer.amount') === get(this._original, 'transfer.amount');
+
+    if (op.amount === this._original.amount
+        && op.created === this._original.created
+        && op.account === this._original.account
+        && !transferUpdated) {
       next();
       return;
     }
 
-    const fromDate = this._original.created < operation.created
-      ? this._original.created
-      : operation.created;
+    const fromDate = this._original.created < op.created ? this._original.created : op.created;
 
-    await model.statics.balanceCorrection(operation.user, operation.account, fromDate);
+    await model.statics.balanceCorrection(op.user, op.account, fromDate);
 
-    if (!operation.account.equals(this._original.account)) {
-      await model.statics.balanceCorrection(operation.user, this._original.account, fromDate);
+    if (transferUpdated) {
+      await model.statics.balanceCorrection(op.user, op.transfer.account, fromDate);
+    }
+
+    if (!op.account.equals(this._original.account)) {
+      await model.statics.balanceCorrection(op.user, this._original.account, fromDate);
+    }
+
+    if (transferUpdated && !op.transfer.account.equals(this._original.transfer.account)) {
+      await model.statics.balanceCorrection(op.user, this._original.transfer.account, fromDate);
     }
 
     next();
@@ -161,10 +204,14 @@ model.post('save', async function postSave(operation, next) {
 });
 
 model.post('remove', async function postRemove(operation, next) {
-  operation = operation.toObject({ depopulate: true, version: false });
+  const op = operation.toObject({ depopulate: true, version: false });
 
   try {
-    await model.statics.balanceCorrection(operation.user, operation.account, operation.created);
+    await model.statics.balanceCorrection(op.user, op.account, op.created);
+
+    if (operation.isTransfer()) {
+      await model.statics.balanceCorrection(op.user, op.transfer.account, op.created);
+    }
   } catch (e) {
     next(e);
     return;
