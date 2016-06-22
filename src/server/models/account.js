@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 
 import OperationModel from './operation';
+import UserModel from './user';
 
 const model = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -13,6 +14,10 @@ const model = new mongoose.Schema({
   type: { type: String, required: true, default: 'standart', enum: ['standart', 'debt'] },
   created: { type: Date, required: true },
   updated: { type: Date, required: true },
+});
+
+model.post('init', function postInit() {
+  this._original = this.toObject({ version: false, depopulate: true });
 });
 
 model.pre('validate', async function preValidate(next) {
@@ -38,6 +43,38 @@ model.pre('remove', async function preRemove(next) {
   } catch (e) {
     next(e);
     return;
+  }
+
+  next();
+});
+
+model.pre('save', function preSave(next) {
+  this.wasNew = this.isNew;
+
+  next();
+});
+
+model.post('save', async function postSave(account, next) {
+  const wasNew = account.wasNew;
+
+  account = account.toObject({ depopulate: false, version: false });
+
+  if (!wasNew && this._original.startBalance !== account.startBalance) {
+    try {
+      const user = await UserModel
+        .findOne({ accounts: { $in: [account._id] } }, '_id');
+
+      const firstOperation = await OperationModel
+        .findOne({ user: user._id, account: account._id }, 'created')
+        .sort({ created: 1 });
+
+      const fromDate = firstOperation ? firstOperation.created : account.created;
+
+      await OperationModel.balanceCorrection(user._id, account._id, fromDate, account.startBalance);
+    } catch (e) {
+      next(e);
+      return;
+    }
   }
 
   next();

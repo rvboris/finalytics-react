@@ -44,11 +44,14 @@ model.statics.getLastBalance = async (userId, accountId, fromDate) => {
   return (await AccountModel.findById(accountId, 'startBalance')).startBalance;
 };
 
-model.statics.balanceCorrection = async (userId, accountId, fromDate) => {
+model.statics.balanceCorrection = async (userId, accountId, fromDate, startBalance) => {
   const OperationModel = mongoose.model('Operation');
   const { currency } = await AccountModel.findById(accountId, 'currency').populate('currency');
 
-  let currentBalance = big(await model.statics.getLastBalance(userId, accountId, fromDate));
+  let currentBalance =
+    startBalance || await model.statics.getLastBalance(userId, accountId, fromDate);
+
+  currentBalance = big(currentBalance);
 
   const operationsToUpdate = await OperationModel.find({
     created: {
@@ -101,22 +104,67 @@ model.pre('validate', async function preValidate(next) {
   next();
 });
 
-model.post('save', async function postSave(operation, next) {
-  try {
-    const operationsAfter = await mongoose.model('Operation').count({
-      created: {
-        $gt: operation.created,
-      },
-      account: operation.account,
-      user: operation.user,
-    });
+model.pre('save', function preSave(next) {
+  this.wasNew = this.isNew;
 
-    if (operationsAfter > 0) {
-      await model.statics
-        .balanceCorrection(operation.user._id, operation.account, operation.created);
-    } else {
-      await AccountModel.update({ _id: operation.account }, { currentBalance: operation.balance });
+  next();
+});
+
+model.post('save', async function postSave(operation, next) {
+  const wasNew = operation.wasNew;
+
+  operation = operation.toObject({ depopulate: true, version: false });
+
+  try {
+    if (wasNew) {
+      const operationsAfter = await mongoose.model('Operation').count({
+        created: {
+          $gt: operation.created,
+        },
+        account: operation.account,
+        user: operation.user,
+      });
+
+      if (operationsAfter > 0) {
+        await model.statics
+          .balanceCorrection(operation.user, operation.account, operation.created);
+      } else {
+        await AccountModel
+          .update({ _id: operation.account }, { currentBalance: operation.balance });
+      }
+
+      next();
+      return;
     }
+
+    if (operation.amount === this._original.amount
+        && operation.created === this._original.created
+        && operation.account === this._original.account) {
+      next();
+      return;
+    }
+
+    const fromDate = this._original.created < operation.created
+      ? this._original.created
+      : operation.created;
+
+    await model.statics.balanceCorrection(operation.user, operation.account, fromDate);
+
+    if (!operation.account.equals(this._original.account)) {
+      await model.statics.balanceCorrection(operation.user, this._original.account, fromDate);
+    }
+
+    next();
+  } catch (e) {
+    next(e);
+  }
+});
+
+model.post('remove', async function postRemove(operation, next) {
+  operation = operation.toObject({ depopulate: true, version: false });
+
+  try {
+    await model.statics.balanceCorrection(operation.user, operation.account, operation.created);
   } catch (e) {
     next(e);
     return;

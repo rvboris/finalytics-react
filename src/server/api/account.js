@@ -75,7 +75,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
   }
 
   try {
-    const { accounts } = await UserModel.populate(ctx.user, {
+    let { accounts } = await UserModel.populate(ctx.user, {
       path: 'accounts',
       populate: { path: 'currency' },
     });
@@ -122,7 +122,10 @@ router.post('/update', { jwt: true }, async (ctx) => {
     }
 
     merge(account, params);
+
     await account.save();
+
+    accounts = await AccountModel.find({ _id: { $in: accounts } });
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
   } catch (e) {
@@ -213,6 +216,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   }
 
   params.startBalance = parseFloat(params.startBalance.toFixed(params.currency.decimalDigits));
+  params.currentBalance = params.startBalance;
 
   let accounts;
 
