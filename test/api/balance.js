@@ -364,15 +364,72 @@ test.serial('add transfer operation', async (t) => {
   t.is(res.body.accounts[1].currentBalance, 200);
 });
 
-// test.serial('insert transfer operation amount', async (t) => {
+test.serial('insert transfer operation', async (t) => {
+  let res = await request.get('/api/account/load');
 
-// });
+  t.is(res.status, 200);
 
-// test.serial('update transfer operation date', async (t) => {
+  const accountFrom = res.body.accounts[0];
+  const accountTo = res.body.accounts[1];
 
-// });
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc('2016-03-05'),
+    accountFrom: accountFrom._id,
+    accountTo: accountTo._id,
+    amountFrom: 500,
+    amountTo: 300,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.balance, -600);
+  t.is(res.body.amount, -500);
+  t.is(res.body.transfer.balance, 500);
+  t.is(res.body.transfer.amount, 300);
+
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts[0].currentBalance, -600);
+  t.is(res.body.accounts[1].currentBalance, 500);
+});
+
+test.serial('update transfer operation date', async (t) => {
+  let res = await request.get('/api/account/load');
+
+  res = await request.get('/api/operation/list');
+
+  t.is(res.status, 200);
+  t.is(res.body.total, 2);
+
+  const operationToUpdate = res.body.operations[1];
+
+  res = await request.post('/api/operation/updateTransfer').send({
+    _id: operationToUpdate._id,
+    created: moment.utc('2016-03-15'),
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -500);
+  t.is(res.body.balance, -600);
+  t.is(res.body.transfer.amount, 300);
+  t.is(res.body.transfer.balance, 500);
+
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts[0].currentBalance, -600);
+  t.is(res.body.accounts[1].currentBalance, 500);
+});
 
 // test.serial('update transfer operation account', async (t) => {
+
+// });
+
+// test.serial('update transfer operation amount', async (t) => {
+
+// });
+
+// test.serial('transfer operation remove account ', async (t) => {
 
 // });
 

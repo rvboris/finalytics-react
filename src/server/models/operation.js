@@ -23,7 +23,8 @@ const model = new mongoose.Schema({
 });
 
 model.methods.isTransfer = function isTransfer() {
-  return this.transfer.account && this.transfer.amount;
+  return !!(this.type === 'transfer' ||
+    (get(this, 'transfer.account', false) && get(this, 'transfer.amount', false)));
 };
 
 model.statics.calcBalance = async (accountId, amount) => {
@@ -34,19 +35,43 @@ model.statics.calcBalance = async (accountId, amount) => {
 };
 
 model.statics.getLastBalance = async (userId, accountId, fromDate) => {
-  const lastOperation = await mongoose.model('Operation').findOne({
+  const query = {
     created: {
       $lt: fromDate,
     },
     user: userId,
-    account: accountId,
-  }, 'balance').sort({ created: -1 });
+  };
+
+  const transferQuery = { 'transfer.account': accountId };
+
+  Object.assign(transferQuery, query);
+
+  query.account = accountId;
+
+  const lastOperation = await mongoose.model('Operation')
+    .findOne({ $or: [query, transferQuery] }, 'balance')
+    .sort({ created: -1 });
 
   if (lastOperation) {
     return lastOperation.balance;
   }
 
   return (await AccountModel.findById(accountId, 'startBalance')).startBalance;
+};
+
+model.statics.isChanged = (op1, op2) => {
+  const dateChanged = op1.created !== op2.created;
+
+  if (dateChanged) {
+    return true;
+  }
+
+  if (op1.isTransfer()) {
+    return get(op1, 'transfer.amount', 0) !== get(op2, 'transfer.amount') ||
+      get(op1, 'transfer.account', '').toString() !== get(op2, 'transfer.account', '').toString();
+  }
+
+  return op1.account.toString() !== op2.account.toString() || op1.amount !== op2.amount;
 };
 
 model.statics.balanceCorrection = async (userId, accountId, fromDate, startBalance) => {
@@ -62,36 +87,32 @@ model.statics.balanceCorrection = async (userId, accountId, fromDate, startBalan
     created: {
       $gte: fromDate,
     },
-    account: accountId,
     user: userId,
   };
 
-  const transferQuery = {
-    transfer: {
-      account: accountId,
-    },
-  };
+  const transferQuery = { 'transfer.account': accountId };
 
   Object.assign(transferQuery, query);
 
+  query.account = accountId;
+
   const operationsToUpdate = await OperationModel.find({
     $or: [query, transferQuery],
-  }, '_id amount transfer').sort({ created: 1 });
+  }, '_id amount type transfer').sort({ created: 1 });
+
 
   operationsToUpdate.forEach(async (operation) => {
-    currentBalance = currentBalance.plus(operation.amount);
-
-    if (operation.isTransfer() && operation.transfer.account.equal(accountId)) {
+    if (operation.isTransfer() && operation.transfer.account.equals(accountId)) {
+      currentBalance = currentBalance.plus(operation.transfer.amount);
       operation.transfer.balance = parseFloat(currentBalance.toFixed(currency.decimalDigits));
-
       await OperationModel.findByIdAndUpdate(operation._id, {
         $set: {
           'transfer.balance': parseFloat(currentBalance.toFixed(currency.decimalDigits)),
         },
       });
     } else {
+      currentBalance = currentBalance.plus(operation.amount);
       operation.balance = parseFloat(currentBalance.toFixed(currency.decimalDigits));
-
       await OperationModel.findByIdAndUpdate(operation._id, {
         $set: {
           balance: parseFloat(currentBalance.toFixed(currency.decimalDigits)),
@@ -142,13 +163,20 @@ model.post('save', async function postSave(operation, next) {
 
   try {
     if (operation.wasNew) {
-      const newer = await mongoose.model('Operation').count({
+      const query = {
         created: {
           $gt: op.created,
         },
-        account: op.account,
         user: op.user,
-      });
+      };
+
+      const transferQuery = { 'transfer.account': op.account };
+
+      Object.assign(transferQuery, query);
+
+      query.account = op.account;
+
+      const newer = await mongoose.model('Operation').count({ $or: [query, transferQuery] });
 
       if (newer) {
         await model.statics.balanceCorrection(op.user, op.account, op.created);
@@ -170,13 +198,9 @@ model.post('save', async function postSave(operation, next) {
     }
 
     const transferUpdated = operation.isTransfer()
-        && get(op, 'transfer.account') === get(this._original, 'transfer.account')
-        && get(op, 'transfer.amount') === get(this._original, 'transfer.amount');
+      && model.statics.isChanged(operation, this._original);
 
-    if (op.amount === this._original.amount
-        && op.created === this._original.created
-        && op.account === this._original.account
-        && !transferUpdated) {
+    if (!model.statics.isChanged(operation, this._original) && !transferUpdated) {
       next();
       return;
     }
