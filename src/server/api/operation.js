@@ -597,15 +597,29 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
   let operation;
 
   try {
-    operation = await OperationModel.findById(params._id).populate({
-      path: 'account',
-      populate: { path: 'currency' },
-    });
+    operation = await OperationModel.findById(params._id).populate([
+      {
+        path: 'account',
+        populate: { path: 'currency' },
+      },
+      {
+        path: 'transfer.account',
+        populate: { path: 'currency' },
+      },
+    ]);
 
     if (!operation || (operation && !operation.transfer)) {
       ctx.status = 400;
       ctx.body = { error: 'operation.updateTransfer.error._id.notFound' };
       return;
+    }
+
+    if (!accountFrom) {
+      accountFrom = operation.account;
+    }
+
+    if (!accountTo) {
+      accountTo = operation.transfer.account;
     }
   } catch (e) {
     ctx.log.error(e);

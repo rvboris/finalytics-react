@@ -394,9 +394,7 @@ test.serial('insert transfer operation', async (t) => {
 });
 
 test.serial('update transfer operation date', async (t) => {
-  let res = await request.get('/api/account/load');
-
-  res = await request.get('/api/operation/list');
+  let res = await request.get('/api/operation/list');
 
   t.is(res.status, 200);
   t.is(res.body.total, 2);
@@ -421,17 +419,59 @@ test.serial('update transfer operation date', async (t) => {
   t.is(res.body.accounts[1].currentBalance, 500);
 });
 
-// test.serial('update transfer operation account', async (t) => {
+test.serial('update transfer operation amount', async (t) => {
+  let res = await request.get('/api/operation/list');
 
-// });
+  t.is(res.status, 200);
+  t.is(res.body.total, 2);
 
-// test.serial('update transfer operation amount', async (t) => {
+  const operationToUpdate = res.body.operations[1];
 
-// });
+  res = await request.post('/api/operation/updateTransfer').send({
+    _id: operationToUpdate._id,
+    amountFrom: 200,
+    amountTo: 300,
+  });
 
-// test.serial('transfer operation remove account ', async (t) => {
+  t.is(res.status, 200);
+  t.is(res.body.amount, -200);
+  t.is(res.body.balance, -200);
+  t.is(res.body.transfer.amount, 300);
+  t.is(res.body.transfer.balance, 300);
 
-// });
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts[0].currentBalance, -700);
+  t.is(res.body.accounts[1].currentBalance, 600);
+});
+
+test.serial('update transfer operation account', async (t) => {
+  let res = await request.get('/api/operation/list');
+
+  t.is(res.status, 200);
+  t.is(res.body.total, 2);
+
+  const operationToUpdate = res.body.operations[1];
+
+  res = await request.post('/api/operation/updateTransfer').send({
+    _id: operationToUpdate._id,
+    accountFrom: operationToUpdate.transfer.account,
+    accountTo: operationToUpdate.account,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -200);
+  t.is(res.body.balance, -200);
+  t.is(res.body.transfer.amount, 300);
+  t.is(res.body.transfer.balance, 300);
+
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts[0].currentBalance, -200);
+  t.is(res.body.accounts[1].currentBalance, 100);
+});
 
 // test.serial('add transfer operation in different currency', async (t) => {
 

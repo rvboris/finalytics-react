@@ -49,10 +49,14 @@ model.statics.getLastBalance = async (userId, accountId, fromDate) => {
   query.account = accountId;
 
   const lastOperation = await mongoose.model('Operation')
-    .findOne({ $or: [query, transferQuery] }, 'balance')
+    .findOne({ $or: [query, transferQuery] }, 'balance type')
     .sort({ created: -1 });
 
   if (lastOperation) {
+    if (lastOperation.isTransfer() && lastOperation.transfer.account.equals(accountId)) {
+      return lastOperation.transfer.balance;
+    }
+
     return lastOperation.balance;
   }
 
@@ -99,7 +103,6 @@ model.statics.balanceCorrection = async (userId, accountId, fromDate, startBalan
   const operationsToUpdate = await OperationModel.find({
     $or: [query, transferQuery],
   }, '_id amount type transfer').sort({ created: 1 });
-
 
   operationsToUpdate.forEach(async (operation) => {
     if (operation.isTransfer() && operation.transfer.account.equals(accountId)) {
