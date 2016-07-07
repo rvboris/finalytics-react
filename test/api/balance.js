@@ -473,6 +473,64 @@ test.serial('update transfer operation account', async (t) => {
   t.is(res.body.accounts[1].currentBalance, 100);
 });
 
-// test.serial('add transfer operation in different currency', async (t) => {
+test.serial('add transfer operation in different currency', async (t) => {
+  let res = await request.get('/api/currency/load');
 
-// });
+  t.is(res.status, 200);
+
+  const currencyList = res.body.currencyList;
+  const usdCurrency = currencyList[0];
+
+  res = await request.post('/api/account/add').send({
+    name: 'test account',
+    startBalance: 1000,
+    type: 'standart',
+    currency: usdCurrency._id,
+  });
+
+  t.is(res.status, 200);
+
+  const accountFromTransfer = res.body.accounts[0];
+  const accountToTransfer = res.body.accounts[res.body.accounts.length - 1];
+
+  t.is(accountToTransfer.startBalance, 1000);
+  t.is(accountToTransfer.currentBalance, 1000);
+
+  res = await request.post('/api/operation/addTransfer').send({
+    created: moment.utc('2016-05-05'),
+    accountFrom: accountFromTransfer._id,
+    accountTo: accountToTransfer._id,
+    amountFrom: 100,
+    amountTo: 200,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, -100);
+  t.is(res.body.balance, -300);
+  t.is(res.body.transfer.amount, 200);
+  t.is(res.body.transfer.balance, 1200);
+});
+
+test.serial('balance calculation accuracy', async (t) => {
+  let res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+
+  const accountToCheck = res.body.accounts[0];
+
+  t.is(accountToCheck.startBalance, 0);
+  t.is(accountToCheck.currentBalance, -300);
+
+  const amount = 10.023456;
+
+  res = await request.post('/api/operation/add').send({
+    created: moment.utc('2016-06-05'),
+    account: accountToCheck._id,
+    category: sample(incomeCategoryList).model._id,
+    amount,
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.amount, 10.02);
+  t.is(res.body.balance, -289.98);
+});

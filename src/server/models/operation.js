@@ -49,7 +49,7 @@ model.statics.getLastBalance = async (userId, accountId, fromDate) => {
   query.account = accountId;
 
   const lastOperation = await mongoose.model('Operation')
-    .findOne({ $or: [query, transferQuery] }, 'balance type')
+    .findOne({ $or: [query, transferQuery] }, 'balance type transfer')
     .sort({ created: -1 });
 
   if (lastOperation) {
