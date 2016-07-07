@@ -210,7 +210,7 @@ export default {
     extensions: ['', '.json', '.js'],
     alias: {
       react: env === 'production' ? 'react-lite' : 'react',
-      'react-dom': env === 'production' ? 'react-lite' : 'react',
+      'react-dom': env === 'production' ? 'react-lite' : 'react-dom',
     },
   },
   eslint: {

@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'development') {
   client.stdout.pipe(process.stdout);
   client.stderr.pipe(process.stderr);
 
-  cp.execSync(`node ${wait} -p build/webpack-assets.json`, execContext);
+  cp.execSync(`node ${wait} -p build/webpack-assets.json -t 60`, execContext);
 
   debug('---------------server build start---------------');
   cp.execSync(`node ${webpack} --config ${serverConfig}`, execContext);
