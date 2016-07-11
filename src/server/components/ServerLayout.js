@@ -3,7 +3,7 @@ import styles from './ServerLayout.css';
 
 export default function ServerLayout({ initialState, body, assets, locale, title, description }) {
   const inlineScript = [
-    `window.__INITIAL_STATE__ = ${JSON.stringify(initialState)}`,
+    `window.INITIAL_STATE = ${JSON.stringify(initialState)}`,
   ];
 
   return (
