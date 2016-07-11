@@ -13,6 +13,20 @@ import fetcher from '../utils/fetcher';
 import ServerLayout from '../components/ServerLayout';
 import { authActions } from '../../shared/actions';
 
+import ClientBundleAssets from '../../../build/client/assets.json';
+
+const chunks = Object.keys(ClientBundleAssets).map(key => ClientBundleAssets[key]);
+
+const assets = chunks.reduce((acc, chunk) => {
+  if (chunk.js) {
+    acc.javascript.push(chunk.js);
+  }
+  if (chunk.css) {
+    acc.css.push(chunk.css);
+  }
+  return acc;
+}, { javascript: [], css: [] });
+
 const runRouter = (location, routes) =>
   new Promise((resolve) =>
     match({ routes, location }, (...args) => resolve(args)));
@@ -69,7 +83,7 @@ export default async(ctx, next) => {
       ctx.log.error(err);
 
       ctx.status = 500;
-      ctx.body = __DEVELOPMENT__ ? err.stack : err.message;
+      ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
 
       return;
     }
@@ -100,7 +114,7 @@ export default async(ctx, next) => {
       locale: ctx.language,
       title: 'koa-universal-react-redux',
       description: 'koa-universal-react-redux',
-      assets: __ASSETS__,
+      assets,
     };
 
     ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;

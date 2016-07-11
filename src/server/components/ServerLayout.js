@@ -14,7 +14,7 @@ export default function ServerLayout({ initialState, body, assets, locale, title
 
         <link rel="icon" type="image/ico" href="/favicon.ico" />
 
-        {assets.styles.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
+        {assets.css.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
 
         <title>{title}</title>
 
@@ -24,7 +24,7 @@ export default function ServerLayout({ initialState, body, assets, locale, title
       <body>
         <div dangerouslySetInnerHTML={{ __html: body }} />
 
-        {assets.scripts.map((src, idx) => <script key={idx} src={src} />)}
+        {assets.javascript.map((src, idx) => <script key={idx} src={src} />)}
       </body>
     </html>
   );

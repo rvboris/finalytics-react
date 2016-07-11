@@ -2,44 +2,38 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
-
-import Toolbar from 'material-ui/Toolbar/Toolbar';
-import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup';
-import ToolbarTitle from 'material-ui/Toolbar/ToolbarTitle';
-import FlatButton from 'material-ui/FlatButton';
+import { Button } from 'react-bootstrap';
 
 const goToMain = (dispatch) => () => dispatch(push('/dashboard'));
 const goToLogout = (dispatch) => () => dispatch(push('/logout'));
 
-const dashboardPage = (props) => (
-  <div>
-    <Toolbar>
-      <ToolbarGroup float="left">
-        <ToolbarTitle text="Options" onTitleTouchTap={goToMain(props.dispatch)} />
-        <FlatButton label="Обзор" primary />
-        <FlatButton label="Операции" primary />
-        <FlatButton label="Бюджет" primary />
-        <FlatButton label="Отчеты" primary />
-      </ToolbarGroup>
+class DashboardPage extends React.Component {
+  static propTypes = {
+    dispatch: React.PropTypes.func.isRequired,
+    profile: React.PropTypes.object.isRequired,
+  };
 
-      <ToolbarGroup float="right" lastChild>
-        <FlatButton label="Настройки" secondary />
-        <FlatButton label="Выход" onClick={goToLogout(props.dispatch)} secondary />
-      </ToolbarGroup>
-    </Toolbar>
-  </div>
-);
+  state = {
+    drawerActive: false,
+  };
 
-dashboardPage.propTypes = {
-  dispatch: React.PropTypes.func.isRequired,
-  profile: React.PropTypes.object.isRequired,
-};
+  toggleDrawerActive = () => {
+    this.setState({ drawerActive: !this.state.drawerActive });
+  };
 
-const profileSelector = (state) => state.auth.profile;
+  render() {
+    return (
+      <div>
+        <Button onClick={goToMain(this.props.dispatch)}>Main</Button>
+        <Button onClick={goToLogout(this.props.dispatch)}>Logout</Button>
+      </div>
+    );
+  }
+}
 
 const selector = createSelector(
-  profileSelector,
-  (profile) => ({ profile })
+  state => state,
+  (state) => ({ profile: state.auth.profile })
 );
 
-export default connect(selector)(dashboardPage);
+export default connect(selector)(DashboardPage);

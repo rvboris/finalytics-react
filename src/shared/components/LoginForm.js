@@ -3,12 +3,7 @@ import { createSelector } from 'reselect';
 import { reduxForm } from 'redux-form';
 import { each, noop } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-
-import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-
+import { Button, FormControl } from 'react-bootstrap';
 import validationHandler from '../utils/validation-handler';
 import styles from './LoginForm.css';
 import fonts from '../fonts.css';
@@ -121,54 +116,54 @@ let LoginForm = (props) => {
 
   return (
     <div className={styles.container}>
-      <Paper className={styles.login} zDepth={1}>
-        <h3><FormattedMessage {...messages.title} /></h3>
+      <h3><FormattedMessage {...messages.title} /></h3>
 
-        <form onSubmit={onSubmit} noValidate>
-          <div className={styles.fields}>
-            <div>
-              <TextField id="login-email" type="email" {...email} />
-            </div>
-            <div>
-              <TextField id="login-password" type="password" {...password} />
-            </div>
+      <form onSubmit={onSubmit} noValidate>
+        <div className={styles.fields}>
+          <div>
+            <FormControl id="login-email" type="email" {...email} />
           </div>
-          <FlatButton
-            type="button"
-            disabled={process}
-            onClick={onRegister}
-            label={formatMessage(messages.registerButton)}
-          />
-          <FlatButton
-            type="submit"
-            disabled={process}
-            label={
-              process
-                ? formatMessage(messages.processButton)
-                : formatMessage(messages.button)
-            }
-            primary
-          />
-        </form>
-
-        <div className={styles.social}>
-          <IconButton
-            onClick={onGoogle}
-            iconClassName={`social ${fonts['icon-google']}`}
-            tooltip="Google"
-          />
-          <IconButton
-            onClick={onFacebook}
-            iconClassName={`social ${fonts['icon-facebook']}`}
-            tooltip="Facebook"
-          />
-          <IconButton
-            onClick={onTwitter}
-            iconClassName={`social ${fonts['icon-twitter']}`}
-            tooltip="Twitter"
-          />
+          <div>
+            <FormControl id="login-password" type="password" {...password} />
+          </div>
         </div>
-      </Paper>
+        <Button
+          type="button"
+          flat
+          disabled={process}
+          onClick={onRegister}
+          label={formatMessage(messages.registerButton)}
+        />
+        <Button
+          type="submit"
+          flat
+          disabled={process}
+          label={
+            process
+              ? formatMessage(messages.processButton)
+              : formatMessage(messages.button)
+          }
+          primary
+        />
+      </form>
+
+      <div className={styles.social}>
+        <Button
+          onClick={onGoogle}
+          icon={`social ${fonts['icon-google']}`}
+          tooltip="Google"
+        >Google</Button>
+        <Button
+          onClick={onFacebook}
+          icon={`social ${fonts['icon-facebook']}`}
+          tooltip="Facebook"
+        >Facebook</Button>
+        <Button
+          onClick={onTwitter}
+          icon={`social ${fonts['icon-twitter']}`}
+          tooltip="Twitter"
+        >Twitter</Button>
+      </div>
     </div>
   );
 };
@@ -183,7 +178,7 @@ LoginForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => ({ process: state.auth.process }), state => state);
+const selector = createSelector(state => state, state => ({ process: state.auth.process }));
 
 LoginForm = reduxForm({
   form: 'login',

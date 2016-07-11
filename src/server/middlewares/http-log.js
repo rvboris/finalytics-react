@@ -9,5 +9,7 @@ export default (ctx, next) => {
     },
   });
 
-  return morgan(__DEVELOPMENT__ ? 'dev' : 'short', { stream: logStream })(ctx, next);
+  return morgan(process.env.NODE_ENV === 'development'
+    ? 'dev'
+    : 'short', { stream: logStream })(ctx, next);
 };

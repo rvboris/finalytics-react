@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { authActions, localeActions, categoryActions, accountActions } from '../actions';
 
 const prepareUser = function * prepareUser() {
-  if (__CLIENT__) {
+  if (IS_CLIENT) {
     yield put(authActions.setSettings({
       timezone: new Date().getTimezoneOffset(),
       locale: 'auto',

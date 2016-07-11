@@ -1,7 +1,5 @@
-const env = process.env.NODE_ENV || 'development';
-const port = process.env.PORT || 3000;
-const hotPort = parseInt(port, 10) + 1;
-const hostname = process.env.HOSTNAME || 'localhost';
+const port = 3000;
+const hostname = 'localhost';
 const apiUrl = `http://${hostname}:${port}/api`;
 
 const sessionKeys = [
@@ -13,9 +11,9 @@ const sessionKeys = [
 ];
 
 export default ({
-  env,
+  env: 'development',
   port,
-  hotPort,
+  devPort: port + 10,
   loglevel: 'silly',
   defaultLang: 'ru',
   hostname,

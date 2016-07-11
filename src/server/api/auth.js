@@ -8,7 +8,7 @@ import { UserModel } from '../models';
 
 const router = new Router();
 
-const tokenKey = __DEVELOPMENT__
+const tokenKey = process.env.NODE_ENV === 'development'
   ? require('../../keys/token-private-development.pem')
   : require('../../keys/token-private-production.pem');
 

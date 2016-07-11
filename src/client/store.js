@@ -10,7 +10,7 @@ import * as sagas from '../shared/sagas';
 import * as reducers from '../shared/reducers';
 import * as middlewares from '../shared/middlewares';
 
-const initialState = Immutable(window.__INITIAL_STATE__);
+const initialState = Immutable(window.INITIAL_STATE);
 const reducer = combineReducers({ ...reducers, routing: routerReducer });
 
 const sagaMiddleware = createSagaMiddleware();
@@ -26,13 +26,13 @@ const storeEnchancers = [
   applyMiddleware(...sagaStoreEnhancer),
 ];
 
-if (__DEVELOPMENT__) {
+if (process.env.NODE_ENV === 'development') {
   storeEnchancers.push(window.devToolsExtension ? window.devToolsExtension() : f => f);
 }
 
 const store = createStore(reducer, initialState, compose(...storeEnchancers));
 
-if (module.hot) {
+if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept('../shared/reducers', () => store.replaceReducer(reducers.default));
 }
 

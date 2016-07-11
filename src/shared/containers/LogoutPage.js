@@ -4,8 +4,6 @@ import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import CircularProgress from 'material-ui/CircularProgress';
-
 import { authActions } from '../actions';
 import styles from './LogoutPage.css';
 
@@ -28,7 +26,7 @@ class LogoutPage extends React.Component {
   }
 
   startTimeout() {
-    if (__CLIENT__) {
+    if (IS_CLIENT) {
       setTimeout(() => this.props.dispatch(push('/')), 2000);
     }
   }
@@ -40,7 +38,7 @@ class LogoutPage extends React.Component {
       <div className={styles.container}>
         {
           process
-            ? <CircularProgress size={2} />
+            ? <p>Process</p>
             : <h1><FormattedMessage {...messages.done} /></h1>
         }
       </div>

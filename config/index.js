@@ -1,2 +1,2 @@
-export { default as development } from './development';
-export { default as production } from './production';
+module.exports.development = require('./development');
+module.exports.production = require('./production');

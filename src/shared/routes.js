@@ -1,12 +1,6 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
-
 import App from './containers/App';
-import Home from './containers/HomePage';
-import LoginPage from './containers/LoginPage';
-import LogoutPage from './containers/LogoutPage';
-import DashboardPage from './containers/DashboardPage';
-import RegisterPage from './containers/RegisterPage';
 
 const requireAuth = (store) => (nextState, replace) => {
   const auth = store.getState().auth;
@@ -31,12 +25,63 @@ const requireGuest = (store) => (nextState, replace) => {
   replace({ pathname: '/dashboard' });
 };
 
+const handleError = (err) => {
+  console.log('==> Error occurred loading dynamic route');
+  console.log(err);
+};
+
+const resolveHomePage = (nextState, cb) => {
+  System.import('./containers/HomePage')
+    .then(module => cb(null, module.default))
+    .catch(handleError);
+};
+
+const resolveLoginPage = (nextState, cb) => {
+  System.import('./containers/LoginPage')
+    .then(module => cb(null, module.default))
+    .catch(handleError);
+};
+
+const resolveLogoutPage = (nextState, cb) => {
+  System.import('./containers/LogoutPage')
+    .then(module => cb(null, module.default))
+    .catch(handleError);
+};
+
+const resolveRegisterPage = (nextState, cb) => {
+  System.import('./containers/RegisterPage')
+    .then(module => cb(null, module.default))
+    .catch(handleError);
+};
+
+const resolveDashboardPage = (nextState, cb) => {
+  System.import('./containers/DashboardPage')
+    .then(module => cb(null, module.default))
+    .catch(handleError);
+};
+
 export default (store) => (
   <Route name="app" component={App} path="/">
-    <IndexRoute component={Home} />
-    <Route path="login" component={LoginPage} onEnter={requireGuest(store)} />
-    <Route path="logout" component={LogoutPage} onEnter={requireAuth(store)} />
-    <Route path="register" component={RegisterPage} onEnter={requireGuest(store)} />
-    <Route path="dashboard" component={DashboardPage} onEnter={requireAuth(store)} />
+    <IndexRoute getComponent={resolveHomePage} />
+    <Route
+      path="login"
+      getComponent={resolveLoginPage}
+      onEnter={requireGuest(store)}
+    />
+    <Route
+      path="logout"
+      getComponent={resolveLogoutPage}
+      onEnter={requireAuth(store)}
+    />
+    <Route
+      path="register"
+      getComponent={resolveRegisterPage}
+      onEnter={requireGuest(store)}
+    />
+    <Route
+      path="dashboard"
+      getComponent={resolveDashboardPage}
+      onEnter={requireAuth(store)}
+    />
   </Route>
 );

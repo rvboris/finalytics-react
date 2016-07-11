@@ -1,1 +1,1 @@
-export default __CONFIG__; // Injected by webpack
+export default CONFIG; // Injected by webpack

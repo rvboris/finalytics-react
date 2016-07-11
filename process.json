@@ -1,8 +1,8 @@
 {
   "apps" : [
     {
-      "name": "fb",
-      "script": "./build/server.js",
+      "name": "financebutler",
+      "script": "./build/server/main.js",
       "watch": false,
       "env": {
         "NODE_ENV": "production",

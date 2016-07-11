@@ -10,12 +10,9 @@
     "no-underscore-dangle": 0
   },
   globals: {
-    "__DEVELOPMENT__": false,
-    "__PRODUCTION__": false,
-    "__CONFIG__": false,
-    "__CLIENT__": false,
-    "__SERVER__": false,
-    "__ASSETS__": false
+    "CONFIG": false,
+    "IS_CLIENT": false,
+    "IS_SERVER": false,
   },
   "extends": "airbnb"
 }
