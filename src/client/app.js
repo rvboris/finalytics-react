@@ -4,6 +4,7 @@ import { Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import browserHistory from 'react-router/lib/browserHistory';
+import WebFont from 'webfontloader';
 import match from 'react-router/lib/match';
 import routes from '../shared/routes';
 import { error } from '../shared/log';
@@ -34,5 +35,11 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept();
   module.hot.accept('../shared/routes', renderApp);
 }
+
+WebFont.load({
+  google: {
+    families: ['Open Sans'],
+  },
+});
 
 renderApp();

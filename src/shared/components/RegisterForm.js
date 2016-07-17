@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Button, FormControl } from 'react-bootstrap';
 import validationHandler from '../utils/validation-handler';
 import styles from './RegisterForm.css';
-import fonts from '../fonts.css';
 
 const fields = ['email', 'password', 'repeatPassword'];
 
@@ -149,15 +148,12 @@ let RegisterForm = (props) => {
       <div className={styles.social}>
         <Button
           onMouseUp={onGoogle}
-          icon={`social ${fonts['icon-google']}`}
         />
         <Button
           onMouseUp={onFacebook}
-          icon={`social ${fonts['icon-facebook']}`}
         />
         <Button
           onMouseUp={onTwitter}
-          icon={`social ${fonts['icon-twitter']}`}
         />
       </div>
     </div>

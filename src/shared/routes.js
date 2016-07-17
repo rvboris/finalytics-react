@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 import App from './containers/App';
+import { error } from './log';
 
 const requireAuth = (store) => (nextState, replace) => {
   const auth = store.getState().auth;
@@ -26,8 +27,8 @@ const requireGuest = (store) => (nextState, replace) => {
 };
 
 const handleError = (err) => {
-  console.log('==> Error occurred loading dynamic route');
-  console.log(err);
+  error('Error occurred loading dynamic route');
+  error(err);
 };
 
 const resolveHomePage = (nextState, cb) => {

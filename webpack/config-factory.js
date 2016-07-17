@@ -10,14 +10,14 @@ const flexbox = require('postcss-flexbox');
 const Visualizer = require('webpack-visualizer-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const stylelint = require('stylelint');
+const rucksack = require('rucksack-css');
+const mqpacker = require('css-mqpacker');
+const postcssReporter = require('postcss-reporter');
 const Writable = require('stream').Writable;
 const configs = require('../config');
-const pkg = require('../package.json');
 
 const ifElse = (condition) => (then, or) => (condition ? then : or);
-
-const externals = _.mapValues(_.merge(pkg.dependencies || [], pkg.devDependencies || []),
-  (dep, key) => `commonjs ${key}`);
 
 const logStream = Writable({
   write(chunk, encoding, next) {
@@ -54,7 +54,6 @@ module.exports = ({ target, options }) => {
     'openexchangerates',
   ]);
 
-  const fontPath = ifServer('../client', '');
   const reloadPath = `http://localhost:${config.devPort}/__webpack_hmr`;
 
   return {
@@ -63,29 +62,14 @@ module.exports = ({ target, options }) => {
       __dirname: true,
       __filename: true,
     },
-    externals: _.compact([
-      ifServer(nodeExternals()),
-    ]),
+    externals: _.compact([ifServer(nodeExternals())]),
     devtool: ifElse(isServer || isDev)(
       'source-map',
       'hidden-source-map'
     ),
     entry: _.merge(
-      {
-        main: _.compact([
-          ifDevClient('react-hot-loader/patch'),
-          ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
-          ifServer(
-            path.resolve(__dirname, `../src/${target}/index.js`),
-            path.resolve(__dirname, `../src/${target}/app.js`)
-          ),
-        ]),
-      },
       ifClient({
         vendor: [
-          ...Object.keys(externals)
-            .filter(depName => depName.startsWith('react') || depName.startsWith('redux')),
-          'bootstrap-css',
           'reselect',
           'seamless-immutable',
           'axios',
@@ -93,7 +77,19 @@ module.exports = ({ target, options }) => {
           'moment',
           'money',
         ],
-      })
+      }),
+      {
+        main: _.compact([
+          ifDevClient('react-hot-loader/patch'),
+          ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
+          ifClient('bootstrap-css'),
+          ifClient('webfontloader'),
+          ifServer(
+            path.resolve(__dirname, `../src/${target}/index.js`),
+            path.resolve(__dirname, `../src/${target}/app.js`)
+          ),
+        ]),
+      }
     ),
     output: {
       path: path.resolve(__dirname, `../build/${target}`),
@@ -118,15 +114,22 @@ module.exports = ({ target, options }) => {
     eslint: {
       configFile: '.eslintrc',
     },
-    postcss: () => [
+    postcss: () => _.compact([
+      stylelint(),
+      rucksack(),
       flexbox(),
-      cssnext,
-    ],
+      cssnext(),
+      mqpacker(),
+      postcssReporter({ clearMessages: true }),
+    ]),
     plugins: _.compact([
       ifDevClient(new webpack.dependencies.LabeledModulesPlugin()),
       ifServer(new webpack.dependencies.LabeledModulesPlugin()),
       new ProgressBarPlugin({ stream: logStream }),
-      new LodashModuleReplacementPlugin(),
+      ifClient(new LodashModuleReplacementPlugin({
+        collections: true,
+        paths: true,
+      })),
       new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|ru)$/),
       new webpack.DefinePlugin({
         CONFIG: JSON.stringify(ifServer(config, configForClient)),
@@ -178,11 +181,6 @@ module.exports = ({ target, options }) => {
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'eslint',
         },
-        {
-          test: /\.css$/,
-          exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: 'stylelint',
-        },
       ],
       loaders: _.compact([
         {
@@ -191,14 +189,9 @@ module.exports = ({ target, options }) => {
           loader: 'raw-loader',
         },
         {
-          test: /\.(jpg|png)$/,
+          test: /\.(jpg|png|svg)$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'url?limit=100000',
-        },
-        {
-          test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-          exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: `file-loader?name=${fontPath}/[sha512:hash:base64:7].[ext]`,
         },
         {
           test: /\.json$/,
@@ -211,7 +204,7 @@ module.exports = ({ target, options }) => {
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           query: _.merge(
             {
-              cacheDirectory: true,
+              cacheDirectory: false,
               babelrc: false,
               env: {
                 development: {
@@ -241,12 +234,17 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /\.css$/ },
+          { test: /node_modules.+\.css$/ },
+          ifDevClient({ loader: ['style-loader', 'css-loader'] }),
+          ifProdClient({ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') })
+        ),
+        _.merge(
+          { test: /src.+\.css$/ },
           ifServer({ loader: ['fake-style', 'css-loader?modules', 'postcss-loader'] }),
           ifDevClient({ loader: ['style-loader', 'css-loader?modules', 'postcss-loader'] }),
           ifProdClient({
             loader:
-              ExtractTextPlugin.extract('style-loader', 'css-loader?modules', 'postcss-loader'),
+              ExtractTextPlugin.extract('style-loader', 'css-loader?modules!postcss-loader'),
           })
         ),
       ]),

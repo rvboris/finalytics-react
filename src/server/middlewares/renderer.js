@@ -101,9 +101,7 @@ export default async(ctx, next) => {
     );
 
     await store.runSaga(...values(sagas));
-
     store.dispatch(push(ctx.request.url));
-
     await fetcher(store.dispatch, renderProps.components, renderProps.params);
 
     const state = store.getState();

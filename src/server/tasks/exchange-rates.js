@@ -1,13 +1,25 @@
 import axios from 'axios';
 import money from 'money';
 import schedule from 'node-schedule';
+import moment from 'moment';
 
 import { task, error } from '../../shared/log';
 import config from '../../shared/config';
 import { ExchangeRateModel } from '../models';
+import ratesFixture from '../fixtures/rates';
 
 const rule = new schedule.RecurrenceRule();
 rule.hour = new schedule.Range(0, 24, 3);
+
+const getFixture = () => {
+  const fixture = ratesFixture;
+
+  fixture.timestamp = new Date();
+  fixture.disclaimer = 'fixture';
+  fixture.license = 'fixture';
+
+  return fixture;
+};
 
 export default () =>
   new Promise(async (resolve) => {
@@ -18,17 +30,24 @@ export default () =>
 
       let result;
 
-      try {
-        result = await axios.get(config.openexchangerates.url + config.openexchangerates.key);
-      } catch (e) {
-        error(e);
-        return;
+      if (process.env.TEST) {
+        result = getFixture();
+      } else {
+        try {
+          const { data } =
+            await axios.get(config.openexchangerates.url + config.openexchangerates.key);
+          result = data;
+          result.timestamp = moment(result.timestamp).toDate();
+        } catch (e) {
+          error(e);
+          result = getFixture();
+        }
       }
 
       try {
         await ExchangeRateModel.remove({});
 
-        const rates = new ExchangeRateModel(result.data);
+        const rates = new ExchangeRateModel(result);
         await rates.save();
 
         money.base = rates.base;

@@ -1,22 +1,19 @@
 import React from 'react';
-import styles from './ServerLayout.css';
 
 export default function ServerLayout({ initialState, body, assets, locale, title, description }) {
-  const inlineScript = [
-    `window.INITIAL_STATE = ${JSON.stringify(initialState)}`,
-  ];
+  delete initialState.locale;
+
+  const inlineScript = [`window.INITIAL_STATE = ${JSON.stringify(initialState)}`];
 
   return (
-    <html lang={locale} className={styles.html}>
+    <html lang={locale}>
       <head>
+        <title>{title}</title>
         <meta name="description" content={description} />
         <meta charSet="utf-8" />
-
         <link rel="icon" type="image/ico" href="/favicon.ico" />
 
         {assets.css.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
-
-        <title>{title}</title>
 
         <script dangerouslySetInnerHTML={{ __html: inlineScript.join(';') }}></script>
       </head>

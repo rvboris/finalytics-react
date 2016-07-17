@@ -1,14 +1,23 @@
 import React from 'react';
 import { createSelector } from 'reselect';
 import { reduxForm } from 'redux-form';
-import { each, noop } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Button, FormControl } from 'react-bootstrap';
+import { each, noop, pick } from 'lodash';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import validationHandler from '../utils/validation-handler';
 import styles from './LoginForm.css';
-import fonts from '../fonts.css';
+import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
+import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
+import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
 
-const fields = ['email', 'password'];
+import {
+  Button,
+  FormControl,
+  FormGroup,
+  ControlLabel,
+  Panel,
+  ButtonGroup,
+  HelpBlock,
+} from 'react-bootstrap';
 
 const messages = defineMessages({
   title: {
@@ -17,25 +26,25 @@ const messages = defineMessages({
     defaultMessage: 'Login',
   },
   email: {
-    hint: {
-      id: 'auth.login.email.hint',
+    placeholder: {
+      id: 'auth.login.email.placeholder',
       description: 'Login dialog email hint',
       defaultMessage: 'example@domain.com',
     },
-    floatHint: {
-      id: 'auth.login.email.floatHint',
+    label: {
+      id: 'auth.login.email.label',
       description: 'Login dialog email float hint',
       defaultMessage: 'Enter your email',
     },
   },
   password: {
-    hint: {
-      id: 'auth.login.password.hint',
+    placeholder: {
+      id: 'auth.login.password.placeholder',
       description: 'Login dialog password hint',
       defaultMessage: 'strong password',
     },
-    floatHint: {
-      id: 'auth.login.password.floatHint',
+    label: {
+      id: 'auth.login.password.label',
       description: 'Login dialog password float hint',
       defaultMessage: 'Enter your password',
     },
@@ -57,6 +66,8 @@ const messages = defineMessages({
   },
 });
 
+const fields = ['email', 'password'];
+
 let LoginForm = (props) => {
   const {
     form: { fields: { email, password }, handleSubmit, fields },
@@ -68,13 +79,12 @@ let LoginForm = (props) => {
     onError,
   } = props;
 
-  each(fields, (field, fieldName) => {
-    field.hintText = formatMessage(messages[fieldName].hint);
-    field.floatingLabelText = formatMessage(messages[fieldName].floatHint);
-    field.fullWidth = true;
+  const errors = { email: {}, password: {} };
 
+  each(fields, (field, fieldName) => {
     if (field.touched && field.error) {
-      field.errorText = formatMessage({ id: field.error });
+      errors[fieldName].error = formatMessage({ id: field.error });
+      field.placeholder = formatMessage(messages[fieldName].placeholder);
     }
   });
 
@@ -93,8 +103,8 @@ let LoginForm = (props) => {
     });
 
   const onSubmit = e => {
-    each(fields, (field) => {
-      delete field.errorText;
+    each(errors, (field) => {
+      delete field.error;
     });
 
     handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
@@ -116,54 +126,65 @@ let LoginForm = (props) => {
 
   return (
     <div className={styles.container}>
-      <h3><FormattedMessage {...messages.title} /></h3>
+      <Panel header={formatMessage(messages.title)} className={styles['login-form']}>
+        <form onSubmit={onSubmit} noValidate>
+          <FormGroup controlId="email" validationState={errors.email.error ? 'error' : null}>
+            <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
+            <FormControl
+              type="email"
+              {...pick(email, ['value', 'placeholder', 'onChange'])}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>{errors.email.error}</HelpBlock>
+          </FormGroup>
 
-      <form onSubmit={onSubmit} noValidate>
-        <div className={styles.fields}>
-          <div>
-            <FormControl id="login-email" type="email" {...email} />
-          </div>
-          <div>
-            <FormControl id="login-password" type="password" {...password} />
-          </div>
-        </div>
-        <Button
-          type="button"
-          flat
-          disabled={process}
-          onClick={onRegister}
-          label={formatMessage(messages.registerButton)}
-        />
-        <Button
-          type="submit"
-          flat
-          disabled={process}
-          label={
-            process
-              ? formatMessage(messages.processButton)
-              : formatMessage(messages.button)
-          }
-          primary
-        />
-      </form>
+          <FormGroup controlId="password" validationState={errors.password.error ? 'error' : null}>
+            <ControlLabel><FormattedMessage {...messages.password.label} /></ControlLabel>
+            <FormControl
+              type="password"
+              {...pick(password, ['value', 'placeholder', 'onChange'])}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>{errors.password.error}</HelpBlock>
+          </FormGroup>
 
-      <div className={styles.social}>
-        <Button
-          onClick={onGoogle}
-          icon={`social ${fonts['icon-google']}`}
-          tooltip="Google"
-        >Google</Button>
-        <Button
-          onClick={onFacebook}
-          icon={`social ${fonts['icon-facebook']}`}
-          tooltip="Facebook"
-        >Facebook</Button>
-        <Button
-          onClick={onTwitter}
-          icon={`social ${fonts['icon-twitter']}`}
-          tooltip="Twitter"
-        >Twitter</Button>
-      </div>
+          <div className={styles['action-buttons']}>
+            <Button
+              type="button"
+              disabled={process}
+              onClick={onRegister}
+            ><FormattedMessage {...messages.registerButton} /></Button>
+            <Button
+              type="submit"
+              bsStyle="primary"
+              disabled={process}
+            >{process
+              ? <FormattedMessage {...messages.processButton} />
+              : <FormattedMessage {...messages.button} />
+            }</Button>
+          </div>
+        </form>
+
+        <ButtonGroup justified>
+          <ButtonGroup>
+            <Button type="button" onClick={onGoogle}>
+              <TiSocialGooglePlus size={30} />
+            </Button>
+          </ButtonGroup>
+
+          <ButtonGroup>
+            <Button type="button" onClick={onFacebook}>
+              <TiSocialFacebook size={30} />
+            </Button>
+          </ButtonGroup>
+
+          <ButtonGroup>
+            <Button type="button" onClick={onTwitter}>
+              <TiSocialTwitter size={30} />
+            </Button>
+          </ButtonGroup>
+        </ButtonGroup>
+      </Panel>
     </div>
   );
 };

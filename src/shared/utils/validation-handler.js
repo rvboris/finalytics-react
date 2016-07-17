@@ -1,4 +1,4 @@
-import { has, keys, intersection, last } from 'lodash';
+import { has, keys, intersection, last, get } from 'lodash';
 
 const technicalError = (fields) => fields.map((field) => ({
   [field]: 'global.error.technical',
@@ -6,7 +6,7 @@ const technicalError = (fields) => fields.map((field) => ({
 }));
 
 export default (values, result) => {
-  result = result.data || result;
+  result = get(result, 'response.data', {});
 
   if (!result.error) {
     return technicalError(keys(values));
