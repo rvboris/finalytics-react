@@ -1,13 +1,24 @@
 import React from 'react';
 import { createSelector } from 'reselect';
 import { reduxForm } from 'redux-form';
-import { each, noop } from 'lodash';
+import { each, noop, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Button, FormControl } from 'react-bootstrap';
 import validationHandler from '../utils/validation-handler';
 import styles from './RegisterForm.css';
 
-const fields = ['email', 'password', 'repeatPassword'];
+import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
+import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
+import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+
+import {
+  Button,
+  FormControl,
+  FormGroup,
+  ControlLabel,
+  Panel,
+  ButtonGroup,
+  HelpBlock,
+} from 'react-bootstrap';
 
 const messages = defineMessages({
   title: {
@@ -16,37 +27,37 @@ const messages = defineMessages({
     defaultMessage: 'Register',
   },
   email: {
-    hint: {
-      id: 'auth.register.email.hint',
+    placeholder: {
+      id: 'auth.register.email.placeholder',
       description: 'Register dialog email hint',
       defaultMessage: 'your@email.com',
     },
-    floatHint: {
-      id: 'auth.register.email.floatHint',
+    label: {
+      id: 'auth.register.email.label',
       description: 'Register dialog email float hint',
       defaultMessage: 'Enter your email',
     },
   },
   password: {
-    hint: {
-      id: 'auth.register.password.hint',
+    placeholder: {
+      id: 'auth.register.password.placeholder',
       description: 'Register dialog password hint',
       defaultMessage: 'strong password',
     },
-    floatHint: {
-      id: 'auth.register.password.floatHint',
+    label: {
+      id: 'auth.register.password.label',
       description: 'Register dialog password float hint',
       defaultMessage: 'Enter your password',
     },
   },
   repeatPassword: {
-    hint: {
-      id: 'auth.register.repeatPassword.hint',
+    placeholder: {
+      id: 'auth.register.repeatPassword.placeholder',
       description: 'Register dialog password repeat hint',
       defaultMessage: 'repeat password',
     },
-    floatHint: {
-      id: 'auth.register.repeatPassword.floatHint',
+    label: {
+      id: 'auth.register.repeatPassword.label',
       description: 'Register dialog repeat password float hint',
       defaultMessage: 'Enter your password again',
     },
@@ -75,6 +86,9 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
+const fields = ['email', 'password', 'repeatPassword'];
+const errors = { email: {}, password: {}, repeatPassword: {} };
+
 let RegisterForm = (props) => {
   const {
     form: { fields: { email, password, repeatPassword }, handleSubmit, fields },
@@ -86,11 +100,8 @@ let RegisterForm = (props) => {
   } = props;
 
   each(fields, (field, fieldName) => {
-    field.hintText = formatMessage(messages[fieldName].hint);
-    field.floatingLabelText = formatMessage(messages[fieldName].floatHint);
-
     if (field.touched && field.error) {
-      field.errorText = formatMessage({ id: field.error });
+      errors[fieldName].error = formatMessage({ id: field.error });
     }
   });
 
@@ -109,8 +120,8 @@ let RegisterForm = (props) => {
     });
 
   const onSubmit = e => {
-    each(fields, (field) => {
-      delete field.errorText;
+    each(errors, (field) => {
+      delete field.error;
     });
 
     handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
@@ -118,44 +129,76 @@ let RegisterForm = (props) => {
 
   return (
     <div className={styles.container}>
-      <h3><FormattedMessage {...messages.title} /></h3>
+      <Panel header={formatMessage(messages.title)} className={styles['register-form']}>
+        <form onSubmit={onSubmit} noValidate>
+          <FormGroup controlId="email" validationState={errors.email.error ? 'error' : null}>
+            <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
+            <FormControl
+              type="email"
+              placeholder={formatMessage(messages.email.placeholder)}
+              {...pick(email, ['value', 'onChange'])}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>{errors.email.error}</HelpBlock>
+          </FormGroup>
 
-      <form onSubmit={onSubmit} noValidate>
-        <div className={styles.fields}>
-          <div>
-            <FormControl id="register-email" type="email" {...email} />
-          </div>
-          <div>
-            <FormControl id="register-password" type="password" {...password} />
-          </div>
-          <div>
-            <FormControl id="register-repeat-password" type="password" {...repeatPassword} />
-          </div>
-        </div>
-        <Button
-          type="submit"
-          flat
-          disabled={process}
-          label={
-            process
-              ? formatMessage(messages.processButton)
-              : formatMessage(messages.button)
-          }
-          primary
-        />
-      </form>
+          <FormGroup controlId="password" validationState={errors.password.error ? 'error' : null}>
+            <ControlLabel><FormattedMessage {...messages.password.label} /></ControlLabel>
+            <FormControl
+              type="password"
+              placeholder={formatMessage(messages.password.placeholder)}
+              {...pick(password, ['value', 'onChange'])}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>{errors.password.error}</HelpBlock>
+          </FormGroup>
 
-      <div className={styles.social}>
-        <Button
-          onMouseUp={onGoogle}
-        />
-        <Button
-          onMouseUp={onFacebook}
-        />
-        <Button
-          onMouseUp={onTwitter}
-        />
-      </div>
+          <FormGroup
+            controlId="repeatPassword"
+            validationState={errors.repeatPassword.error ? 'error' : null}
+          >
+            <ControlLabel><FormattedMessage {...messages.repeatPassword.label} /></ControlLabel>
+            <FormControl
+              type="password"
+              placeholder={formatMessage(messages.repeatPassword.placeholder)}
+              {...pick(repeatPassword, ['value', 'onChange'])}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>{errors.repeatPassword.error}</HelpBlock>
+          </FormGroup>
+
+          <Button
+            type="submit"
+            bsStyle="primary"
+            disabled={process}
+            className={styles['submit-button']}
+            block
+          >{process
+            ? <FormattedMessage {...messages.processButton} />
+            : <FormattedMessage {...messages.button} />
+          }</Button>
+        </form>
+
+        <ButtonGroup justified>
+          <ButtonGroup>
+            <Button type="button" onClick={onGoogle}>
+              <TiSocialGooglePlus size={30} />
+            </Button>
+          </ButtonGroup>
+
+          <ButtonGroup>
+            <Button type="button" onClick={onFacebook}>
+              <TiSocialFacebook size={30} />
+            </Button>
+          </ButtonGroup>
+
+          <ButtonGroup>
+            <Button type="button" onClick={onTwitter}>
+              <TiSocialTwitter size={30} />
+            </Button>
+          </ButtonGroup>
+        </ButtonGroup>
+      </Panel>
     </div>
   );
 };
@@ -169,7 +212,7 @@ RegisterForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => ({ process: state.auth.process }), state => state);
+const selector = createSelector(state => state, state => ({ process: state.auth.process }));
 
 RegisterForm = reduxForm({
   form: 'register',
