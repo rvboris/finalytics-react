@@ -16,7 +16,7 @@ export default {
   'auth.login.error.password.invalid': 'Не верный email или пароль',
 
   'auth.register.title': 'Регистрация',
-  'auth.register.email.placeholder': 'your@email.com',
+  'auth.register.email.placeholder': 'example@domain.com',
   'auth.register.email.label': 'Введите свой email адрес',
   'auth.register.password.placeholder': 'сложный пароль',
   'auth.register.password.label': 'Введите свой пароль',
