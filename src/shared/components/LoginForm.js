@@ -67,6 +67,19 @@ const messages = defineMessages({
 });
 
 const fields = ['email', 'password'];
+const errors = { email: {}, password: {} };
+
+const onGoogle = () => {
+  window.location.pathname = '/api/auth/google';
+};
+
+const onFacebook = () => {
+  window.location.pathname = '/api/auth/facebook';
+};
+
+const onTwitter = () => {
+  window.location.pathname = '/api/auth/twitter';
+};
 
 let LoginForm = (props) => {
   const {
@@ -79,12 +92,9 @@ let LoginForm = (props) => {
     onError,
   } = props;
 
-  const errors = { email: {}, password: {} };
-
   each(fields, (field, fieldName) => {
     if (field.touched && field.error) {
       errors[fieldName].error = formatMessage({ id: field.error });
-      field.placeholder = formatMessage(messages[fieldName].placeholder);
     }
   });
 
@@ -112,18 +122,6 @@ let LoginForm = (props) => {
 
   const onRegister = () => go('/register');
 
-  const onGoogle = () => {
-    window.location.pathname = '/api/auth/google';
-  };
-
-  const onFacebook = () => {
-    window.location.pathname = '/api/auth/facebook';
-  };
-
-  const onTwitter = () => {
-    window.location.pathname = '/api/auth/twitter';
-  };
-
   return (
     <div className={styles.container}>
       <Panel header={formatMessage(messages.title)} className={styles['login-form']}>
@@ -132,7 +130,8 @@ let LoginForm = (props) => {
             <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
             <FormControl
               type="email"
-              {...pick(email, ['value', 'placeholder', 'onChange'])}
+              placeholder={formatMessage(messages.email.placeholder)}
+              {...pick(email, ['value', 'onChange'])}
             />
             <FormControl.Feedback />
             <HelpBlock>{errors.email.error}</HelpBlock>
@@ -142,7 +141,8 @@ let LoginForm = (props) => {
             <ControlLabel><FormattedMessage {...messages.password.label} /></ControlLabel>
             <FormControl
               type="password"
-              {...pick(password, ['value', 'placeholder', 'onChange'])}
+              placeholder={formatMessage(messages.password.placeholder)}
+              {...pick(password, ['value', 'onChange'])}
             />
             <FormControl.Feedback />
             <HelpBlock>{errors.password.error}</HelpBlock>
@@ -153,7 +153,9 @@ let LoginForm = (props) => {
               type="button"
               disabled={process}
               onClick={onRegister}
-            ><FormattedMessage {...messages.registerButton} /></Button>
+            >
+              <FormattedMessage {...messages.registerButton} />
+            </Button>
             <Button
               type="submit"
               bsStyle="primary"

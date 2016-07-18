@@ -1,20 +1,13 @@
-.register {
-  padding: 20px;
-  display: inline-block;
-  text-align: center;
-  width: 320px;
-
-  .fields {
-    margin-bottom: 20px;
-  }
-
-  .social {
-    margin-top: 30px;
-    box: horizontal space-around;
-  }
-}
-
 .container {
   box: vertical middle center;
   height: inherit;
+}
+
+.register-form {
+  display: inline-block;
+  width: 320px;
+}
+
+.submit-button {
+  margin-bottom: 40px;
 }
