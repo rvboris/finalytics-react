@@ -65,6 +65,17 @@ export default (store) => (
   <Route name="app" component={App} path="/">
     <IndexRoute getComponent={resolveHomePage} />
     <Route
+      path="dashboard"
+      getComponent={resolveDashboardPage}
+      onEnter={requireAuth(store)}
+    >
+      <Route
+        path="login"
+        getComponent={resolveLoginPage}
+        onEnter={requireGuest(store)}
+      />
+    </Route>
+    <Route
       path="login"
       getComponent={resolveLoginPage}
       onEnter={requireGuest(store)}
@@ -78,11 +89,6 @@ export default (store) => (
       path="register"
       getComponent={resolveRegisterPage}
       onEnter={requireGuest(store)}
-    />
-    <Route
-      path="dashboard"
-      getComponent={resolveDashboardPage}
-      onEnter={requireAuth(store)}
     />
   </Route>
 );

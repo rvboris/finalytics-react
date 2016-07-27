@@ -2,13 +2,13 @@ import React from 'react';
 import { createSelector } from 'reselect';
 import { reduxForm } from 'redux-form';
 import { each, noop, pick } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import validationHandler from '../utils/validation-handler';
-import styles from './RegisterForm.css';
-
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import validationHandler from '../../utils/validation-handler';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
 import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+
+import style from './style.css';
 
 import {
   Button,
@@ -22,57 +22,53 @@ import {
 
 const messages = defineMessages({
   title: {
-    id: 'auth.register.title',
-    description: 'Register dialog title',
-    defaultMessage: 'Register',
+    id: 'auth.login.title',
+    description: 'Login dialog title',
+    defaultMessage: 'Login',
   },
   email: {
     placeholder: {
-      id: 'auth.register.email.placeholder',
-      description: 'Register dialog email hint',
-      defaultMessage: 'your@email.com',
+      id: 'auth.login.email.placeholder',
+      description: 'Login dialog email hint',
+      defaultMessage: 'example@domain.com',
     },
     label: {
-      id: 'auth.register.email.label',
-      description: 'Register dialog email float hint',
+      id: 'auth.login.email.label',
+      description: 'Login dialog email float hint',
       defaultMessage: 'Enter your email',
     },
   },
   password: {
     placeholder: {
-      id: 'auth.register.password.placeholder',
-      description: 'Register dialog password hint',
+      id: 'auth.login.password.placeholder',
+      description: 'Login dialog password hint',
       defaultMessage: 'strong password',
     },
     label: {
-      id: 'auth.register.password.label',
-      description: 'Register dialog password float hint',
+      id: 'auth.login.password.label',
+      description: 'Login dialog password float hint',
       defaultMessage: 'Enter your password',
     },
   },
-  repeatPassword: {
-    placeholder: {
-      id: 'auth.register.repeatPassword.placeholder',
-      description: 'Register dialog password repeat hint',
-      defaultMessage: 'repeat password',
-    },
-    label: {
-      id: 'auth.register.repeatPassword.label',
-      description: 'Register dialog repeat password float hint',
-      defaultMessage: 'Enter your password again',
-    },
-  },
   button: {
-    id: 'auth.register.button',
-    description: 'Register dialog submit button label',
-    defaultMessage: 'Register',
+    id: 'auth.login.button',
+    description: 'Login dialog submit button label',
+    defaultMessage: 'Login',
   },
   processButton: {
-    id: 'auth.register.processButton',
-    description: 'Register dialog submit button label in process state',
+    id: 'auth.login.processButton',
+    description: 'Login dialog submit button label in process state',
     defaultMessage: 'Please wait...',
   },
+  registerButton: {
+    id: 'auth.login.registerButton',
+    description: 'Login dialog register button label',
+    defaultMessage: 'Registration',
+  },
 });
+
+const fields = ['email', 'password'];
+const errors = { email: {}, password: {} };
 
 const onGoogle = () => {
   window.location.pathname = '/api/auth/google';
@@ -86,15 +82,13 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
-const fields = ['email', 'password', 'repeatPassword'];
-const errors = { email: {}, password: {}, repeatPassword: {} };
-
-let RegisterForm = (props) => {
+let LoginForm = (props) => {
   const {
-    form: { fields: { email, password, repeatPassword }, handleSubmit, fields },
+    form: { fields: { email, password }, handleSubmit, fields },
     intl: { formatMessage },
     process,
-    register,
+    login,
+    go,
     onSuccess,
     onError,
   } = props;
@@ -110,7 +104,7 @@ let RegisterForm = (props) => {
       let result;
 
       try {
-        result = await register(values);
+        result = await login(values);
       } catch (err) {
         reject(validationHandler(values, err));
         return;
@@ -127,9 +121,11 @@ let RegisterForm = (props) => {
     handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
   };
 
+  const onRegister = () => go('/register');
+
   return (
-    <div className={styles.container}>
-      <Panel header={formatMessage(messages.title)} className={styles['register-form']}>
+    <div className={style.container}>
+      <Panel header={formatMessage(messages.title)} className={style['login-form']}>
         <form onSubmit={onSubmit} noValidate>
           <FormGroup controlId="email" validationState={errors.email.error ? 'error' : null}>
             <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
@@ -153,30 +149,23 @@ let RegisterForm = (props) => {
             <HelpBlock>{errors.password.error}</HelpBlock>
           </FormGroup>
 
-          <FormGroup
-            controlId="repeatPassword"
-            validationState={errors.repeatPassword.error ? 'error' : null}
-          >
-            <ControlLabel><FormattedMessage {...messages.repeatPassword.label} /></ControlLabel>
-            <FormControl
-              type="password"
-              placeholder={formatMessage(messages.repeatPassword.placeholder)}
-              {...pick(repeatPassword, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.repeatPassword.error}</HelpBlock>
-          </FormGroup>
-
-          <Button
-            type="submit"
-            bsStyle="primary"
-            disabled={process}
-            className={styles['submit-button']}
-            block
-          >{process
-            ? <FormattedMessage {...messages.processButton} />
-            : <FormattedMessage {...messages.button} />
-          }</Button>
+          <div className={style['action-buttons']}>
+            <Button
+              type="button"
+              disabled={process}
+              onClick={onRegister}
+            >
+              <FormattedMessage {...messages.registerButton} />
+            </Button>
+            <Button
+              type="submit"
+              bsStyle="primary"
+              disabled={process}
+            >{process
+              ? <FormattedMessage {...messages.processButton} />
+              : <FormattedMessage {...messages.button} />
+            }</Button>
+          </div>
         </form>
 
         <ButtonGroup justified>
@@ -203,22 +192,23 @@ let RegisterForm = (props) => {
   );
 };
 
-RegisterForm.propTypes = {
+LoginForm.propTypes = {
   form: React.PropTypes.object.isRequired,
   intl: React.PropTypes.object.isRequired,
   process: React.PropTypes.bool.isRequired,
-  register: React.PropTypes.func.isRequired,
+  login: React.PropTypes.func.isRequired,
+  go: React.PropTypes.func.isRequired,
   onSuccess: React.PropTypes.func,
   onError: React.PropTypes.func,
 };
 
 const selector = createSelector(state => state, state => ({ process: state.auth.process }));
 
-RegisterForm = reduxForm({
-  form: 'register',
+LoginForm = reduxForm({
+  form: 'login',
   propNamespace: 'form',
   returnRejectedSubmitPromise: true,
   fields,
-}, selector)(RegisterForm);
+}, selector)(LoginForm);
 
-export default RegisterForm = injectIntl(RegisterForm);
+export default LoginForm = injectIntl(LoginForm);

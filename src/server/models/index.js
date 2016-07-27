@@ -29,10 +29,7 @@ export const connect = () =>
   mongoose.connect(dbURI, connectOptions).then(async () => {
     log(`mongoose default connection open to ${dbURI}`);
 
-    const dropDatabase =
-      process.env.NODE_ENV === 'development' ||
-      get(process, 'env.TEST') ||
-      get(process, 'env.E2E');
+    const dropDatabase = get(process, 'env.TEST') || get(process, 'env.E2E');
 
     if (dropDatabase) {
       log('mongoose drop database');

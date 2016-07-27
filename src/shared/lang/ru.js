@@ -148,4 +148,11 @@ export default {
   'operation.list.error.dateTo.invalid': 'Недопустимая конечная дата',
   'operation.list.error.skip.invalid': 'Недопустимые параметры постраничной навигации',
   'operation.list.error.limit.invalid': 'Недопустимые параметры постраничной навигации',
+
+  'component.appBar.overview': 'Обзор',
+  'component.appBar.operations': 'Операции',
+  'component.appBar.budget': 'Бюджет',
+  'component.appBar.reports': 'Отчеты',
+  'component.appBar.settings': 'Настройки',
+  'component.appBar.exit': 'Выход',
 };

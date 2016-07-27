@@ -82,7 +82,7 @@ module.exports = ({ target, options }) => {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
-          ifClient('bootstrap-css'),
+          ifClient('./src/client/bootstrap-css/bootstrap.css'),
           ifClient('webfontloader'),
           ifServer(
             path.resolve(__dirname, `../src/${target}/index.js`),
@@ -234,12 +234,12 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /node_modules.+\.css$/ },
+          { test: /src\/client\/bootstrap-css.+\.css$/ },
           ifDevClient({ loader: ['style-loader', 'css-loader'] }),
           ifProdClient({ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') })
         ),
         _.merge(
-          { test: /src.+\.css$/ },
+          { test: /src\/(client|server|shared)\/(?!bootstrap).+\.css$/ },
           ifServer({ loader: ['fake-style', 'css-loader?modules', 'postcss-loader'] }),
           ifDevClient({ loader: ['style-loader', 'css-loader?modules', 'postcss-loader'] }),
           ifProdClient({
