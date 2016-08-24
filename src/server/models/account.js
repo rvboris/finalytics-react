@@ -20,7 +20,7 @@ model.post('init', function postInit() {
   this._original = this.toObject({ version: false, depopulate: true });
 });
 
-model.pre('validate', async function preValidate(next) {
+model.pre('validate', function preValidate(next) {
   if (!this.created) {
     this.created = moment.utc();
   }

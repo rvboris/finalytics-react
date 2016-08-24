@@ -12,6 +12,7 @@ import CategoryModel from './category';
 import OperationModel from './operation';
 
 const crypto = require('crypto');
+
 const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 

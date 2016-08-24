@@ -228,7 +228,7 @@ module.exports = ({ target, options }) => {
               presets: [
                 'react',
                 'stage-1',
-                'es2015-webpack',
+                'es2015',
               ],
             })
           ),

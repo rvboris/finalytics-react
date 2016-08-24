@@ -2,12 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
-
-import AppBar from '../components/AppBar';
-
 import {
   Button,
 } from 'react-bootstrap';
+
+import AppBar from '../components/AppBar';
 
 const goToMain = (dispatch) => () => dispatch(push('/dashboard'));
 const goToLogout = (dispatch) => () => dispatch(push('/logout'));

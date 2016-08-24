@@ -1,7 +1,8 @@
+import { get } from 'lodash';
+
 import app from './app';
 import config from '../shared/config';
 import log, { error } from '../shared/log';
-import { get } from 'lodash';
 
 process.on('uncaughtException', error);
 

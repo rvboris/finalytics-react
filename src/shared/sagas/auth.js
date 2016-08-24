@@ -3,7 +3,7 @@ import { select, fork, put, take } from 'redux-saga/effects';
 import { get } from 'lodash';
 import { authActions, localeActions, categoryActions, accountActions } from '../actions';
 
-const prepareUser = function * prepareUser() {
+const prepareUser = function* prepareUser() {
   if (IS_CLIENT) {
     yield put(authActions.setSettings({
       timezone: new Date().getTimezoneOffset(),
@@ -24,7 +24,7 @@ const prepareUser = function * prepareUser() {
   }
 };
 
-const onUserReady = function * userReady() {
+const onUserReady = function* userReady() {
   const initUserActions = [
     'AUTH_SET_SETTINGS_RESOLVED',
     'CATEGORY_LOAD_RESOLVED',
@@ -40,12 +40,12 @@ const onUserReady = function * userReady() {
   }
 };
 
-const onAuth = function * onAuth(action) {
+const onAuth = function* onAuth(action) {
   yield put(authActions.setToken(get(action, 'payload.data.token')));
   yield put(authActions.getProfile());
 };
 
-const onProfile = function * onProfile(action) {
+const onProfile = function* onProfile(action) {
   if (get(action, 'payload.data.status') === 'init') {
     yield fork(prepareUser);
   }
@@ -53,11 +53,11 @@ const onProfile = function * onProfile(action) {
   yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
 };
 
-const onSettings = function * onSettings(action) {
+const onSettings = function* onSettings(action) {
   yield put(localeActions.load(get(action, 'payload.data.locale')));
 };
 
-export default function *() {
+export default function* () {
   yield fork(onUserReady);
 
   const auth = yield select((state) => state.auth);

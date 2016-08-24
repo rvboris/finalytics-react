@@ -5,7 +5,7 @@ import { ExtractJwt } from 'passport-jwt';
 import config from '../../shared/config';
 import { store, cookieSettings, sessionPrefix, cookiePrefix } from '../middlewares/session';
 
-export default co.wrap(function * tokenExtractor(req) {
+export default co.wrap(function* tokenExtractor(req) {
   let token = null;
 
   token = ExtractJwt.fromAuthHeader()(req);

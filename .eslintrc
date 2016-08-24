@@ -7,12 +7,20 @@
     "new-cap": 0,
     "no-console": 0,
     "no-constant-condition": 0,
-    "no-underscore-dangle": 0
+    "no-underscore-dangle": 0,
+    "react/jsx-filename-extension": 0,
+    "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "generator-star-spacing": 0
   },
   globals: {
     "CONFIG": false,
     "IS_CLIENT": false,
     "IS_SERVER": false,
   },
-  "extends": "airbnb"
+  "extends": "airbnb",
+  "env": {
+    "browser": true,
+    "node": true
+  }
 }

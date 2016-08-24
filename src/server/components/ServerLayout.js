@@ -15,7 +15,7 @@ export default function ServerLayout({ initialState, body, assets, locale, title
 
         {assets.css.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
 
-        <script dangerouslySetInnerHTML={{ __html: inlineScript.join(';') }}></script>
+        <script dangerouslySetInnerHTML={{ __html: inlineScript.join(';') }} />
       </head>
 
       <body>

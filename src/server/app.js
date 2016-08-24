@@ -1,10 +1,11 @@
 import Koa from 'koa';
+import { get } from 'lodash';
+
 import * as middlewares from './middlewares';
 import * as tasks from './tasks';
 import config from '../shared/config';
 import { error } from '../shared/log';
 import { connect, disconnect, initData } from './models';
-import { get } from 'lodash';
 
 const createApp = (instance, jobs) => {
   const app = new Koa();

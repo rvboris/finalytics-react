@@ -3,13 +3,9 @@ import { createSelector } from 'reselect';
 import { reduxForm } from 'redux-form';
 import { each, noop, pick } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import validationHandler from '../../utils/validation-handler';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
 import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
-
-import style from './style.css';
-
 import {
   Button,
   FormControl,
@@ -19,6 +15,9 @@ import {
   ButtonGroup,
   HelpBlock,
 } from 'react-bootstrap';
+
+import validationHandler from '../../utils/validation-handler';
+import style from './style.css';
 
 const messages = defineMessages({
   title: {
