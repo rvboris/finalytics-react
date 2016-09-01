@@ -1,7 +1,7 @@
 import React from 'react';
 import { createSelector } from 'reselect';
-import { reduxForm } from 'redux-form';
-import { each, noop, pick } from 'lodash';
+import { reduxForm, Field } from 'redux-form';
+import { each, noop } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
@@ -81,9 +81,21 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
+const renderField = (field) =>
+  <FormGroup controlId={field.name} validationState={field.error ? 'error' : null}>
+    <ControlLabel>{field.label}</ControlLabel>
+    <FormControl
+      type={field.type}
+      placeholder={field.placeholder}
+      {...field.input}
+    />
+    <FormControl.Feedback />
+    <HelpBlock>{field.error}</HelpBlock>
+  </FormGroup>;
+
 let LoginForm = (props) => {
   const {
-    form: { fields: { email, password }, handleSubmit, fields },
+    form: { handleSubmit, fields },
     intl: { formatMessage },
     process,
     login,
@@ -126,27 +138,23 @@ let LoginForm = (props) => {
     <div className={style.container}>
       <Panel header={formatMessage(messages.title)} className={style['login-form']}>
         <form onSubmit={onSubmit} noValidate>
-          <FormGroup controlId="email" validationState={errors.email.error ? 'error' : null}>
-            <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
-            <FormControl
-              type="email"
-              placeholder={formatMessage(messages.email.placeholder)}
-              {...pick(email, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.email.error}</HelpBlock>
-          </FormGroup>
+          <Field
+            name="email"
+            error={errors.email.error}
+            label={formatMessage(messages.email.label)}
+            placeholder={formatMessage(messages.email.placeholder)}
+            component={renderField}
+            type="email"
+          />
 
-          <FormGroup controlId="password" validationState={errors.password.error ? 'error' : null}>
-            <ControlLabel><FormattedMessage {...messages.password.label} /></ControlLabel>
-            <FormControl
-              type="password"
-              placeholder={formatMessage(messages.password.placeholder)}
-              {...pick(password, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.password.error}</HelpBlock>
-          </FormGroup>
+          <Field
+            name="password"
+            error={errors.password.error}
+            label={formatMessage(messages.password.label)}
+            placeholder={formatMessage(messages.password.placeholder)}
+            component={renderField}
+            type="password"
+          />
 
           <div className={style['action-buttons']}>
             <Button

@@ -1,5 +1,6 @@
 {
   "parser": "babel-eslint",
+  "extends": "airbnb",
   "rules": {
     "strict": 0,
     "no-param-reassign": 0,
@@ -11,14 +12,14 @@
     "react/jsx-filename-extension": 0,
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-    "generator-star-spacing": 0
+    "generator-star-spacing": 0,
+    "linebreak-style": 0
   },
   globals: {
     "CONFIG": false,
     "IS_CLIENT": false,
     "IS_SERVER": false,
   },
-  "extends": "airbnb",
   "env": {
     "browser": true,
     "node": true

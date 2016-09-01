@@ -234,13 +234,13 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /src\/client\/bootstrap-css.+\.css$/ },
+          { test: /bootstrap\.css$/ },
           ifDevClient({ loader: ['style-loader', 'css-loader'] }),
           ifProdClient({ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') })
         ),
         _.merge(
-          { test: /src\/(client|server|shared)\/(?!bootstrap).+\.css$/ },
-          ifServer({ loader: ['fake-style', 'css-loader?modules', 'postcss-loader'] }),
+          { test: /shared.+\.css$/ },
+          ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifDevClient({ loader: ['style-loader', 'css-loader?modules', 'postcss-loader'] }),
           ifProdClient({
             loader:
