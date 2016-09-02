@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { reduxForm } from 'redux-form';
-import { each, noop, pick } from 'lodash';
+import { reduxForm, Field, SubmissionError } from 'redux-form';
+import { mapValues } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
@@ -14,6 +15,7 @@ import {
   Panel,
   ButtonGroup,
   HelpBlock,
+  Alert,
 } from 'react-bootstrap';
 
 import style from './style.css';
@@ -85,12 +87,21 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
-const fields = ['email', 'password', 'repeatPassword'];
-const errors = { email: {}, password: {}, repeatPassword: {} };
+const FormField = (field) =>
+  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
+    <ControlLabel>{field.label}</ControlLabel>
+    <FormControl
+      type={field.type}
+      placeholder={field.placeholder}
+      {...field.input}
+    />
+    <FormControl.Feedback />
+    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+  </FormGroup>;
 
 let RegisterForm = (props) => {
   const {
-    form: { fields: { email, password, repeatPassword }, handleSubmit, fields },
+    form: { error, handleSubmit, pristine, submitting },
     intl: { formatMessage },
     process,
     register,
@@ -98,78 +109,61 @@ let RegisterForm = (props) => {
     onError,
   } = props;
 
-  each(fields, (field, fieldName) => {
-    if (field.touched && field.error) {
-      errors[fieldName].error = formatMessage({ id: field.error });
-    }
-  });
+  const defaultValues = { email: null, password: null };
 
   const submitHandler = (values) =>
     new Promise(async (resolve, reject) => {
       let result;
 
+      const toValidate = Object.assign(defaultValues, values);
+
       try {
-        result = await register(values);
+        result = await register(toValidate);
       } catch (err) {
-        reject(validationHandler(values, err));
+        const validationResult =
+          mapValues(validationHandler(toValidate, err), (val) => formatMessage({ id: val }));
+
+        reject(new SubmissionError(validationResult));
         return;
       }
 
       resolve(result.data.token);
-    });
-
-  const onSubmit = e => {
-    each(errors, (field) => {
-      delete field.error;
-    });
-
-    handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
-  };
+    }).then(onSuccess, onError);
 
   return (
     <div className={style.container}>
       <Panel header={formatMessage(messages.title)} className={style['register-form']}>
-        <form onSubmit={onSubmit} noValidate>
-          <FormGroup controlId="email" validationState={errors.email.error ? 'error' : null}>
-            <ControlLabel><FormattedMessage {...messages.email.label} /></ControlLabel>
-            <FormControl
-              type="email"
-              placeholder={formatMessage(messages.email.placeholder)}
-              {...pick(email, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.email.error}</HelpBlock>
-          </FormGroup>
+        <form onSubmit={handleSubmit(submitHandler)} noValidate>
+          <Field
+            name="email"
+            label={formatMessage(messages.email.label)}
+            placeholder={formatMessage(messages.email.placeholder)}
+            component={FormField}
+            type="email"
+          />
 
-          <FormGroup controlId="password" validationState={errors.password.error ? 'error' : null}>
-            <ControlLabel><FormattedMessage {...messages.password.label} /></ControlLabel>
-            <FormControl
-              type="password"
-              placeholder={formatMessage(messages.password.placeholder)}
-              {...pick(password, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.password.error}</HelpBlock>
-          </FormGroup>
+          <Field
+            name="password"
+            label={formatMessage(messages.password.label)}
+            placeholder={formatMessage(messages.password.placeholder)}
+            component={FormField}
+            type="password"
+          />
 
-          <FormGroup
-            controlId="repeatPassword"
-            validationState={errors.repeatPassword.error ? 'error' : null}
-          >
-            <ControlLabel><FormattedMessage {...messages.repeatPassword.label} /></ControlLabel>
-            <FormControl
-              type="password"
-              placeholder={formatMessage(messages.repeatPassword.placeholder)}
-              {...pick(repeatPassword, ['value', 'onChange'])}
-            />
-            <FormControl.Feedback />
-            <HelpBlock>{errors.repeatPassword.error}</HelpBlock>
-          </FormGroup>
+          <Field
+            name="repeatPassword"
+            label={formatMessage(messages.repeatPassword.label)}
+            placeholder={formatMessage(messages.repeatPassword.placeholder)}
+            component={FormField}
+            type="password"
+          />
+
+          { error && <Alert bsStyle="danger">{error}</Alert> }
 
           <Button
             type="submit"
             bsStyle="primary"
-            disabled={process}
+            disabled={pristine || submitting || process}
             className={style['submit-button']}
             block
           >{process
@@ -213,11 +207,7 @@ RegisterForm.propTypes = {
 
 const selector = createSelector(state => state, state => ({ process: state.auth.process }));
 
-RegisterForm = reduxForm({
-  form: 'register',
-  propNamespace: 'form',
-  returnRejectedSubmitPromise: true,
-  fields,
-}, selector)(RegisterForm);
+RegisterForm = reduxForm({ form: 'register', propNamespace: 'form' })(RegisterForm);
+RegisterForm = connect(selector)(RegisterForm);
 
 export default RegisterForm = injectIntl(RegisterForm);

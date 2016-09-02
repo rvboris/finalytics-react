@@ -150,7 +150,6 @@ export default {
   'operation.list.error.skip.invalid': 'Invalid paging params',
   'operation.list.error.limit.invalid': 'Invalid paging params',
 
-  'component.appBar.overview': 'Overview',
   'component.appBar.operations': 'Operations',
   'component.appBar.budget': 'Budget',
   'component.appBar.reports': 'Reports',

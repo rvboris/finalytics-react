@@ -1,22 +1,19 @@
 import { has, keys, intersection, last, get } from 'lodash';
 
-const technicalError = (fields) => fields.map((field) => ({
-  [field]: 'global.error.technical',
-  _error: 'global.error.technical',
-}));
+const technicalError = { _error: 'global.error.technical' };
 
 export default (values, result) => {
   result = get(result, 'response.data', {});
 
   if (!result.error) {
-    return technicalError(keys(values));
+    return technicalError;
   }
 
   const namespace = result.error.split('.');
   const errorFor = intersection(namespace, keys(values));
 
   if (!errorFor) {
-    return technicalError(keys(values));
+    return technicalError;
   }
 
   const fieldName = last(errorFor);
@@ -25,5 +22,5 @@ export default (values, result) => {
     return { [fieldName]: result.error };
   }
 
-  return technicalError(keys(values));
+  return technicalError;
 };

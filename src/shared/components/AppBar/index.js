@@ -5,11 +5,6 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 const messages = defineMessages({
-  overview: {
-    id: 'component.appBar.overview',
-    description: 'AppBar overview link',
-    defaultMessage: 'Overview',
-  },
   operations: {
     id: 'component.appBar.operations',
     description: 'AppBar operations link',
@@ -41,31 +36,28 @@ const AppBar = () => (
   <Navbar staticTop>
     <Navbar.Header>
       <Navbar.Brand>
-        <Link to="/dashboard">FinanceButler</Link>
+        <Link to="/dashboard/operations">FinanceButler</Link>
       </Navbar.Brand>
       <Navbar.Toggle />
     </Navbar.Header>
     <Navbar.Collapse>
       <Nav>
-        <IndexLinkContainer to="/dashboard">
-          <NavItem eventKey={1}><FormattedMessage {...messages.overview} /></NavItem>
+        <IndexLinkContainer to="/dashboard/operations">
+          <NavItem eventKey={1}><FormattedMessage {...messages.operations} /></NavItem>
         </IndexLinkContainer>
-        <LinkContainer to="/operations">
-          <NavItem eventKey={2}><FormattedMessage {...messages.operations} /></NavItem>
+        <LinkContainer to="/dashboard/budget">
+          <NavItem eventKey={2}><FormattedMessage {...messages.budget} /></NavItem>
         </LinkContainer>
-        <LinkContainer to="/budget">
-          <NavItem eventKey={3}><FormattedMessage {...messages.budget} /></NavItem>
-        </LinkContainer>
-        <LinkContainer to="/reports">
-          <NavItem eventKey={4}><FormattedMessage {...messages.reports} /></NavItem>
+        <LinkContainer to="/dashboard/reports">
+          <NavItem eventKey={3}><FormattedMessage {...messages.reports} /></NavItem>
         </LinkContainer>
       </Nav>
       <Nav pullRight>
         <LinkContainer to="/settings">
-          <NavItem eventKey={5}><FormattedMessage {...messages.settings} /></NavItem>
+          <NavItem eventKey={4}><FormattedMessage {...messages.settings} /></NavItem>
         </LinkContainer>
         <LinkContainer to="/logout">
-          <NavItem eventKey={6}><FormattedMessage {...messages.exit} /></NavItem>
+          <NavItem eventKey={5}><FormattedMessage {...messages.exit} /></NavItem>
         </LinkContainer>
       </Nav>
     </Navbar.Collapse>

@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { reduxForm, Field } from 'redux-form';
-import { each, noop } from 'lodash';
+import { reduxForm, Field, SubmissionError } from 'redux-form';
+import { mapValues } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
@@ -14,6 +15,7 @@ import {
   Panel,
   ButtonGroup,
   HelpBlock,
+  Alert,
 } from 'react-bootstrap';
 
 import validationHandler from '../../utils/validation-handler';
@@ -66,9 +68,6 @@ const messages = defineMessages({
   },
 });
 
-const fields = ['email', 'password'];
-const errors = { email: {}, password: {} };
-
 const onGoogle = () => {
   window.location.pathname = '/api/auth/google';
 };
@@ -81,8 +80,8 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
-const renderField = (field) =>
-  <FormGroup controlId={field.name} validationState={field.error ? 'error' : null}>
+const FormField = (field) =>
+  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
     <ControlLabel>{field.label}</ControlLabel>
     <FormControl
       type={field.type}
@@ -90,12 +89,12 @@ const renderField = (field) =>
       {...field.input}
     />
     <FormControl.Feedback />
-    <HelpBlock>{field.error}</HelpBlock>
+    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
   </FormGroup>;
 
 let LoginForm = (props) => {
   const {
-    form: { handleSubmit, fields },
+    form: { error, handleSubmit, pristine, submitting },
     intl: { formatMessage },
     process,
     login,
@@ -104,57 +103,50 @@ let LoginForm = (props) => {
     onError,
   } = props;
 
-  each(fields, (field, fieldName) => {
-    if (field.touched && field.error) {
-      errors[fieldName].error = formatMessage({ id: field.error });
-    }
-  });
+  const defaultValues = { email: null, password: null };
+
+  const onRegister = () => go('/register');
 
   const submitHandler = (values) =>
     new Promise(async (resolve, reject) => {
       let result;
 
+      const toValidate = Object.assign(defaultValues, values);
+
       try {
-        result = await login(values);
+        result = await login(toValidate);
       } catch (err) {
-        reject(validationHandler(values, err));
+        const validationResult =
+          mapValues(validationHandler(toValidate, err), (val) => formatMessage({ id: val }));
+
+        reject(new SubmissionError(validationResult));
         return;
       }
 
       resolve(result.data.token);
-    });
-
-  const onSubmit = e => {
-    each(errors, (field) => {
-      delete field.error;
-    });
-
-    handleSubmit(submitHandler)(e).then(onSuccess || noop, onError || noop);
-  };
-
-  const onRegister = () => go('/register');
+    }).then(onSuccess, onError);
 
   return (
     <div className={style.container}>
       <Panel header={formatMessage(messages.title)} className={style['login-form']}>
-        <form onSubmit={onSubmit} noValidate>
+        <form onSubmit={handleSubmit(submitHandler)} noValidate>
           <Field
             name="email"
-            error={errors.email.error}
             label={formatMessage(messages.email.label)}
             placeholder={formatMessage(messages.email.placeholder)}
-            component={renderField}
+            component={FormField}
             type="email"
           />
 
           <Field
             name="password"
-            error={errors.password.error}
             label={formatMessage(messages.password.label)}
             placeholder={formatMessage(messages.password.placeholder)}
-            component={renderField}
+            component={FormField}
             type="password"
           />
+
+          { error && <Alert bsStyle="danger">{error}</Alert> }
 
           <div className={style['action-buttons']}>
             <Button
@@ -167,7 +159,7 @@ let LoginForm = (props) => {
             <Button
               type="submit"
               bsStyle="primary"
-              disabled={process}
+              disabled={pristine || submitting || process}
             >{process
               ? <FormattedMessage {...messages.processButton} />
               : <FormattedMessage {...messages.button} />
@@ -211,11 +203,7 @@ LoginForm.propTypes = {
 
 const selector = createSelector(state => state, state => ({ process: state.auth.process }));
 
-LoginForm = reduxForm({
-  form: 'login',
-  propNamespace: 'form',
-  returnRejectedSubmitPromise: true,
-  fields,
-}, selector)(LoginForm);
+LoginForm = reduxForm({ form: 'login', propNamespace: 'form' })(LoginForm);
+LoginForm = connect(selector)(LoginForm);
 
 export default LoginForm = injectIntl(LoginForm);
