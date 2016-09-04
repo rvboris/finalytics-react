@@ -4,8 +4,8 @@ import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { authActions } from '../actions';
-import styles from './LogoutPage.css';
+import { authActions } from '../../actions';
+import styles from './style.css';
 
 const messages = defineMessages({
   done: {
@@ -15,7 +15,7 @@ const messages = defineMessages({
   },
 });
 
-class LogoutPage extends React.Component {
+class Logout extends React.Component {
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     process: React.PropTypes.bool.isRequired,
@@ -46,5 +46,5 @@ class LogoutPage extends React.Component {
   }
 }
 
-const selector = createSelector(state => ({ process: state.auth.process }), state => state);
-export default connect(selector)(LogoutPage);
+const selector = createSelector(state => state.auth.process, process => ({ process }));
+export default connect(selector)(Logout);

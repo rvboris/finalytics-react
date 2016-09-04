@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { Route, IndexRoute, IndexRedirect } from 'react-router';
 import App from './containers/App';
 import { error } from './log';
 
@@ -23,7 +23,7 @@ const requireGuest = (store) => (nextState, replace) => {
     return;
   }
 
-  replace({ pathname: '/dashboard' });
+  replace({ pathname: '/dashboard/operations' });
 };
 
 const handleError = (err) => {
@@ -31,63 +31,60 @@ const handleError = (err) => {
   error(err);
 };
 
-const resolveHomePage = (nextState, cb) => {
-  System.import('./containers/HomePage')
-    .then(module => cb(null, module.default))
-    .catch(handleError);
+const loadRoute = (cb) => (module) => cb(null, module.default);
+
+const resolveHomeRoute = (nextState, cb) => {
+  System.import('./containers/Home').then(loadRoute(cb)).catch(handleError);
 };
 
-const resolveLoginPage = (nextState, cb) => {
-  System.import('./containers/LoginPage')
-    .then(module => cb(null, module.default))
-    .catch(handleError);
+const resolveLoginRoute = (nextState, cb) => {
+  System.import('./containers/Login').then(loadRoute(cb)).catch(handleError);
 };
 
-const resolveLogoutPage = (nextState, cb) => {
-  System.import('./containers/LogoutPage')
-    .then(module => cb(null, module.default))
-    .catch(handleError);
+const resolveLogoutRoute = (nextState, cb) => {
+  System.import('./containers/Logout').then(loadRoute(cb)).catch(handleError);
 };
 
-const resolveRegisterPage = (nextState, cb) => {
-  System.import('./containers/RegisterPage')
-    .then(module => cb(null, module.default))
-    .catch(handleError);
+const resolveRegisterRoute = (nextState, cb) => {
+  System.import('./containers/Register').then(loadRoute(cb)).catch(handleError);
 };
 
-const resolveDashboardPage = (nextState, cb) => {
-  System.import('./containers/DashboardPage')
-    .then(module => cb(null, module.default))
-    .catch(handleError);
+const resolveDashboardRoute = (nextState, cb) => {
+  System.import('./containers/Dashboard').then(loadRoute(cb)).catch(handleError);
+};
+
+const resolveOperationsRoute = (nextState, cb) => {
+  System.import('./containers/Operations').then(loadRoute(cb)).catch(handleError);
 };
 
 export default (store) => (
   <Route name="app" component={App} path="/">
-    <IndexRoute getComponent={resolveHomePage} />
+    <IndexRoute getComponent={resolveHomeRoute} />
     <Route
       path="dashboard"
-      getComponent={resolveDashboardPage}
+      getComponent={resolveDashboardRoute}
       onEnter={requireAuth(store)}
     >
+      <IndexRedirect to="operations" />
       <Route
-        path="login"
-        getComponent={resolveLoginPage}
-        onEnter={requireGuest(store)}
+        path="operations"
+        getComponent={resolveOperationsRoute}
+        onEnter={requireAuth(store)}
       />
     </Route>
     <Route
       path="login"
-      getComponent={resolveLoginPage}
+      getComponent={resolveLoginRoute}
       onEnter={requireGuest(store)}
     />
     <Route
       path="logout"
-      getComponent={resolveLogoutPage}
+      getComponent={resolveLogoutRoute}
       onEnter={requireAuth(store)}
     />
     <Route
       path="register"
-      getComponent={resolveRegisterPage}
+      getComponent={resolveRegisterRoute}
       onEnter={requireGuest(store)}
     />
   </Route>

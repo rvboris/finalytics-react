@@ -201,7 +201,7 @@ LoginForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => state, state => ({ process: state.auth.process }));
+const selector = createSelector(state => state.auth.process, process => ({ process }));
 
 LoginForm = reduxForm({ form: 'login', propNamespace: 'form' })(LoginForm);
 LoginForm = connect(selector)(LoginForm);

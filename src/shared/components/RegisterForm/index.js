@@ -109,7 +109,11 @@ let RegisterForm = (props) => {
     onError,
   } = props;
 
-  const defaultValues = { email: null, password: null };
+  const defaultValues = {
+    email: null,
+    password: null,
+    repeatPassword: null,
+  };
 
   const submitHandler = (values) =>
     new Promise(async (resolve, reject) => {
@@ -205,7 +209,7 @@ RegisterForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => state, state => ({ process: state.auth.process }));
+const selector = createSelector(state => state.auth.process, process => ({ process }));
 
 RegisterForm = reduxForm({ form: 'register', propNamespace: 'form' })(RegisterForm);
 RegisterForm = connect(selector)(RegisterForm);
