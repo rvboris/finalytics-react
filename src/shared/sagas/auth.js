@@ -1,15 +1,25 @@
 import { takeLatest } from 'redux-saga';
 import { select, fork, put, take } from 'redux-saga/effects';
 import { get } from 'lodash';
-import { authActions, localeActions, categoryActions, accountActions } from '../actions';
+import {
+  authActions,
+  localeActions,
+  categoryActions,
+  accountActions,
+  currencyActions,
+} from '../actions';
 
-const prepareUser = function* prepareUser() {
+const userTimezoneLocale = function* userTimezoneLocale() {
   if (IS_CLIENT) {
     yield put(authActions.setSettings({
       timezone: new Date().getTimezoneOffset(),
       locale: 'auto',
     }));
+  }
+};
 
+const prepareUserData = function* prepareUser() {
+  if (IS_CLIENT) {
     const category = yield select((state) => state.category);
 
     if (!category.data) {
@@ -20,6 +30,12 @@ const prepareUser = function* prepareUser() {
 
     if (!accounts) {
       yield put(accountActions.load());
+    }
+
+    const currencyList = yield select((state) => get(state, 'currency.currencyList'));
+
+    if (!currencyList) {
+      yield put(currencyActions.load());
     }
   }
 };
@@ -47,7 +63,7 @@ const onAuth = function* onAuth(action) {
 
 const onProfile = function* onProfile(action) {
   if (get(action, 'payload.data.status') === 'init') {
-    yield fork(prepareUser);
+    yield fork(userTimezoneLocale);
   }
 
   yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
@@ -55,6 +71,7 @@ const onProfile = function* onProfile(action) {
 
 const onSettings = function* onSettings(action) {
   yield put(localeActions.load(get(action, 'payload.data.locale')));
+  yield fork(prepareUserData);
 };
 
 export default function* () {
@@ -63,7 +80,7 @@ export default function* () {
   const auth = yield select((state) => state.auth);
 
   if (get(auth, 'profile.status') === 'init') {
-    yield fork(prepareUser);
+    yield fork(userTimezoneLocale);
   }
 
   yield [

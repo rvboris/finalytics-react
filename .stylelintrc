@@ -4,7 +4,7 @@
     "property-no-unknown": [
       true,
       {
-        "ignoreProperties": ["box"]
+        "ignoreProperties": ["box", "box-item"]
       }
     ]
   }

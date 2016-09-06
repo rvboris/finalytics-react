@@ -5,7 +5,7 @@ import OperationModel from './operation';
 import UserModel from './user';
 
 const model = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
   currency: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required: true },
   startBalance: { type: Number, required: true, default: 0 },
   currentBalance: { type: Number, required: true, default: 0 },

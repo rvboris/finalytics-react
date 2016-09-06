@@ -1,0 +1,11 @@
+.operations {
+  box: horizontal;
+}
+
+.balance-container {
+  box-item: flex-1;
+}
+
+.operations-container {
+  box-item: flex-2;
+}

@@ -1,0 +1,7 @@
+.account-list-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: normal;
+  padding-top: 8px;
+}
