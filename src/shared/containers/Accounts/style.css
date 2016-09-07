@@ -1,0 +1,16 @@
+.accounts {
+  box: horizontal;
+}
+
+.account-list-container {
+  box-item: flex-1;
+}
+
+.account-details-container {
+  box-item: flex-2;
+  margin-left: 20px;
+}
+
+.account-create {
+  margin-top: 20px;
+}

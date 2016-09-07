@@ -1,19 +1,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { Button } from 'react-bootstrap';
+import { push } from 'react-router-redux';
 
 import classnames from 'classnames';
 import MoneyFormat from '../MoneyFormat';
 import style from './style.css';
+
+const messages = defineMessages({
+  manage: {
+    id: 'component.accountList.manage',
+    description: 'AccountList manage button',
+    defaultMessage: 'Manage',
+  },
+  accounts: {
+    id: 'component.accountList.accounts',
+    description: 'AccountList panel title',
+    defaultMessage: 'Accounts',
+  },
+});
 
 const AccountList = (props) => (
   <div>
     <div className="panel panel-default">
       <div className="panel-heading">
         <h3 className={classnames('panel-title', 'pull-left', style['account-list-title'])}>
-          Счета
+          <FormattedMessage {...messages.accounts} />
         </h3>
-        <button className="btn btn-default pull-right">Управление</button>
+        <Button className="pull-right" onClick={props.manageAccounts}>
+          <FormattedMessage {...messages.manage} />
+        </Button>
         <div className="clearfix" />
       </div>
       <ul className="list-group">
@@ -32,7 +50,12 @@ const AccountList = (props) => (
 
 AccountList.propTypes = {
   accounts: React.PropTypes.array.isRequired,
+  manageAccounts: React.PropTypes.func.isRequired,
 };
+
+const mapDispatchToProps = (dispatch) => ({
+  manageAccounts: () => dispatch(push('/dashboard/accounts')),
+});
 
 const selector = createSelector(
   state => state.account.accounts,
@@ -43,4 +66,4 @@ const selector = createSelector(
   }),
 );
 
-export default connect(selector)(AccountList);
+export default injectIntl(connect(selector, mapDispatchToProps)(AccountList));

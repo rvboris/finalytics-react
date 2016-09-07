@@ -57,6 +57,10 @@ const resolveOperationsRoute = (nextState, cb) => {
   System.import('./containers/Operations').then(loadRoute(cb)).catch(handleError);
 };
 
+const resolveAccountsRoute = (nextState, cb) => {
+  System.import('./containers/Accounts').then(loadRoute(cb)).catch(handleError);
+};
+
 export default (store) => (
   <Route name="app" component={App} path="/">
     <IndexRoute getComponent={resolveHomeRoute} />
@@ -69,6 +73,11 @@ export default (store) => (
       <Route
         path="operations"
         getComponent={resolveOperationsRoute}
+        onEnter={requireAuth(store)}
+      />
+      <Route
+        path="accounts(/:accountId)"
+        getComponent={resolveAccountsRoute}
         onEnter={requireAuth(store)}
       />
     </Route>

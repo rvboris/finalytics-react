@@ -7,8 +7,8 @@ import style from './style.css';
 
 const Operations = () => (
   <div className={style.operations}>
-    <div className={style['balance-container']}><AccountList /></div>
     <div className={style['operations-container']}>123</div>
+    <div className={style['balance-container']}><AccountList /></div>
   </div>
 );
 

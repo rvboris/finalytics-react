@@ -155,4 +155,7 @@ export default {
   'component.appBar.reports': 'Reports',
   'component.appBar.settings': 'Settings',
   'component.appBar.exit': 'Logout',
+
+  'component.accountList.manage': 'Manage',
+  'component.accountList.accounts': 'Accounts',
 };

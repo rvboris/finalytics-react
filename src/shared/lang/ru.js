@@ -154,4 +154,7 @@ export default {
   'component.appBar.reports': 'Отчеты',
   'component.appBar.settings': 'Настройки',
   'component.appBar.exit': 'Выход',
+
+  'component.accountList.manage': 'Управление',
+  'component.accountList.accounts': 'Счета',
 };
