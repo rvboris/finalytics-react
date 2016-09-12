@@ -157,4 +157,20 @@ export default {
 
   'component.accountList.manage': 'Управление',
   'component.accountList.accounts': 'Счета',
+
+  'component.selectInput.notFound': 'Ничего не найдено',
+
+  'component.accountEditForm.infoAlert': 'Выберите счет или создайте новый',
+  'component.accountEditForm.name.label': 'Имя счета',
+  'component.accountEditForm.name.placeholder': 'Введите имя счета',
+  'component.accountEditForm.currencyId.label': 'Выберите валюту счета',
+  'component.accountEditForm.startBalance.label': 'Начальный баланс',
+  'component.accountEditForm.startBalance.placeholder': '0.00',
+  'component.accountEditForm.type.label': 'Это долг или кредит?',
+  'component.accountEditForm.processButton': 'Сохранение...',
+  'component.accountEditForm.createButton': 'Создать',
+  'component.accountEditForm.saveButton': 'Сохранить',
+
+  'containers.accounts.manageAccounts': 'Управление счетами',
+  'containers.accounts.createAccount': 'Создать новый счет',
 };

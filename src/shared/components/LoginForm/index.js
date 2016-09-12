@@ -111,7 +111,7 @@ let LoginForm = (props) => {
     new Promise(async (resolve, reject) => {
       let result;
 
-      const toValidate = Object.assign(defaultValues, values);
+      const toValidate = Object.assign({}, defaultValues, values);
 
       try {
         result = await login(toValidate);
@@ -206,4 +206,4 @@ const selector = createSelector(state => state.auth.process, process => ({ proce
 LoginForm = reduxForm({ form: 'login', propNamespace: 'form' })(LoginForm);
 LoginForm = connect(selector)(LoginForm);
 
-export default LoginForm = injectIntl(LoginForm);
+export default injectIntl(LoginForm);

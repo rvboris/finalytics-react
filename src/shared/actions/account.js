@@ -14,6 +14,30 @@ export const load = createAction('ACCOUNT_LOAD',
   })
 );
 
+export const create = createAction('ACCOUNT_CREATE',
+  null,
+  (values) => ({
+    request: {
+      url: `${ACCOUNT_API}/add`,
+      method: 'post',
+      values,
+    },
+  })
+);
+
+export const save = createAction('ACCOUNT_SAVE',
+  null,
+  (values) => ({
+    request: {
+      url: `${ACCOUNT_API}/update`,
+      method: 'post',
+      values,
+    },
+  })
+);
+
 export default {
   load,
+  create,
+  save,
 };

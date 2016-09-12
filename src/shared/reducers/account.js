@@ -15,4 +15,26 @@ export default handleActions({
       .set('accounts', action.payload.data.accounts),
 
   ACCOUNT_LOAD_REJECTED: () => initialState,
+
+  ACCOUNT_CREATE: (state) => state.set('process', true),
+
+  ACCOUNT_CREATE_RESOLVED: (state, action) =>
+    state
+      .set('process', false)
+      .set('accounts', action.payload.data.accounts),
+
+  ACCOUNT_CREATE_REJECTED: (state) =>
+    state
+      .set('process', false),
+
+  ACCOUNT_SAVE: (state) => state.set('process', true),
+
+  ACCOUNT_SAVE_RESOLVED: (state, action) =>
+    state
+      .set('process', false)
+      .set('accounts', action.payload.data.accounts),
+
+  ACCOUNT_SAVE_REJECTED: (state) =>
+    state
+      .set('process', false),
 }, initialState);

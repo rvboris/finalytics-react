@@ -82,7 +82,12 @@ module.exports = ({ target, options }) => {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
-          ifClient('./src/client/bootstrap-css/bootstrap.css'),
+          ifClient('react-select/dist/react-select.css'),
+          ifClient('react-toggle/style.css'),
+          ifClient('./src/client/globals-css/bootstrap.css'),
+          ifClient('./src/client/globals-css/select.css'),
+          ifClient('./src/client/globals-css/toggle.css'),
+          ifClient('./src/client/globals-css/app.css'),
           ifClient('webfontloader'),
           ifServer(
             path.resolve(__dirname, `../src/${target}/index.js`),
@@ -234,7 +239,7 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /bootstrap\.css$/ },
+          { test: /(globals-css|react-select|react-toggle).+\.css$/ },
           ifDevClient({ loader: ['style-loader', 'css-loader'] }),
           ifProdClient({ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') })
         ),

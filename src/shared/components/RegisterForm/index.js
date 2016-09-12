@@ -119,7 +119,7 @@ let RegisterForm = (props) => {
     new Promise(async (resolve, reject) => {
       let result;
 
-      const toValidate = Object.assign(defaultValues, values);
+      const toValidate = Object.assign({}, defaultValues, values);
 
       try {
         result = await register(toValidate);
@@ -214,4 +214,4 @@ const selector = createSelector(state => state.auth.process, process => ({ proce
 RegisterForm = reduxForm({ form: 'register', propNamespace: 'form' })(RegisterForm);
 RegisterForm = connect(selector)(RegisterForm);
 
-export default RegisterForm = injectIntl(RegisterForm);
+export default injectIntl(RegisterForm);

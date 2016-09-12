@@ -1,9 +1,13 @@
 import acceptLanguage from 'accept-language';
-import { isArray, isEmpty, maxBy } from 'lodash';
 
 import config from '../../shared/config';
 
-const languages = ['ru', 'en'];
+const languagesBCP47Map = {
+  'ru-RU': 'ru',
+  'en-US': 'en',
+};
+
+acceptLanguage.languages(Object.keys(languagesBCP47Map));
 
 export default async(ctx, next) => {
   const header = ctx.request.header['accept-language'];
@@ -18,7 +22,7 @@ export default async(ctx, next) => {
   let parsed;
 
   try {
-    parsed = acceptLanguage.parse(header);
+    parsed = acceptLanguage.get(header);
   } catch (err) {
     ctx.log.error(err);
 
@@ -26,12 +30,7 @@ export default async(ctx, next) => {
     return;
   }
 
-  if (isArray(parsed) && !isEmpty(parsed)) {
-    const userLanguage = maxBy(parsed, (lang) => lang.quality);
-    const selectedLanguage = languages.indexOf(userLanguage.language || ctx.language);
-
-    ctx.language = languages[selectedLanguage];
-  }
+  ctx.language = languagesBCP47Map[parsed] || ctx.language;
 
   await next();
 };

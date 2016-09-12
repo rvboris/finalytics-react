@@ -8,9 +8,15 @@ const LinkedAccountList = (props) => (
     {props.accounts.map((account) => {
       const onSelect = () => props.onSelect(account._id);
 
-      return (<ListGroupItem onClick={onSelect} active={account._id === props.selectedAccountId}>
-        <h4>{account.name}</h4>
-      </ListGroupItem>);
+      return (
+        <ListGroupItem
+          onClick={onSelect}
+          active={account._id === props.selectedAccountId}
+          key={account._id}
+        >
+          {account.name}
+        </ListGroupItem>
+      );
     })}
   </ListGroup>
 );

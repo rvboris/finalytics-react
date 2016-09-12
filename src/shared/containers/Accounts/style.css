@@ -3,11 +3,11 @@
 }
 
 .account-list-container {
-  box-item: flex-1;
+  width: 350px;
 }
 
 .account-details-container {
-  box-item: flex-2;
+  width: 450px;
   margin-left: 20px;
 }
 

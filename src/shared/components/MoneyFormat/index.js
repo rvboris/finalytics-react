@@ -3,15 +3,17 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import accounting from 'accounting';
 
-const MoneyFormat = (props) => {
+export const format = (num, currency) => {
   const formatOptions = { format: '%v %s' };
 
-  if (props.currency) {
-    formatOptions.symbol = props.currency.code;
+  if (currency) {
+    formatOptions.symbol = currency.symbol;
   }
 
-  return (<span>{accounting.formatMoney(props.sum, formatOptions)}</span>);
+  return accounting.formatMoney(num, formatOptions);
 };
+
+const MoneyFormat = (props) => (<span>{format(props.sum, props.currency)}</span>);
 
 MoneyFormat.propTypes = {
   sum: React.PropTypes.number.isRequired,

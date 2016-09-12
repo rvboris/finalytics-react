@@ -17,7 +17,13 @@ router.get('/load', { jwt: true }, async (ctx) => {
   }
 
   ctx.body = {
-    currencyList: currencyList.map(currency => currency.toObject({ versionKey: false })),
+    currencyList: currencyList.map(currency => {
+      const currencyObject = currency.toObject({ versionKey: false });
+      currencyObject.translatedName =
+        currencyObject.translate[ctx.language].name || currencyObject.name;
+      delete currencyObject.translate;
+      return currencyObject;
+    }),
   };
 });
 

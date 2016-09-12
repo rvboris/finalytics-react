@@ -158,4 +158,20 @@ export default {
 
   'component.accountList.manage': 'Manage',
   'component.accountList.accounts': 'Accounts',
+
+  'component.selectInput.notFound': 'Not found',
+
+  'component.accountEditForm.infoAlert': 'Select or create a new account',
+  'component.accountEditForm.name.label': 'Name of account',
+  'component.accountEditForm.name.placeholder': 'Enter account name',
+  'component.accountEditForm.currencyId.label': 'Select the account currency',
+  'component.accountEditForm.startBalance.label': 'Start balance',
+  'component.accountEditForm.startBalance.placeholder': '0.00',
+  'component.accountEditForm.type.label': 'This is a debt or a loan?',
+  'component.accountEditForm.processButton': 'Saving...',
+  'component.accountEditForm.createButton': 'Create',
+  'component.accountEditForm.saveButton': 'Save',
+
+  'containers.accounts.manageAccounts': 'Account management',
+  'containers.accounts.createAccount': 'Create new account',
 };
