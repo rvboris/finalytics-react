@@ -59,29 +59,26 @@ const onUserReady = function* userReady() {
 const onAuth = function* onAuth(action) {
   yield put(authActions.setToken(get(action, 'payload.data.token')));
   yield put(authActions.getProfile());
-};
-
-const onProfile = function* onProfile(action) {
-  if (get(action, 'payload.data.status') === 'init') {
-    yield fork(userTimezoneLocale);
-  }
-
-  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
-};
-
-const onSettings = function* onSettings(action) {
-  yield put(localeActions.load(get(action, 'payload.data.locale')));
-  yield fork(prepareUserData);
-};
-
-export default function* () {
-  yield fork(onUserReady);
 
   const auth = yield select((state) => state.auth);
 
   if (get(auth, 'profile.status') === 'init') {
     yield fork(userTimezoneLocale);
   }
+
+  yield fork(prepareUserData);
+};
+
+const onProfile = function* onProfile(action) {
+  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
+};
+
+const onSettings = function* onSettings(action) {
+  yield put(localeActions.load(get(action, 'payload.data.locale')));
+};
+
+export default function* () {
+  yield fork(onUserReady);
 
   yield [
     takeLatest(['AUTH_LOGIN_RESOLVED', 'AUTH_REGISTER_RESOLVED'], onAuth),

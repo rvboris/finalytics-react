@@ -1,5 +1,6 @@
-import agent from '../agent';
 import test from 'ava';
+
+import agent from '../agent';
 
 let request;
 

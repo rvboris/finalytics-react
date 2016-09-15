@@ -158,6 +158,7 @@ export default {
 
   'component.accountList.manage': 'Manage',
   'component.accountList.accounts': 'Accounts',
+  'component.accountList.noAccounts': 'You have no accounts',
 
   'component.selectInput.notFound': 'Not found',
 
@@ -168,10 +169,20 @@ export default {
   'component.accountEditForm.startBalance.label': 'Start balance',
   'component.accountEditForm.startBalance.placeholder': '0.00',
   'component.accountEditForm.type.label': 'This is a debt or a loan?',
-  'component.accountEditForm.processButton': 'Saving...',
+  'component.accountEditForm.saveProcessButton': 'Saving...',
   'component.accountEditForm.createButton': 'Create',
   'component.accountEditForm.saveButton': 'Save',
+  'component.accountEditForm.deleteProcessButton': 'Deleting...',
+  'component.accountEditForm.deleteButton': 'Delete',
+  'component.accountEditForm.deleteModalTitle': 'Удалить счет',
+  'component.accountEditForm.deleteModalConfirm': 'Are you sure want to delete your account {name}?',
+  'component.accountEditForm.deleteModalWarning': 'All your operations for this account will be removed.',
+  'component.accountEditForm.deleteModalNotice': 'You can also close the account so as not to see it in the list.',
+  'component.accountEditForm.deleteModalError': 'When you delete an account error occurred',
+  'component.accountEditForm.cancelButton': 'Cancel',
 
   'containers.accounts.manageAccounts': 'Account management',
   'containers.accounts.createAccount': 'Create new account',
+
+  'component.linkedAccountList.noAccounts': 'You have no accounts',
 };

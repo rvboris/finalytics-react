@@ -1,9 +1,10 @@
-import agent from '../agent';
 import test from 'ava';
 import TreeModel from 'tree-model';
 import mongoose from 'mongoose';
 import { sample, difference } from 'lodash';
 import Chance from 'chance';
+
+import agent from '../agent';
 
 let request;
 let chance;

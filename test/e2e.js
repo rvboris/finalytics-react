@@ -1,4 +1,5 @@
 const cp = require('child_process');
+
 const execContext = { env: process.env, stdio: 'inherit' };
 const server = cp.fork('./build/server/main.js', execContext);
 

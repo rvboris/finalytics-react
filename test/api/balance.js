@@ -1,8 +1,9 @@
-import agent from '../agent';
 import test from 'ava';
 import moment from 'moment';
 import TreeModel from 'tree-model';
 import { sample, filter } from 'lodash';
+
+import agent from '../agent';
 
 let request;
 

@@ -5,3 +5,7 @@
   line-height: normal;
   padding-top: 8px;
 }
+
+.account-list-empty-txt {
+  margin: 20px;
+}

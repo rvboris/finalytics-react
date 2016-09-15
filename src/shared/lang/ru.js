@@ -157,6 +157,7 @@ export default {
 
   'component.accountList.manage': 'Управление',
   'component.accountList.accounts': 'Счета',
+  'component.accountList.noAccounts': 'У вас пока нет счетов',
 
   'component.selectInput.notFound': 'Ничего не найдено',
 
@@ -170,7 +171,17 @@ export default {
   'component.accountEditForm.processButton': 'Сохранение...',
   'component.accountEditForm.createButton': 'Создать',
   'component.accountEditForm.saveButton': 'Сохранить',
+  'component.accountEditForm.deleteProcessButton': 'Удаление...',
+  'component.accountEditForm.deleteButton': 'Удалить',
+  'component.accountEditForm.deleteModalTitle': 'Удалить счет',
+  'component.accountEditForm.deleteModalConfirm': 'Вы уверены что хотите удалить счет {name}?',
+  'component.accountEditForm.deleteModalWarning': 'При удалении счета все связанные с ним операции также будут удалены.',
+  'component.accountEditForm.deleteModalNotice': 'Вы также можете закрыть счет чтобы скрыть его из списка',
+  'component.accountEditForm.deleteModalError': 'При удалении счета произошла ошибка',
+  'component.accountEditForm.cancelButton': 'Отмена',
 
   'containers.accounts.manageAccounts': 'Управление счетами',
   'containers.accounts.createAccount': 'Создать новый счет',
+
+  'component.linkedAccountList.noAccounts': 'У вас пока нет счетов',
 };

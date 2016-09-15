@@ -37,4 +37,15 @@ export default handleActions({
   ACCOUNT_SAVE_REJECTED: (state) =>
     state
       .set('process', false),
+
+  ACCOUNT_REMOVE: (state) => state.set('process', true),
+
+  ACCOUNT_REMOVE_RESOLVED: (state, action) =>
+    state
+      .set('process', false)
+      .set('accounts', action.payload.data.accounts),
+
+  ACCOUNT_REMOVE_REJECTED: (state) =>
+    state
+      .set('process', false),
 }, initialState);

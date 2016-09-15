@@ -36,8 +36,20 @@ export const save = createAction('ACCOUNT_SAVE',
   })
 );
 
+export const remove = createAction('ACCOUNT_REMOVE',
+  null,
+  (values) => ({
+    request: {
+      url: `${ACCOUNT_API}/delete`,
+      method: 'post',
+      values,
+    },
+  })
+);
+
 export default {
   load,
   create,
   save,
+  remove,
 };

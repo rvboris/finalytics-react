@@ -20,21 +20,26 @@ const messages = defineMessages({
     description: 'AccountList panel title',
     defaultMessage: 'Accounts',
   },
+  noAccounts: {
+    id: 'component.accountList.noAccounts',
+    description: 'Empty account list message',
+    defaultMessage: 'You have no accounts',
+  },
 });
 
 const AccountList = (props) => (
-  <div>
-    <div className="panel panel-default">
-      <div className="panel-heading">
-        <h3 className={classnames('panel-title', 'pull-left', style['account-list-title'])}>
-          <FormattedMessage {...messages.accounts} />
-        </h3>
-        <Button className="pull-right" onClick={props.manageAccounts}>
-          <FormattedMessage {...messages.manage} />
-        </Button>
-        <div className="clearfix" />
-      </div>
-      <ul className="list-group">
+  <div className="panel panel-default">
+    <div className="panel-heading">
+      <h3 className={classnames('panel-title', 'pull-left', style['account-list-title'])}>
+        <FormattedMessage {...messages.accounts} />
+      </h3>
+      <Button className="pull-right" onClick={props.manageAccounts}>
+        <FormattedMessage {...messages.manage} />
+      </Button>
+      <div className="clearfix" />
+    </div>
+    { props.accounts.length
+      ? <ul className="list-group">
         {props.accounts.map((account) => (
           <li className="list-group-item" key={account._id}>
             <span className="badge">
@@ -44,7 +49,10 @@ const AccountList = (props) => (
           </li>
         ))}
       </ul>
-    </div>
+      : <p className={classnames('text-center', style['account-list-empty-txt'])}>
+        <FormattedMessage {...messages.noAccounts} />
+      </p>
+    }
   </div>
 );
 

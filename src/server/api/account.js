@@ -1,4 +1,3 @@
-
 import Router from 'koa-66';
 import mongoose from 'mongoose';
 import { pick, merge } from 'lodash';
@@ -115,7 +114,9 @@ router.post('/update', { jwt: true }, async (ctx) => {
       params.startBalance = parseFloat(startBalance.toFixed(account.currency.decimalDigits));
     }
 
-    if (params.name && accounts.find(account => account.name === params.name)) {
+    if (params.name
+        && account.name !== params.name
+        && accounts.find(account => account.name === params.name)) {
       ctx.status = 400;
       ctx.body = { error: 'account.update.error.name.exist' };
       return;

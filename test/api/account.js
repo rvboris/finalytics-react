@@ -1,8 +1,9 @@
-import agent from '../agent';
 import test from 'ava';
 import mongoose from 'mongoose';
 import Chance from 'chance';
 import { sample } from 'lodash';
+
+import agent from '../agent';
 
 let request;
 let chance;
@@ -227,15 +228,26 @@ test.serial('update', async (t) => {
   t.is(res.status, 400);
   t.is(res.body.error, 'account.update.error.startBalance.negative');
 
+  let accountToCheck = sample(accounts);
+
   res = await request.post('/api/account/update').send({
     _id: sample(accounts.filter(account => account.type === 'debt'))._id,
-    name: 'debt',
+    name: accounts.find(account => account._id !== accountToCheck._id).name,
   });
 
   t.is(res.status, 400);
   t.is(res.body.error, 'account.update.error.name.exist');
 
-  let accountToCheck = sample(accounts);
+  accountToCheck = sample(accounts);
+
+  res = await request.post('/api/account/update').send({
+    _id: accountToCheck._id,
+    name: accountToCheck.name,
+  });
+
+  t.is(res.status, 200);
+
+  accountToCheck = sample(accounts);
 
   res = await request.post('/api/account/update').send({ _id: accountToCheck._id });
 

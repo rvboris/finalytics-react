@@ -5,25 +5,30 @@
     "strict": 0,
     "no-param-reassign": 0,
     "no-shadow": 0,
+    "arrow-parens": 0,
     "new-cap": 0,
     "no-console": 0,
+    "no-plusplus": 0,
     "no-constant-condition": 0,
     "no-underscore-dangle": 0,
-    "react/jsx-filename-extension": 0,
-    "import/prefer-default-export": 0,
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "generator-star-spacing": 0,
     "linebreak-style": 0,
+    "class-methods-use-this": 0,
+    "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "react/jsx-filename-extension": 0,
     "react/forbid-prop-types": 0,
-    "react/no-unused-prop-types": 0
+    "react/no-unused-prop-types": 0,
+    "react/require-extension": "off"
   },
   globals: {
     "CONFIG": false,
     "IS_CLIENT": false,
-    "IS_SERVER": false,
+    "IS_SERVER": false
   },
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es6": true
   }
 }

@@ -1,10 +1,11 @@
-import agent from '../agent';
 import test from 'ava';
 import moment from 'moment';
 import mongoose from 'mongoose';
 import TreeModel from 'tree-model';
 import { sample, filter } from 'lodash';
 import Chance from 'chance';
+
+import agent from '../agent';
 
 let request;
 let chance;
