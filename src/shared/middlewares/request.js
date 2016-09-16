@@ -17,7 +17,7 @@ export default store => next => action => {
     const values = get(action, 'meta.request.values');
 
     if (req[method]) {
-      action.meta.promise = req[method](url, values);
+      action.meta.promise = new Promise((...args) => req[method](url, values).then(...args));
       action.meta.optimist = true;
 
       delete action.meta.request;

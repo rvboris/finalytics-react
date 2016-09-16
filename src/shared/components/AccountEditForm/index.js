@@ -17,10 +17,11 @@ import {
 } from 'react-bootstrap';
 
 import { error } from '../../log';
+import { accountActions } from '../../actions';
 import validationHandler from '../../utils/validation-handler';
 import SelectInput from '../SelectInput';
 import ToggleInput from '../ToggleInput';
-import { accountActions } from '../../actions';
+import MoneyInput from '../MoneyInput';
 import style from './style.css';
 
 const messages = defineMessages({
@@ -140,12 +141,7 @@ const NumberFormField = field =>
   <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
     <ControlLabel>{field.label}</ControlLabel>
     <InputGroup>
-      <FormControl
-        type="number"
-        step="0.01"
-        placeholder={field.placeholder}
-        {...field.input}
-      />
+      <MoneyInput {...field} className="form-control" />
       <InputGroup.Addon>{field.currency.code}</InputGroup.Addon>
     </InputGroup>
     <FormControl.Feedback />

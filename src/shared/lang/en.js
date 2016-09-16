@@ -32,8 +32,6 @@ export default {
   'auth.register.error.password.identical': 'Passwords must be identical',
   'auth.register.error.password.short': 'Password must be larger than 8 chars',
 
-  'auth.logout.done': 'The logout is complete, return to the main page...',
-
   'category.update.error._id.required': 'Category id is required',
   'category.update.error._id.notFound': 'Category not found',
   'category.update.error.name.required': 'Category name is required',
@@ -181,8 +179,11 @@ export default {
   'component.accountEditForm.deleteModalError': 'When you delete an account error occurred',
   'component.accountEditForm.cancelButton': 'Cancel',
 
-  'containers.accounts.manageAccounts': 'Account management',
-  'containers.accounts.createAccount': 'Create new account',
+  'container.accounts.manageAccounts': 'Account management',
+  'container.accounts.createAccount': 'Create new account',
+
+  'container.logout.done': 'The logout is complete, return to the main page...',
+  'container.logout.process': 'Logout...',
 
   'component.linkedAccountList.noAccounts': 'You have no accounts',
 };

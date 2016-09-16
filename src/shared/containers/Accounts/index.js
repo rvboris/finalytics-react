@@ -11,12 +11,12 @@ import AccountEditForm from '../../components/AccountEditForm';
 
 const messages = defineMessages({
   manageAccounts: {
-    id: 'containers.accounts.manageAccounts',
+    id: 'container.accounts.manageAccounts',
     description: 'Page title',
     defaultMessage: 'Account management',
   },
   createAccount: {
-    id: 'containers.accounts.createAccount',
+    id: 'container.accounts.createAccount',
     description: 'Create account button',
     defaultMessage: 'Create new account',
   },

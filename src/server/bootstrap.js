@@ -6,6 +6,13 @@ import log, { error } from '../shared/log';
 
 process.on('uncaughtException', error);
 
+Promise.config({
+  warnings: false,
+  longStackTraces: true,
+  cancellation: false,
+  monitoring: false,
+});
+
 export { default as app } from './app';
 
 export const server = (async () => {

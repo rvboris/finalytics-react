@@ -90,7 +90,7 @@ module.exports = ({ target, options }) => {
           ifClient('./src/client/globals-css/app.css'),
           ifClient('webfontloader'),
           ifServer(
-            path.resolve(__dirname, `../src/${target}/index.js`),
+            path.resolve(__dirname, `../src/${target}/bootstrap.js`),
             path.resolve(__dirname, `../src/${target}/app.js`)
           ),
         ]),
@@ -219,6 +219,7 @@ module.exports = ({ target, options }) => {
               plugins: [
                 'transform-class-properties',
                 'lodash',
+                'transform-promise-to-bluebird',
                 [
                   'transform-runtime',
                   {

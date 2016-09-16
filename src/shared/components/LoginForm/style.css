@@ -1,6 +1,6 @@
 .container {
   box: vertical middle center;
-  height: inherit;
+  min-height: 100vh;
 }
 
 .login-form {

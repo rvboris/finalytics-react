@@ -10,7 +10,12 @@ import routes from '../shared/routes';
 import { error } from '../shared/log';
 import store, { runSaga } from './store';
 
-runSaga();
+Promise.config({
+  warnings: false,
+  longStackTraces: true,
+  cancellation: false,
+  monitoring: false,
+});
 
 const renderApp = () => {
   const matchRouter = { history: browserHistory, routes: routes(store) };
@@ -36,10 +41,11 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept('../shared/routes', renderApp);
 }
 
+runSaga();
+renderApp();
+
 WebFont.load({
   google: {
     families: ['Open Sans'],
   },
 });
-
-renderApp();

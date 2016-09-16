@@ -2,49 +2,63 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { authActions } from '../../actions';
+import Spinner from '../../components/Spinner';
 import styles from './style.css';
 
 const messages = defineMessages({
   done: {
-    id: 'auth.logout.done',
+    id: 'container.logout.done',
     description: 'Logout exit message',
-    defaultMessage: 'The logout is complete, return to the main page...',
+    defaultMessage: 'The logout is complete, return to the main page',
+  },
+  process: {
+    id: 'container.logout.process',
+    description: 'Logout process message',
+    defaultMessage: 'Logout...',
   },
 });
 
 class Logout extends React.Component {
   static propTypes = {
-    dispatch: React.PropTypes.func.isRequired,
+    logout: React.PropTypes.func.isRequired,
+    goMain: React.PropTypes.func.isRequired,
     process: React.PropTypes.bool.isRequired,
-  }
+  };
 
-  componentDidMount() {
-    this.props.dispatch(authActions.logout()).finally(this.startTimeout.bind(this));
-  }
+  constructor(...args) {
+    super(...args);
 
-  startTimeout() {
     if (IS_CLIENT) {
-      setTimeout(() => this.props.dispatch(push('/')), 2000);
+      this.props.logout().finally(Promise.delay(2000).then(this.props.goMain));
     }
   }
 
   render() {
-    const { process } = this.props;
-
     return (
       <div className={styles.container}>
+        <Spinner />
+
         {
-          process
-            ? <p>Process</p>
-            : <h1><FormattedMessage {...messages.done} /></h1>
+          this.props.process
+            ? <h4><FormattedMessage {...messages.process} /></h4>
+            : <h4><FormattedMessage {...messages.done} /></h4>
         }
       </div>
     );
   }
 }
 
-const selector = createSelector(state => state.auth.process, process => ({ process }));
-export default connect(selector)(Logout);
+const mapDispatchToProps = (dispatch) => ({
+  logout: () => dispatch(authActions.logout()),
+  goMain: () => dispatch(push('/')),
+});
+
+const selector = createSelector(
+  state => state.auth.process,
+  process => ({ process }),
+);
+
+export default injectIntl(connect(selector, mapDispatchToProps)(Logout));

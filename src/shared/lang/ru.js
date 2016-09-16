@@ -32,8 +32,6 @@ export default {
   'auth.register.error.password.identical': 'Пароли должны совпадать',
   'auth.register.error.password.short': 'Пароль должен быть не менее 8 символов',
 
-  'auth.logout.done': 'Выход выполнен, возврат на главную страницу...',
-
   'category.update.error._id.required': 'Не указан id категории',
   'category.update.error._id.notFound': 'Категория не найдена',
   'category.update.error.name.required': 'Не указано новое имя категории',
@@ -180,8 +178,11 @@ export default {
   'component.accountEditForm.deleteModalError': 'При удалении счета произошла ошибка',
   'component.accountEditForm.cancelButton': 'Отмена',
 
-  'containers.accounts.manageAccounts': 'Управление счетами',
-  'containers.accounts.createAccount': 'Создать новый счет',
+  'container.accounts.manageAccounts': 'Управление счетами',
+  'container.accounts.createAccount': 'Создать новый счет',
+
+  'container.logout.done': 'Выход выполнен, возвращаемся на главную...',
+  'container.logout.process': 'Выход...',
 
   'component.linkedAccountList.noAccounts': 'У вас пока нет счетов',
 };
