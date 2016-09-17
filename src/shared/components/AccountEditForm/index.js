@@ -246,7 +246,7 @@ class AccountEditForm extends React.Component {
       toValidate._id = this.props.accountId;
     }
 
-    return new Promise((async) (resolve, reject) => {
+    return new Promise(async function submitPromise(resolve, reject) {
       let result;
 
       try {
@@ -281,18 +281,15 @@ class AccountEditForm extends React.Component {
     this.setState({ accountDeleteModal: !this.state.accountDeleteModal });
   }
 
-  removeAccount = async () => {
-    try {
-      await this.props.removeAccount({ _id: this.props.accountId });
-    } catch (e) {
-      error(e);
-      this.setState(Object.assign(this.state, { accountDeleteError: true }));
-      return;
-    }
-
-    this.toggleModal();
-    this.props.selectAccount('');
-  }
+  removeAccount = () =>
+    this.props.removeAccount({ _id: this.props.accountId })
+      .then(() => {
+        this.toggleModal();
+        this.props.selectAccount('');
+      }, (e) => {
+        error(e);
+        this.setState(Object.assign(this.state, { accountDeleteError: true }));
+      });
 
   render() {
     const { formatMessage } = this.props.intl;

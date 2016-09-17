@@ -128,8 +128,6 @@ module.exports = ({ target, options }) => {
       postcssReporter({ clearMessages: true }),
     ]),
     plugins: _.compact([
-      ifDevClient(new webpack.dependencies.LabeledModulesPlugin()),
-      ifServer(new webpack.dependencies.LabeledModulesPlugin()),
       new ProgressBarPlugin({ stream: logStream }),
       ifClient(new LodashModuleReplacementPlugin({
         collections: true,
@@ -176,7 +174,11 @@ module.exports = ({ target, options }) => {
       ),
       ifProd(new webpack.optimize.DedupePlugin()),
       ifProdClient(
-        new ExtractTextPlugin('[name]-[chunkhash].css', { allChunks: true })
+        new ExtractTextPlugin({
+          filename: '[name]-[chunkhash].css',
+          disable: false,
+          allChunks: true,
+        })
       ),
     ]),
     module: {
@@ -217,7 +219,6 @@ module.exports = ({ target, options }) => {
                 },
               },
               plugins: [
-                'transform-class-properties',
                 'lodash',
                 'transform-promise-to-bluebird',
                 [
@@ -229,28 +230,29 @@ module.exports = ({ target, options }) => {
                 ],
               ],
             },
-            ifServer({ presets: ['react', 'stage-1'] }),
-            ifClient({
-              presets: [
-                'react',
-                'stage-1',
-                'es2015',
-              ],
-            })
+            ifServer({ presets: ['react', 'es2016', 'es2017', 'stage-1'] }),
+            ifClient({ presets: ['react', 'latest', 'stage-1'] })
           ),
         },
         _.merge(
           { test: /(globals-css|react-select|react-toggle).+\.css$/ },
           ifDevClient({ loader: ['style-loader', 'css-loader'] }),
-          ifProdClient({ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') })
+          ifProdClient({
+            loader: ExtractTextPlugin.extract({
+              fallbackLoader: 'style-loader',
+              loader: 'css-loader',
+            }),
+          })
         ),
         _.merge(
           { test: /shared.+\.css$/ },
           ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifDevClient({ loader: ['style-loader', 'css-loader?modules', 'postcss-loader'] }),
           ifProdClient({
-            loader:
-              ExtractTextPlugin.extract('style-loader', 'css-loader?modules!postcss-loader'),
+            loader: ExtractTextPlugin.extract({
+              fallbackLoader: 'style-loader',
+              loader: 'css-loader?modules!postcss-loader',
+            }),
           })
         ),
       ]),
