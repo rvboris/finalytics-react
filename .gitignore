@@ -44,3 +44,7 @@ config/production.js
 
 #Idea
 .idea
+
+#VS Code
+jsconfig.json
+.vscode

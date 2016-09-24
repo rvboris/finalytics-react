@@ -235,7 +235,7 @@ class AccountEditForm extends React.Component {
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
-  }
+  };
 
   submitHandler = (values) => {
     const toValidate = Object.assign({}, defaultValues, values);
@@ -275,11 +275,11 @@ class AccountEditForm extends React.Component {
 
       this.props.selectAccount(account._id);
     });
-  }
+  };
 
   toggleModal = () => {
     this.setState({ accountDeleteModal: !this.state.accountDeleteModal });
-  }
+  };
 
   removeAccount = () =>
     this.props.removeAccount({ _id: this.props.accountId })

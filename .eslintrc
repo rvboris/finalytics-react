@@ -22,7 +22,7 @@
     "react/require-extension": "off",
     "react/no-danger": 0,
   },
-  globals: {
+  "globals": {
     "CONFIG": false,
     "IS_CLIENT": false,
     "IS_SERVER": false

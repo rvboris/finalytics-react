@@ -83,6 +83,7 @@ module.exports = ({ target, options }) => {
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
           ifClient('react-select/dist/react-select.css'),
+          ifClient('rc-tree/assets/index.css'),
           ifClient('react-toggle/style.css'),
           ifClient('./src/client/globals-css/bootstrap.css'),
           ifClient('./src/client/globals-css/select.css'),
@@ -116,18 +117,22 @@ module.exports = ({ target, options }) => {
         'react-dom': ifElse(isDev)('react-dom', 'react-lite'),
       },
     },
-    eslint: {
-      configFile: '.eslintrc',
-    },
-    postcss: () => _.compact([
-      stylelint(),
-      rucksack(),
-      flexbox(),
-      cssnext(),
-      mqpacker(),
-      postcssReporter({ clearMessages: true }),
-    ]),
     plugins: _.compact([
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          postcss: () => _.compact([
+            stylelint(),
+            rucksack(),
+            flexbox(),
+            cssnext(),
+            mqpacker(),
+            postcssReporter({ clearMessages: true }),
+          ]),
+          eslint: {
+            configFile: '.eslintrc',
+          },
+        },
+      }),
       new ProgressBarPlugin({ stream: logStream }),
       ifClient(new LodashModuleReplacementPlugin({
         collections: true,
@@ -182,14 +187,13 @@ module.exports = ({ target, options }) => {
       ),
     ]),
     module: {
-      preLoaders: [
+      rules: _.compact([
         {
+          enforce: 'pre',
           test: /\.js$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'eslint',
         },
-      ],
-      loaders: _.compact([
         {
           test: /\.pem$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
@@ -235,7 +239,7 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /(globals-css|react-select|react-toggle).+\.css$/ },
+          { test: /(globals-css|react-select|react-toggle|rc-tree).+\.css$/ },
           ifDevClient({ loader: ['style-loader', 'css-loader'] }),
           ifProdClient({
             loader: ExtractTextPlugin.extract({

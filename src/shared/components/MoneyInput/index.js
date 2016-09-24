@@ -3,21 +3,24 @@ import React from 'react';
 const getCursorPosition = (element) => {
   if (element.selectionStart) {
     return element.selectionStart;
-  } else if (document.selection) {
-    element.focus();
-    const r = document.selection.createRange();
+  }
 
-    if (r == null) {
+  if (document.selection) {
+    element.focus();
+
+    const range = document.selection.createRange();
+
+    if (!range) {
       return 0;
     }
 
-    const re = element.createTextRange();
-    const rc = re.duplicate();
+    const textRange = element.createTextRange();
+    const dupRange = textRange.duplicate();
 
-    re.moveToBookmark(r.getBookmark());
-    rc.setEndPoint('EndToStart', re);
+    textRange.moveToBookmark(range.getBookmark());
+    dupRange.setEndPoint('EndToStart', textRange);
 
-    return rc.text.length;
+    return dupRange.text.length;
   }
 
   return 0;
@@ -28,23 +31,14 @@ const checkValue = (event, currentValue) => {
 
   if (inputCode > 0 && (inputCode < 48 || inputCode > 57)) {
     if (inputCode === 46) {
-      if (getCursorPosition(event.target) === 0 && currentValue.charAt(0) === '-') {
-        event.preventDefault();
-      }
-      if (currentValue.match(/[.]/)) {
+      if ((getCursorPosition(event.target) === 0 && currentValue.charAt(0) === '-') || currentValue.match(/[.]/)) {
         event.preventDefault();
       }
     } else if (inputCode === 45) {
-      if (currentValue.charAt(0) === '-') {
+      if (currentValue.charAt(0) === '-' || getCursorPosition(event.target) !== 0) {
         event.preventDefault();
       }
-
-      if (getCursorPosition(event.target) !== 0) {
-        event.preventDefault();
-      }
-    } else if (inputCode === 8) {
-      console.log('ok');
-    } else {
+    } else if (inputCode !== 8) {
       event.preventDefault();
     }
   } else if (inputCode > 0 && (inputCode >= 48 && inputCode <= 57)) {
