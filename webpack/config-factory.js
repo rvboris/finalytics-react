@@ -83,7 +83,6 @@ module.exports = ({ target, options }) => {
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
           ifClient('react-select/dist/react-select.css'),
-          ifClient('rc-tree/assets/index.css'),
           ifClient('react-toggle/style.css'),
           ifClient('./src/client/globals-css/bootstrap.css'),
           ifClient('./src/client/globals-css/select.css'),

@@ -24,7 +24,7 @@ coverage
 node_modules
 
 # NPM cache directory
-npm-cache
+npm_cache
 
 # Optional npm cache directory
 .npm
