@@ -36,7 +36,7 @@ const AppBar = () => (
   <Navbar staticTop>
     <Navbar.Header>
       <Navbar.Brand>
-        <Link to="/dashboard/operations">FinanceButler</Link>
+        <Link to="/dashboard/operations">Finalytics</Link>
       </Navbar.Brand>
       <Navbar.Toggle />
     </Navbar.Header>

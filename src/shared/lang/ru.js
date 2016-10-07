@@ -185,4 +185,7 @@ export default {
   'container.logout.process': 'Выход...',
 
   'component.linkedAccountList.noAccounts': 'У вас пока нет счетов',
+
+  'container.categories.manageCategories': 'Управление категориями',
+  'container.categories.createCategory': 'Создать категорию',
 };

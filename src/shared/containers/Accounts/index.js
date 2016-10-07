@@ -31,7 +31,6 @@ const Accounts = (props) => {
       <hr />
       <div className={style.accounts}>
         <div className={style['account-list-container']}>
-          <LinkedAccountList onSelect={props.selectAccount} selectedAccountId={selectedAccountId} />
           <Button
             block
             bsStyle="primary"
@@ -40,6 +39,7 @@ const Accounts = (props) => {
           >
             <FormattedMessage {...messages.createAccount} />
           </Button>
+          <LinkedAccountList onSelect={props.selectAccount} selectedAccountId={selectedAccountId} />
         </div>
         <div className={style['account-details-container']}>
           <AccountEditForm accountId={selectedAccountId} />

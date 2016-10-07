@@ -186,4 +186,7 @@ export default {
   'container.logout.process': 'Logout...',
 
   'component.linkedAccountList.noAccounts': 'You have no accounts',
+
+  'container.categories.manageCategories': 'Categories management',
+  'container.categories.createCategory': 'Create new category',
 };
