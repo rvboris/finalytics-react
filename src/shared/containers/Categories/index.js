@@ -3,18 +3,31 @@ import { push } from 'react-router-redux';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import CategoriesTree from '../../components/CategoriesTree';
 import CategoryEditForm from '../../components/CategoryEditForm';
 import style from './style.css';
+
+const messages = defineMessages({
+  manageCategories: {
+    id: 'container.categories.manageCategories',
+    description: 'Page title',
+    defaultMessage: 'Categories management',
+  },
+  createCategory: {
+    id: 'container.categories.createCategory',
+    description: 'Create category button',
+    defaultMessage: 'Create new category',
+  },
+});
 
 const Categories = (props) => {
   const selectedCategoryId = get(props, 'params.categoryId', null);
 
   return (
     <div>
-      <h3>Управление категориями</h3>
+      <h3><FormattedMessage {...messages.manageCategories} /></h3>
       <hr />
       <div className={style.categories}>
         <div className={style['categories-tree-container']}>
@@ -24,7 +37,7 @@ const Categories = (props) => {
             className={style['category-create']}
             onClick={props.newCategory}
           >
-            Создать новую категорию
+            <FormattedMessage {...messages.createCategory} />
           </Button>
 
           <CategoriesTree onSelect={props.selectCategory} selectedCategoryId={selectedCategoryId} />

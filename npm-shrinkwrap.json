@@ -2480,6 +2480,18 @@
         }
       }
     },
+    "eslint-config-airbnb": {
+      "version": "11.2.0",
+      "from": "eslint-config-airbnb@11.2.0",
+      "resolved": "./node_shrinkwrap/eslint-config-airbnb-11.2.0.tar",
+      "dev": true
+    },
+    "eslint-config-airbnb-base": {
+      "version": "7.2.0",
+      "from": "eslint-config-airbnb-base@>=7.2.0 <8.0.0",
+      "resolved": "./node_shrinkwrap/eslint-config-airbnb-base-7.2.0.tar",
+      "dev": true
+    },
     "eslint-import-resolver-node": {
       "version": "0.2.3",
       "from": "eslint-import-resolver-node@>=0.2.0 <0.3.0",
@@ -2506,15 +2518,10 @@
         }
       }
     },
-    "eslint-module-utils": {
-      "version": "1.0.0",
-      "from": "eslint-module-utils@>=1.0.0 <2.0.0",
-      "resolved": "./node_shrinkwrap/eslint-module-utils-1.0.0.tar"
-    },
     "eslint-plugin-import": {
-      "version": "2.0.0",
-      "from": "eslint-plugin-import@2.0.0",
-      "resolved": "./node_shrinkwrap/eslint-plugin-import-2.0.0.tar",
+      "version": "1.16.0",
+      "from": "eslint-plugin-import@1.16.0",
+      "resolved": "./node_shrinkwrap/eslint-plugin-import-1.16.0.tar",
       "dependencies": {
         "doctrine": {
           "version": "1.3.0",
@@ -2525,6 +2532,11 @@
           "version": "1.0.0",
           "from": "isarray@>=1.0.0 <2.0.0",
           "resolved": "./node_shrinkwrap/isarray-1.0.0.tar"
+        },
+        "object-assign": {
+          "version": "4.1.0",
+          "from": "object-assign@>=4.0.1 <5.0.0",
+          "resolved": "./node_shrinkwrap/object-assign-4.1.0.tar"
         }
       }
     },
@@ -3889,9 +3901,9 @@
       "resolved": "./node_shrinkwrap/koa-66-1.0.0.tar"
     },
     "koa-body": {
-      "version": "1.5.0",
-      "from": "koa-body@>=1.5.0 <2.0.0",
-      "resolved": "./node_shrinkwrap/koa-body-1.5.0.tar"
+      "version": "1.6.0",
+      "from": "koa-body@1.6.0",
+      "resolved": "./node_shrinkwrap/koa-body-1.6.0.tar"
     },
     "koa-compose": {
       "version": "3.1.0",
@@ -3929,9 +3941,9 @@
       "resolved": "./node_shrinkwrap/koa-morgan-1.0.1.tar"
     },
     "koa-passport": {
-      "version": "2.2.2",
-      "from": "koa-passport@>=2.1.1 <3.0.0",
-      "resolved": "./node_shrinkwrap/koa-passport-2.2.2.tar"
+      "version": "2.1.1",
+      "from": "koa-passport@2.1.1",
+      "resolved": "./node_shrinkwrap/koa-passport-2.1.1.tar"
     },
     "koa-session-mongoose": {
       "version": "1.0.0",
@@ -4030,9 +4042,9 @@
       }
     },
     "lodash": {
-      "version": "4.16.3",
-      "from": "lodash@4.16.3",
-      "resolved": "./node_shrinkwrap/lodash-4.16.3.tar"
+      "version": "4.16.4",
+      "from": "lodash@4.16.4",
+      "resolved": "./node_shrinkwrap/lodash-4.16.4.tar"
     },
     "lodash-es": {
       "version": "4.15.0",
@@ -4040,10 +4052,16 @@
       "resolved": "./node_shrinkwrap/lodash-es-4.15.0.tar"
     },
     "lodash-webpack-plugin": {
-      "version": "0.10.1",
-      "from": "lodash-webpack-plugin@>=0.10.1 <0.11.0",
-      "resolved": "./node_shrinkwrap/lodash-webpack-plugin-0.10.1.tar",
-      "dev": true
+      "version": "0.10.2",
+      "from": "lodash-webpack-plugin@0.10.2",
+      "resolved": "./node_shrinkwrap/lodash-webpack-plugin-0.10.2.tar",
+      "dependencies": {
+        "lodash": {
+          "version": "4.16.4",
+          "from": "lodash@>=4.16.4 <5.0.0",
+          "resolved": "./node_shrinkwrap/lodash-4.16.4.tar"
+        }
+      }
     },
     "lodash._arraycopy": {
       "version": "3.0.0",
@@ -4149,6 +4167,21 @@
       "from": "lodash.difference@>=4.3.0 <5.0.0",
       "resolved": "./node_shrinkwrap/lodash.difference-4.5.0.tar",
       "dev": true
+    },
+    "lodash.endswith": {
+      "version": "4.2.1",
+      "from": "lodash.endswith@>=4.0.1 <5.0.0",
+      "resolved": "./node_shrinkwrap/lodash.endswith-4.2.1.tar"
+    },
+    "lodash.find": {
+      "version": "4.6.0",
+      "from": "lodash.find@>=4.3.0 <5.0.0",
+      "resolved": "./node_shrinkwrap/lodash.find-4.6.0.tar"
+    },
+    "lodash.findindex": {
+      "version": "4.6.0",
+      "from": "lodash.findindex@>=4.3.0 <5.0.0",
+      "resolved": "./node_shrinkwrap/lodash.findindex-4.6.0.tar"
     },
     "lodash.foreach": {
       "version": "4.5.0",
@@ -4470,7 +4503,7 @@
       "dependencies": {
         "isarray": {
           "version": "1.0.0",
-          "from": "isarray@~1.0.0",
+          "from": "isarray@>=1.0.0 <1.1.0",
           "resolved": "./node_shrinkwrap/isarray-1.0.0.tar"
         },
         "readable-stream": {
@@ -4486,9 +4519,9 @@
       "resolved": "./node_shrinkwrap/mongodb-core-2.0.12.tar"
     },
     "mongoose": {
-      "version": "4.6.2",
-      "from": "mongoose@4.6.2",
-      "resolved": "./node_shrinkwrap/mongoose-4.6.2.tar"
+      "version": "4.6.3",
+      "from": "mongoose@4.6.3",
+      "resolved": "./node_shrinkwrap/mongoose-4.6.3.tar"
     },
     "mongoose-unique-validator": {
       "version": "1.0.2",

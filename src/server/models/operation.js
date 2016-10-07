@@ -230,7 +230,7 @@ model.post('save', async function postSave(operation, next) {
   }
 });
 
-model.post('remove', async function postRemove(operation, next) {
+model.post('remove', async (operation, next) => {
   const op = operation.toObject({ depopulate: true, version: false });
 
   try {
