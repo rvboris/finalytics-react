@@ -1,6 +1,6 @@
 import convert from 'koa-convert';
 import staticCache from 'koa-static-cache';
-import clientConfigBuilder from '../../../webpack/client-config.js';
+import clientConfigBuilder from '../../../webpack/client-config';
 
 const webpackClientConfig = clientConfigBuilder({ mode: process.env.NODE_ENV });
 
