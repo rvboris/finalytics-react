@@ -1,6 +1,6 @@
 export default {
   ru: {
-    name: 'root',
+    name: '/',
     type: 'any',
     system: true,
     children: [

@@ -246,7 +246,7 @@ class AccountEditForm extends React.Component {
       toValidate._id = this.props.accountId;
     }
 
-    return new Promise(async function submitPromise(resolve, reject) {
+    return new Promise(async (resolve, reject) => {
       let result;
 
       try {

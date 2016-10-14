@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get, isUndefined, pick, mapValues } from 'lodash';
+import { get, isUndefined, pick, omit, mapValues } from 'lodash';
 import { createSelector } from 'reselect';
 import { push } from 'react-router-redux';
 import { reduxForm, Field, SubmissionError, formValueSelector } from 'redux-form';
@@ -16,6 +16,7 @@ import {
   Modal,
 } from 'react-bootstrap';
 
+import { categoryActions } from '../../actions';
 import { error } from '../../log';
 import SelectInput from '../SelectInput';
 import validationHandler from '../../utils/validation-handler';
@@ -139,8 +140,8 @@ const SelectFormField = field =>
     <ControlLabel>{field.label}</ControlLabel>
     <SelectInput
       {...field}
-      options={field.options}
       clearable={false}
+      options={field.options}
     />
     <FormControl.Feedback />
     {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
@@ -162,14 +163,15 @@ class CategoryEditForm extends React.Component {
     process: React.PropTypes.bool.isRequired,
     form: React.PropTypes.object.isRequired,
     intl: React.PropTypes.object.isRequired,
-    createCategory: React.PropTypes.func.isRequired,
-    saveCategory: React.PropTypes.func.isRequired,
+    updateCategory: React.PropTypes.func.isRequired,
     removeCategory: React.PropTypes.func.isRequired,
+    addCategory: React.PropTypes.func.isRequired,
+    moveCategory: React.PropTypes.func.isRequired,
     selectCategory: React.PropTypes.func.isRequired,
     isNewCategory: React.PropTypes.bool.isRequired,
     isSystemCategory: React.PropTypes.bool.isRequired,
-    canChangeType: React.PropTypes.bool.isRequired,
     availableParentsList: React.PropTypes.array.isRequired,
+    availableTypesList: React.PropTypes.array.isRequired,
   };
 
   constructor(...args) {
@@ -211,34 +213,38 @@ class CategoryEditForm extends React.Component {
   };
 
   submitHandler = (values) => {
-    const toValidate = Object.assign({}, defaultValues, values);
+    const toValidate = {};
 
-    if (!this.props.isNewCategory) {
-      toValidate._id = this.props.categoryId;
-    }
+    toValidate._id = this.props.isNewCategory ? values.parent : this.props.categoryId;
 
-    return new Promise(async function submitPromise(resolve, reject) {
-      let result;
-
+    return new Promise(async (resolve, reject) => {
       try {
         if (this.props.isNewCategory) {
-          result = await this.props.createCategory(toValidate);
+          toValidate.newNode = omit(values, 'parent');
+          await this.props.addCategory(toValidate);
         } else {
-          result = await this.props.saveCategory(toValidate);
+          toValidate.name = values.name;
+
+          if (this.props.form.initialValues.parent !== values.parent) {
+            toValidate.to = values.parent;
+            await this.props.moveCategory(toValidate);
+          }
+
+          await this.props.updateCategory(toValidate);
         }
       } catch (err) {
+        error(err);
+
         const validationResult =
           mapValues(validationHandler(toValidate, err),
             val => this.props.intl.formatMessage({ id: val }));
 
         reject(new SubmissionError(validationResult));
+
         return;
       }
 
-      const accounts = get(result, 'data.accounts', []);
-      const account = accounts.find(account => account.name === toValidate.name);
-
-      resolve(account);
+      resolve();
     }).then((category) => {
       if (!this.props.isNewCategory) {
         return;
@@ -249,7 +255,7 @@ class CategoryEditForm extends React.Component {
   };
 
   toggleModal = () => {
-    this.setState({ accountDeleteModal: !this.state.accountDeleteModal });
+    this.setState({ categoryDeleteModal: !this.state.categoryDeleteModal });
   };
 
   removeAccount = () =>
@@ -259,7 +265,7 @@ class CategoryEditForm extends React.Component {
         this.props.selectCategory('');
       }, (e) => {
         error(e);
-        this.setState(Object.assign(this.state, { accountDeleteError: true }));
+        this.setState(Object.assign(this.state, { categoryDeleteError: true }));
       });
 
   render() {
@@ -287,17 +293,17 @@ class CategoryEditForm extends React.Component {
         <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
             label={formatMessage(messages.currencyId.label)}
-            name="type"
-            options={availableTypesListLabeled}
+            name="parent"
+            options={this.props.availableParentsList}
             component={SelectFormField}
-            disabled={!this.props.canChangeType}
           />
 
           <Field
             label={formatMessage(messages.currencyId.label)}
-            name="parent"
-            options={this.props.availableParentsList}
+            name="type"
+            options={this.props.availableTypesList}
             component={SelectFormField}
+            disabled={!this.props.isNewCategory || this.props.availableTypesList.length <= 1}
           />
 
           <Field
@@ -398,18 +404,6 @@ const isSystemCategorySelector = createSelector(
   }
 );
 
-const canChangeTypeSelector = createSelector(
-  categoryNodeSelector,
-  isNewCategorySelector,
-  (categoryNode, isNewCategory) => {
-    if (isNewCategory) {
-      return true;
-    }
-
-    return !categoryNode.hasChildren();
-  }
-);
-
 const categoryDefaultsSelector = createSelector(
   state => state.category.data,
   categoryNodeSelector,
@@ -429,24 +423,64 @@ const categoryDefaultsSelector = createSelector(
 
 const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
 
-const availableParentsList = createSelector(
+const availableParentsListSelector = createSelector(
   categoryDefaultsSelector,
   state => formFieldSelector(state, ...fieldsToEdit),
+  state => state.category.data,
+  isNewCategorySelector,
+  (initialValues, currentValues, categoryData, isNewCategory) => {
+    const values = Object.assign({}, initialValues, currentValues);
+
+    const tree = new TreeModel();
+    const rootNode = tree.parse(categoryData);
+    const parentsList = rootNode.all();
+    const filteredList = isNewCategory
+      ? parentsList
+      : parentsList.filter(node =>
+        (node.model.type === 'any' || node.model.type === values.type)
+        && node.model._id !== values._id
+      );
+
+    return filteredList.map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
+  }
+);
+
+const availableTypesListSelector = createSelector(
+  categoryDefaultsSelector,
+  state => formFieldSelector(state, ...fieldsToEdit.concat('parent')),
   state => state.category.data,
   (initialValues, currentValues, categoryData) => {
     const values = Object.assign({}, initialValues, currentValues);
 
     const tree = new TreeModel();
     const rootNode = tree.parse(categoryData);
-    const parentsList = rootNode.all();
+    const selectedParent = rootNode.first(node => node.model._id === values.parent);
 
-    return parentsList
-      .filter(node =>
-        (node.model.type === 'any' || node.model.type === values.type)
-        && node.model._id !== values._id
-        && categoryData._id !== node.model._id
-      )
-      .map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
+    if (selectedParent && !selectedParent.isRoot()) {
+      return [{ label: selectedParent.model.type, value: selectedParent.model.type }];
+    }
+
+    return availableTypesListLabeled;
+  }
+);
+
+const initialValuesSelector = createSelector(
+  categoryDefaultsSelector,
+  state => formFieldSelector(state, ...fieldsToEdit.concat('parent')),
+  availableTypesListSelector,
+  isNewCategorySelector,
+  (initialValues, currentValues, availableTypesList, isNewCategory) => {
+    if (!isNewCategory) {
+      return initialValues;
+    }
+
+    const values = Object.assign({}, initialValues, currentValues);
+
+    if (availableTypesList.length === 1) {
+      return Object.assign(values, { type: availableTypesList[0].value });
+    }
+
+    return values;
   }
 );
 
@@ -454,29 +488,30 @@ const selector = createSelector([
   processSelector,
   isNewCategorySelector,
   isSystemCategorySelector,
-  canChangeTypeSelector,
-  availableParentsList,
-  categoryDefaultsSelector,
+  availableParentsListSelector,
+  availableTypesListSelector,
+  initialValuesSelector,
 ], (
   process,
   isNewCategory,
   isSystemCategory,
-  canChangeType,
   availableParentsList,
+  availableTypesList,
   initialValues
 ) => ({
   process,
   isNewCategory,
   isSystemCategory,
-  canChangeType,
   availableParentsList,
+  availableTypesList,
   initialValues,
 }));
 
 const mapDispatchToProps = dispatch => ({
-  saveCategory: () => dispatch(),
-  createCategory: () => dispatch(),
-  removeCategory: () => dispatch(),
+  updateCategory: (...args) => dispatch(categoryActions.update(...args)),
+  removeCategory: (...args) => dispatch(categoryActions.remove(...args)),
+  addCategory: (...args) => dispatch(categoryActions.add(...args)),
+  moveCategory: (...args) => dispatch(categoryActions.move(...args)),
   selectCategory: categoryId => dispatch(push(`/dashboard/categories/${categoryId}`)),
 });
 

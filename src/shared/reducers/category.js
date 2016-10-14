@@ -7,14 +7,44 @@ const initialState = Immutable({
   data: null,
 });
 
+const preReducer = (state) => state.set('process', true);
+
+const reducer = (state, action) =>
+  state
+    .set('process', false)
+    .set('data', action.payload.data.data)
+    .set('_id', action.payload.data._id);
+
+const postReducer = () => initialState;
+
 export default handleActions({
-  CATEGORY_LOAD: (state) => state.set('process', true),
+  CATEGORY_LOAD: preReducer,
 
-  CATEGORY_LOAD_RESOLVED: (state, action) =>
-    state
-      .set('process', false)
-      .set('data', action.payload.data.data)
-      .set('_id', action.payload.data._id),
+  CATEGORY_LOAD_RESOLVED: reducer,
 
-  CATEGORY_LOAD_REJECTED: () => initialState,
+  CATEGORY_LOAD_REJECTED: postReducer,
+
+  CATEGORY_UPDATE: preReducer,
+
+  CATEGORY_UPDATE_RESOLVED: reducer,
+
+  CATEGORY_UPDATE_REJECTED: postReducer,
+
+  CATEGORY_REMOVE: preReducer,
+
+  CATEGORY_REMOVE_RESOLVED: reducer,
+
+  CATEGORY_REMOVE_REJECTED: postReducer,
+
+  CATEGORY_ADD: preReducer,
+
+  CATEGORY_ADD_RESOLVED: reducer,
+
+  CATEGORY_ADD_REJECTED: postReducer,
+
+  CATEGORY_MOVE: preReducer,
+
+  CATEGORY_MOVE_RESOLVED: reducer,
+
+  CATEGORY_MOVE_REJECTED: postReducer,
 }, initialState);
