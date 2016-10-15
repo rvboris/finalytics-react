@@ -1,14 +1,15 @@
 /* eslint global-require: 0 */
 
+require('babel-polyfill');
+
 process.env.DEBUG = 'dev,webpack';
 
 const path = require('path');
 const cp = require('child_process');
 const chokidar = require('chokidar');
 const webpack = require('webpack');
-const express = require('express');
-const createWebpackMiddleware = require('webpack-dev-middleware');
-const createWebpackHotMiddleware = require('webpack-hot-middleware');
+const Koa = require('koa');
+const koaWebpackMiddleware = require('koa-webpack-middleware');
 const log = require('debug')('dev');
 const config = require('./config/development');
 
@@ -89,18 +90,17 @@ class HotServer {
 
 class HotClient {
   constructor(compiler) {
-    const app = express();
+    const app = new Koa();
 
-    this.webpackDevMiddleware = createWebpackMiddleware(compiler, {
+    app.use(koaWebpackMiddleware.devMiddleware(compiler, {
       quiet: true,
       noInfo: true,
       stats: { colors: true },
       headers: { 'Access-Control-Allow-Origin': '*' },
       publicPath: compiler.options.output.publicPath,
-    });
+    }));
 
-    app.use(this.webpackDevMiddleware);
-    app.use(createWebpackHotMiddleware(compiler));
+    app.use(koaWebpackMiddleware.hotMiddleware(compiler));
 
     this.listenerManager = new ListenerManager(app.listen(config.devPort));
 
@@ -108,8 +108,6 @@ class HotClient {
   }
 
   dispose() {
-    this.webpackDevMiddleware.close();
-
     return Promise.all([
       this.listenerManager ? this.listenerManager.dispose() : undefined,
     ]);
@@ -153,7 +151,7 @@ class HotServers {
   restart() {
     const clearWebpackConfigsCache = () => {
       Object.keys(require.cache).forEach(modulePath => {
-        if (~modulePath.indexOf('webpack')) {
+        if (modulePath.indexOf('webpack') >= 0) {
           delete require.cache[modulePath];
         }
       });
