@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get, isUndefined, pick, omit, mapValues } from 'lodash';
+import { get, isUndefined, pick, mapValues, isEmpty } from 'lodash';
 import { createSelector } from 'reselect';
 import { push } from 'react-router-redux';
 import { reduxForm, Field, SubmissionError, formValueSelector } from 'redux-form';
@@ -150,6 +150,8 @@ const SelectFormField = field =>
 const defaultValues = {
   type: 'expense',
   name: null,
+  parent: null,
+  _id: null,
 };
 
 const fieldsToEdit = Object.keys(defaultValues);
@@ -172,6 +174,7 @@ class CategoryEditForm extends React.Component {
     isSystemCategory: React.PropTypes.bool.isRequired,
     availableParentsList: React.PropTypes.array.isRequired,
     availableTypesList: React.PropTypes.array.isRequired,
+    canChangeType: React.PropTypes.bool.isRequired,
   };
 
   constructor(...args) {
@@ -183,9 +186,12 @@ class CategoryEditForm extends React.Component {
     };
   }
 
+  componentWillReceiveProps() {
+  }
+
   getSubmitButton = () => {
-    const { pristine, submitting } = this.props.form;
-    const disabled = pristine || submitting || this.props.process;
+    const { submitting } = this.props.form;
+    const disabled = submitting || this.props.process;
 
     let label;
 
@@ -220,7 +226,7 @@ class CategoryEditForm extends React.Component {
     return new Promise(async (resolve, reject) => {
       try {
         if (this.props.isNewCategory) {
-          toValidate.newNode = omit(values, 'parent');
+          toValidate.newNode = pick(values, ['name', 'type']);
           await this.props.addCategory(toValidate);
         } else {
           toValidate.name = values.name;
@@ -303,7 +309,7 @@ class CategoryEditForm extends React.Component {
             name="type"
             options={this.props.availableTypesList}
             component={SelectFormField}
-            disabled={!this.props.isNewCategory || this.props.availableTypesList.length <= 1}
+            disabled={!this.props.canChangeType}
           />
 
           <Field
@@ -366,14 +372,25 @@ const processSelector = createSelector(
   process => process,
 );
 
-const categoryNodeSelector = createSelector(
+const categoryTreeSelector = createSelector(
   state => state.category.data,
-  (_, props) => props.categoryId,
-  (categoryData, categoryId) => {
+  categoryData => {
     const tree = new TreeModel();
     const rootNode = tree.parse(categoryData);
 
-    return rootNode.first((node) => node.model._id === categoryId);
+    return rootNode;
+  }
+);
+
+const categoryNodeSelector = createSelector(
+  categoryTreeSelector,
+  (_, props) => props.categoryId,
+  (categoryTree, categoryId) => {
+    if (categoryId === 'new') {
+      return undefined;
+    }
+
+    return categoryTree.first((node) => node.model._id === categoryId);
   }
 );
 
@@ -408,12 +425,12 @@ const categoryDefaultsSelector = createSelector(
   state => state.category.data,
   categoryNodeSelector,
   (categoryData, categoryNode) => {
-    let result = defaultValues;
+    let result = Object.assign({}, defaultValues);
 
     result.parent = categoryData._id;
 
     if (categoryNode) {
-      result = pick(categoryNode.model, fieldsToEdit.concat('_id'));
+      result = pick(categoryNode.model, fieldsToEdit);
       result.parent = getParentNode(categoryNode).model._id;
     }
 
@@ -421,19 +438,40 @@ const categoryDefaultsSelector = createSelector(
   }
 );
 
+const initialValuesSelector = createSelector(
+  (_, props) => props.categoryId,
+  categoryDefaultsSelector,
+  state => formFieldSelector(state, ...fieldsToEdit),
+  categoryTreeSelector,
+  isNewCategorySelector,
+  (categoryId, initialValues, currentValues, categoryTree, isNewCategory) => {
+    let values;
+
+    if (categoryId === currentValues._id || (isNewCategory && !isEmpty(currentValues))) {
+      values = currentValues;
+    } else {
+      values = initialValues;
+    }
+
+    const selectedParent = categoryTree.first(node => node.model._id === values.parent);
+
+    if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
+      values.type = selectedParent.model.type;
+    }
+
+    return values;
+  }
+);
+
 const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
 
 const availableParentsListSelector = createSelector(
-  categoryDefaultsSelector,
-  state => formFieldSelector(state, ...fieldsToEdit),
-  state => state.category.data,
+  initialValuesSelector,
+  categoryTreeSelector,
   isNewCategorySelector,
-  (initialValues, currentValues, categoryData, isNewCategory) => {
-    const values = Object.assign({}, initialValues, currentValues);
-
-    const tree = new TreeModel();
-    const rootNode = tree.parse(categoryData);
-    const parentsList = rootNode.all();
+  (initialValues, categoryTree, isNewCategory) => {
+    const values = Object.assign({}, initialValues);
+    const parentsList = categoryTree.all();
     const filteredList = isNewCategory
       ? parentsList
       : parentsList.filter(node =>
@@ -446,17 +484,13 @@ const availableParentsListSelector = createSelector(
 );
 
 const availableTypesListSelector = createSelector(
-  categoryDefaultsSelector,
-  state => formFieldSelector(state, ...fieldsToEdit.concat('parent')),
-  state => state.category.data,
-  (initialValues, currentValues, categoryData) => {
-    const values = Object.assign({}, initialValues, currentValues);
+  initialValuesSelector,
+  categoryTreeSelector,
+  (initialValues, categoryTree) => {
+    const values = Object.assign({}, initialValues);
+    const selectedParent = categoryTree.first(node => node.model._id === values.parent);
 
-    const tree = new TreeModel();
-    const rootNode = tree.parse(categoryData);
-    const selectedParent = rootNode.first(node => node.model._id === values.parent);
-
-    if (selectedParent && !selectedParent.isRoot()) {
+    if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
       return [{ label: selectedParent.model.type, value: selectedParent.model.type }];
     }
 
@@ -464,24 +498,10 @@ const availableTypesListSelector = createSelector(
   }
 );
 
-const initialValuesSelector = createSelector(
-  categoryDefaultsSelector,
-  state => formFieldSelector(state, ...fieldsToEdit.concat('parent')),
+const canChangeTypeSelector = createSelector(
   availableTypesListSelector,
   isNewCategorySelector,
-  (initialValues, currentValues, availableTypesList, isNewCategory) => {
-    if (!isNewCategory) {
-      return initialValues;
-    }
-
-    const values = Object.assign({}, initialValues, currentValues);
-
-    if (availableTypesList.length === 1) {
-      return Object.assign(values, { type: availableTypesList[0].value });
-    }
-
-    return values;
-  }
+  (availableTypesList, isNewCategory) => availableTypesList.length !== 1 && isNewCategory
 );
 
 const selector = createSelector([
@@ -490,6 +510,7 @@ const selector = createSelector([
   isSystemCategorySelector,
   availableParentsListSelector,
   availableTypesListSelector,
+  canChangeTypeSelector,
   initialValuesSelector,
 ], (
   process,
@@ -497,6 +518,7 @@ const selector = createSelector([
   isSystemCategory,
   availableParentsList,
   availableTypesList,
+  canChangeType,
   initialValues
 ) => ({
   process,
@@ -504,6 +526,7 @@ const selector = createSelector([
   isSystemCategory,
   availableParentsList,
   availableTypesList,
+  canChangeType,
   initialValues,
 }));
 

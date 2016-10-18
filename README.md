@@ -20,7 +20,7 @@ Node.js 6+
 # Setup
 
  1. Clone repo
- 2. Run npm install (it use [shrinkpack](https://github.com/JamieMason/shrinkpack) project, all deps included in this repo)
+ 2. Run [yarn](https://yarnpkg.com)
  3. Edit and rename configs under ./config folder
 
 # Usage
@@ -29,7 +29,7 @@ The project uses webpack build system.
 
 *Development and hot reload*
 
-    npm run development
+    npm run dev
 
 *Production build*
 
@@ -54,20 +54,6 @@ Run E2E tests
 Run both
 
     npm run test
-
-# Additional npm commands
-
-Check deps updates
-
-    npm run up:check
-
-Update package.json
-
-    npm run up:upgrade
-
-Shrinkwrap and update tarballs
-
-    npm run up:pack
 
 # License
 
