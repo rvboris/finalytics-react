@@ -24,100 +24,88 @@ import style from './style.css';
 
 const messages = defineMessages({
   infoAlert: {
-    id: 'component.accountEditForm.infoAlert',
+    id: 'component.categoryEditForm.infoAlert',
     description: 'Info alert',
-    defaultMessage: 'Select an account to edit or create a new one',
+    defaultMessage: 'Select an category to edit or create a new one',
+  },
+  isSystemAlert: {
+    id: 'component.categoryEditForm.isSystemAlert',
+    description: 'Is system category alert',
+    defaultMessage: 'This system category, it can not be edited or deleted',
   },
   name: {
     label: {
-      id: 'component.accountEditForm.name.label',
-      description: 'Label of account name field',
-      defaultMessage: 'Name of account',
+      id: 'component.categoryEditForm.name.label',
+      description: 'Label of category name field',
+      defaultMessage: 'Name of category',
     },
     placeholder: {
-      id: 'component.accountEditForm.name.placeholder',
-      description: 'Placeholder of account name field',
-      defaultMessage: 'Name of account',
-    },
-  },
-  currencyId: {
-    label: {
-      id: 'component.accountEditForm.currencyId.label',
-      description: 'Label of currency field',
-      defaultMessage: 'Currency of account',
-    },
-  },
-  startBalance: {
-    label: {
-      id: 'component.accountEditForm.startBalance.label',
-      description: 'Label of startBalance field',
-      defaultMessage: 'Start balance',
-    },
-    placeholder: {
-      id: 'component.accountEditForm.startBalance.placeholder',
-      description: 'Placeholder of startBalance field',
-      defaultMessage: '0.00',
+      id: 'component.categoryEditForm.name.placeholder',
+      description: 'Placeholder of category name field',
+      defaultMessage: 'Name of category',
     },
   },
   type: {
     label: {
-      id: 'component.accountEditForm.type.label',
+      id: 'component.categoryEditForm.type.label',
       description: 'Label of type field',
-      defaultMessage: 'This is a debt or a loan?',
+      defaultMessage: 'Type of category',
+    },
+  },
+  parent: {
+    label: {
+      id: 'component.categoryEditForm.parent.label',
+      description: 'Label of parent field',
+      defaultMessage: 'Parent of category',
     },
   },
   saveProcessButton: {
-    id: 'component.accountEditForm.saveProcessButton',
+    id: 'component.categoryEditForm.saveProcessButton',
     description: 'Label of button in process',
     defaultMessage: 'Saving...',
   },
   createButton: {
-    id: 'component.accountEditForm.createButton',
+    id: 'component.categoryEditForm.createButton',
     description: 'Label of create button',
     defaultMessage: 'Create',
   },
   saveButton: {
-    id: 'component.accountEditForm.saveButton',
+    id: 'component.categoryEditForm.saveButton',
     description: 'Label of save button',
     defaultMessage: 'Save',
   },
   deleteButton: {
-    id: 'component.accountEditForm.deleteButton',
+    id: 'component.categoryEditForm.deleteButton',
     description: 'Label of delete button',
     defaultMessage: 'Delete',
   },
   deleteProcessButton: {
-    id: 'component.accountEditForm.deleteProcessButton',
+    id: 'component.categoryEditForm.deleteProcessButton',
     description: 'Label of delete button in process',
     defaultMessage: 'Deleting...',
   },
   deleteModalTitle: {
-    id: 'component.accountEditForm.deleteModalTitle',
+    id: 'component.categoryEditForm.deleteModalTitle',
     description: 'Title of delete modal',
-    defaultMessage: 'Delete account',
+    defaultMessage: 'Delete category',
   },
   deleteModalConfirm: {
-    id: 'component.accountEditForm.deleteModalConfirm',
-    description: 'Confirm text to delete account',
-    defaultMessage: 'Are you sure want to delete your account {name}?',
+    id: 'component.categoryEditForm.deleteModalConfirm',
+    description: 'Confirm text to delete category',
+    defaultMessage: 'Are you sure want to delete your category {name}?',
   },
   deleteModalWarning: {
-    id: 'component.accountEditForm.deleteModalWarning',
-    description: 'Warning text to delete account',
-    defaultMessage: 'All your operations for this account will be removed.',
-  },
-  deleteModalNotice: {
-    id: 'component.accountEditForm.deleteModalNotice',
-    description: 'Notice text to delete account',
-    defaultMessage: 'You can also close the account so as not to see it in the list.',
+    id: 'component.categoryEditForm.deleteModalWarning',
+    description: 'Warning text to delete category',
+    defaultMessage: 'All your operations for this category will be moved in "no category"',
   },
   deleteModalError: {
-    id: 'component.accountEditForm.deleteModalError',
-    description: 'Delete account error text',
-    defaultMessage: 'When you delete an account error occurred',
+    id: 'component.categoryEditForm.deleteModalError',
+    description: 'Delete category error text',
+    defaultMessage: 'When you delete an category error occurred',
   },
   cancelButton: {
-    id: 'component.accountEditForm.cancelButton',
+    id: 'component.categoryEditForm.cancelButton',
     description: 'Label of cancel button',
     defaultMessage: 'Cancel',
   },
@@ -303,25 +291,25 @@ class CategoryEditForm extends React.Component {
       />);
 
     if (!this.props.categoryId) {
-      return (<Alert>1</Alert>);
+      return (<Alert><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
     if (this.props.isSystemCategory) {
-      return (<Alert>2</Alert>);
+      return (<Alert><FormattedMessage {...messages.isSystemAlert} /></Alert>);
     }
 
     return (
       <div>
         <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
-            label={formatMessage(messages.currencyId.label)}
+            label={formatMessage(messages.parent.label)}
             name="parent"
             options={this.props.availableParentsList}
             component={SelectFormField}
           />
 
           <Field
-            label={formatMessage(messages.currencyId.label)}
+            label={formatMessage(messages.type.label)}
             name="type"
             options={this.props.availableTypesList}
             component={SelectFormField}
@@ -351,7 +339,6 @@ class CategoryEditForm extends React.Component {
           <Modal.Body>
             <p>{deleteConfirmMessage}</p>
             <Alert bsStyle="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
-            <Alert bsStyle="info"><FormattedMessage {...messages.deleteModalNotice} /></Alert>
           </Modal.Body>
           <Modal.Footer>
             { this.state.accountDeleteError &&

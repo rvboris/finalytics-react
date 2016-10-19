@@ -178,6 +178,23 @@ export default {
   'component.accountEditForm.deleteModalError': 'При удалении счета произошла ошибка',
   'component.accountEditForm.cancelButton': 'Отмена',
 
+  'component.categoryEditForm.infoAlert': 'Выберите категорию или создайте новую',
+  'component.categoryEditForm.isSystemAlert': 'Это системная категория, ее нельзя редактировать или удалять',
+  'component.categoryEditForm.name.label': 'Имя категории',
+  'component.categoryEditForm.name.placeholder': 'Имя категории',
+  'component.categoryEditForm.type.label': 'Тип категории',
+  'component.categoryEditForm.parent.label': 'Родительская категория',
+  'component.categoryEditForm.saveProcessButton': 'Сохранение...',
+  'component.categoryEditForm.createButton': 'Создать',
+  'component.categoryEditForm.saveButton': 'Сохранить',
+  'component.categoryEditForm.deleteProcessButton': 'Удаление...',
+  'component.categoryEditForm.deleteButton': 'Удалить',
+  'component.categoryEditForm.deleteModalTitle': 'Удалить категорию',
+  'component.categoryEditForm.deleteModalConfirm': 'Вы уверены что хотите удалить категорию {name}?',
+  'component.categoryEditForm.deleteModalWarning': 'При удалении категории все операции связанные с ней будут перемещены в "Без категории"',
+  'component.categoryEditForm.deleteModalError': 'При удалении категории произошла ошибка',
+  'component.categoryEditForm.cancelButton': 'Отмена',
+
   'container.accounts.manageAccounts': 'Управление счетами',
   'container.accounts.createAccount': 'Создать новый счет',
 

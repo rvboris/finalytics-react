@@ -103,8 +103,6 @@ class HotClient {
     app.use(koaWebpackMiddleware.hotMiddleware(compiler));
 
     this.listenerManager = new ListenerManager(app.listen(config.devPort));
-
-    log('client dev server running');
   }
 
   dispose() {
