@@ -233,6 +233,7 @@ test.serial('add', async (t) => {
 
   t.is(res.status, 200);
   t.true(mongoose.Types.ObjectId.isValid(res.body._id));
+  t.true(mongoose.Types.ObjectId.isValid(res.body.newId));
 
   tree = new TreeModel();
   categoryRoot = tree.parse(res.body.data);

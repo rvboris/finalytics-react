@@ -159,6 +159,16 @@ const fieldsToEdit = Object.keys(defaultValues);
 const availableTypesList = ['expense', 'income', 'any'];
 const availableTypesListLabeled = availableTypesList.map(type => ({ value: type, label: type }));
 
+const getParentNode = (node) => {
+  if (node.isRoot()) {
+    return node;
+  }
+
+  const nodePath = node.getPath();
+
+  return nodePath[nodePath.length - 2];
+};
+
 class CategoryEditForm extends React.Component {
   static propTypes = {
     categoryId: React.PropTypes.string,
@@ -175,6 +185,7 @@ class CategoryEditForm extends React.Component {
     availableParentsList: React.PropTypes.array.isRequired,
     availableTypesList: React.PropTypes.array.isRequired,
     canChangeType: React.PropTypes.bool.isRequired,
+    categoryNode: React.PropTypes.object,
   };
 
   constructor(...args) {
@@ -184,9 +195,6 @@ class CategoryEditForm extends React.Component {
       categoryDeleteModal: false,
       categoryDeleteError: false,
     };
-  }
-
-  componentWillReceiveProps() {
   }
 
   getSubmitButton = () => {
@@ -218,53 +226,61 @@ class CategoryEditForm extends React.Component {
     );
   };
 
-  submitHandler = (values) => {
-    const toValidate = {};
+  submitHandler = (values) => new Promise(async (resolve, reject) => {
+    let result;
 
-    toValidate._id = this.props.isNewCategory ? values.parent : this.props.categoryId;
+    try {
+      if (this.props.isNewCategory) {
+        result = await this.props.addCategory({
+          _id: values.parent,
+          newNode: pick(values, ['name', 'type']),
+        });
+      } else {
+        if (this.props.categoryNode) {
+          const currentParentId = getParentNode(this.props.categoryNode).model._id;
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (this.props.isNewCategory) {
-          toValidate.newNode = pick(values, ['name', 'type']);
-          await this.props.addCategory(toValidate);
-        } else {
-          toValidate.name = values.name;
-
-          if (this.props.form.initialValues.parent !== values.parent) {
-            toValidate.to = values.parent;
-            await this.props.moveCategory(toValidate);
+          if (currentParentId !== values.parent) {
+            await this.props.moveCategory({ _id: this.props.categoryId, to: values.parent });
           }
-
-          await this.props.updateCategory(toValidate);
         }
-      } catch (err) {
-        error(err);
 
-        const validationResult =
-          mapValues(validationHandler(toValidate, err),
-            val => this.props.intl.formatMessage({ id: val }));
-
-        reject(new SubmissionError(validationResult));
-
-        return;
+        result = await this.props.updateCategory({
+          _id: this.props.categoryId,
+          name: values.name,
+        });
       }
+    } catch (err) {
+      error(err);
 
-      resolve();
-    }).then((category) => {
-      if (!this.props.isNewCategory) {
-        return;
-      }
+      const validationResult = validationHandler({
+        _id: this.props.categoryId,
+        name: values.name,
+        type: values.type,
+        to: values.parent,
+      }, err);
 
-      this.props.selectCategory(category._id);
-    });
-  };
+      const validationResultErrors = mapValues(validationResult,
+        val => this.props.intl.formatMessage({ id: val }));
+
+      reject(new SubmissionError(validationResultErrors));
+
+      return;
+    }
+
+    resolve(get(result, 'data.newId'));
+  }).then((newId) => {
+    if (!this.props.isNewCategory) {
+      return;
+    }
+
+    this.props.selectCategory(newId);
+  });
 
   toggleModal = () => {
     this.setState({ categoryDeleteModal: !this.state.categoryDeleteModal });
   };
 
-  removeAccount = () =>
+  removeCategory = () =>
     this.props.removeCategory({ _id: this.props.categoryId })
       .then(() => {
         this.toggleModal();
@@ -328,7 +344,7 @@ class CategoryEditForm extends React.Component {
           </div>
         </form>
 
-        <Modal show={this.state.accountDeleteModal}>
+        <Modal show={this.state.categoryDeleteModal}>
           <Modal.Header>
             <Modal.Title><FormattedMessage {...messages.deleteModalTitle} /></Modal.Title>
           </Modal.Header>
@@ -342,7 +358,7 @@ class CategoryEditForm extends React.Component {
               <p className="text-danger pull-left"><FormattedMessage {...messages.deleteModalError} /></p>
             }
 
-            <Button onClick={this.removeAccount} disabled={this.props.process} bsStyle="danger">
+            <Button onClick={this.removeCategory} disabled={this.props.process} bsStyle="danger">
               {
                 this.props.process
                   ? <FormattedMessage {...messages.deleteProcessButton} />
@@ -382,6 +398,11 @@ const categoryTreeSelector = createSelector(
   }
 );
 
+const categoryListSelector = createSelector(
+  categoryTreeSelector,
+  categoryTree => categoryTree.all()
+);
+
 const categoryNodeSelector = createSelector(
   categoryTreeSelector,
   (_, props) => props.categoryId,
@@ -398,16 +419,6 @@ const isNewCategorySelector = createSelector(
   categoryNodeSelector,
   categoryToEdit => isUndefined(categoryToEdit),
 );
-
-const getParentNode = (node) => {
-  if (node.isRoot()) {
-    return node;
-  }
-
-  const nodePath = node.getPath();
-
-  return nodePath[nodePath.length - 2];
-};
 
 const isSystemCategorySelector = createSelector(
   categoryNodeSelector,
@@ -432,6 +443,8 @@ const categoryDefaultsSelector = createSelector(
     if (categoryNode) {
       result = pick(categoryNode.model, fieldsToEdit);
       result.parent = getParentNode(categoryNode).model._id;
+    } else {
+      result._id = 'new';
     }
 
     return result;
@@ -453,6 +466,10 @@ const initialValuesSelector = createSelector(
       values = initialValues;
     }
 
+    if (categoryId !== currentValues._id && isNewCategory) {
+      values = Object.assign({}, initialValues, { _id: categoryId });
+    }
+
     const selectedParent = categoryTree.first(node => node.model._id === values.parent);
 
     if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
@@ -467,14 +484,13 @@ const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node
 
 const availableParentsListSelector = createSelector(
   initialValuesSelector,
-  categoryTreeSelector,
+  categoryListSelector,
   isNewCategorySelector,
-  (initialValues, categoryTree, isNewCategory) => {
+  (initialValues, categoryList, isNewCategory) => {
     const values = Object.assign({}, initialValues);
-    const parentsList = categoryTree.all();
     const filteredList = isNewCategory
-      ? parentsList
-      : parentsList.filter(node =>
+      ? categoryList
+      : categoryList.filter(node =>
         (node.model.type === 'any' || node.model.type === values.type)
         && node.model._id !== values._id
       );
@@ -506,6 +522,7 @@ const canChangeTypeSelector = createSelector(
 
 const selector = createSelector([
   processSelector,
+  categoryNodeSelector,
   isNewCategorySelector,
   isSystemCategorySelector,
   availableParentsListSelector,
@@ -514,6 +531,7 @@ const selector = createSelector([
   initialValuesSelector,
 ], (
   process,
+  categoryNode,
   isNewCategory,
   isSystemCategory,
   availableParentsList,
@@ -522,6 +540,7 @@ const selector = createSelector([
   initialValues
 ) => ({
   process,
+  categoryNode,
   isNewCategory,
   isSystemCategory,
   availableParentsList,

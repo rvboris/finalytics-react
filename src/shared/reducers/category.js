@@ -3,7 +3,6 @@ import { handleActions } from 'redux-actions';
 
 const initialState = Immutable({
   process: false,
-  _id: null,
   data: null,
 });
 
@@ -12,8 +11,7 @@ const preReducer = (state) => state.set('process', true);
 const reducer = (state, action) =>
   state
     .set('process', false)
-    .set('data', action.payload.data.data)
-    .set('_id', action.payload.data._id);
+    .set('data', action.payload.data.data);
 
 const postReducer = () => initialState;
 

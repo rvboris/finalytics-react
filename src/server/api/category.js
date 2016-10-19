@@ -144,7 +144,9 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  resultNode.addChild(tree.parse({ _id: mongoose.Types.ObjectId(), name, type }));
+  const newId = mongoose.Types.ObjectId();
+
+  resultNode.addChild(tree.parse({ _id: newId, name, type }));
 
   categoryModel.markModified('data');
 
@@ -157,7 +159,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     return;
   }
 
-  ctx.body = categoryModel;
+  ctx.body = Object.assign({}, categoryModel.toJSON(), { newId });
 });
 
 router.post('/delete', { jwt: true }, async (ctx) => {
