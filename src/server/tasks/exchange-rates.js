@@ -2,6 +2,7 @@ import axios from 'axios';
 import money from 'money';
 import schedule from 'node-schedule';
 import moment from 'moment';
+import { get } from 'lodash';
 
 import { task, error } from '../../shared/log';
 import config from '../../shared/config';
@@ -30,7 +31,7 @@ export default () =>
 
       let result;
 
-      if (process.env.TEST) {
+      if (process.env.TEST || !get(config, 'openexchangerates.key')) {
         result = getFixture();
       } else {
         try {

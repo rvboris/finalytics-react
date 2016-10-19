@@ -10,7 +10,7 @@ const sessionKeys = [
   '5',
 ];
 
-export default ({
+module.exports = {
   env: 'development',
   port,
   devPort: port + 10,
@@ -39,4 +39,4 @@ export default ({
     key: '',
     url: 'http://openexchangerates.org/api/latest.json?app_id=',
   },
-});
+};

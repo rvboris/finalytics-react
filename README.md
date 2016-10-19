@@ -22,6 +22,7 @@ Node.js 6+
  1. Clone repo
  2. Run [yarn](https://yarnpkg.com)
  3. Edit and rename configs under ./config folder
+ 4. Create key files in ./src/keys/ folder (token-private-development.pem, token-private-production.pem) it used for jwt token creation
 
 # Usage
 
@@ -55,6 +56,10 @@ Run both
 
     npm run test
 
+# Bug Reports & Feature Requests
+
+Please use the [issue tracker](https://github.com/rvboris/finalytics/issues) to report any bugs or create feature requests.
+
 # License
 
-Finalytics is released as open source software under the GPL v3 license, see the LICENSE file in the project root for the full license text.
+Finalytics is released as open source software under the GPL v3 license, see the [LICENSE](https://github.com/rvboris/finalytics/blob/master/LICENSE.txt) file in the project root for the full license text.
