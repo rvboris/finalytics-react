@@ -44,7 +44,7 @@ module.exports = ({ target, options }) => {
   const ifDevServer = ifElse(isDev && isServer);
   const ifProdClient = ifElse(isProd && isClient);
 
-  const config = configs[options.mode];
+  const config = configs[process.env.CI ? 'ci' : options.mode];
   const configForClient = _.omit(config, [
     'sessionKeys',
     'db',
@@ -148,6 +148,7 @@ module.exports = ({ target, options }) => {
           NODE_ENV: JSON.stringify(options.mode),
           SERVER_PORT: JSON.stringify(config.port),
           DEBUG: JSON.stringify(options.debug || ''),
+          CI: JSON.stringify(process.env.CI || ''),
         },
       }),
       ifClient(new AssetsPlugin({
