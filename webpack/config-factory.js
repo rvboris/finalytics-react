@@ -84,6 +84,7 @@ module.exports = ({ target, options }) => {
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
           ifClient('react-select/dist/react-select.css'),
           ifClient('react-toggle/style.css'),
+          ifClient('./src/client/globals-css/semantic.css'),
           ifClient('./src/client/globals-css/bootstrap.css'),
           ifClient('./src/client/globals-css/select.css'),
           ifClient('./src/client/globals-css/toggle.css'),
@@ -178,7 +179,7 @@ module.exports = ({ target, options }) => {
         })
       ),
       ifProd(new webpack.optimize.DedupePlugin()),
-      ifProdClient(
+      ifClient(
         new ExtractTextPlugin({
           filename: '[name]-[chunkhash].css',
           disable: false,
@@ -203,6 +204,14 @@ module.exports = ({ target, options }) => {
           test: /\.(jpg|png|svg)$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'url?limit=100000',
+        },
+        {
+          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: 'url-loader?limit=10000&mimetype=application/font-woff',
+        },
+        {
+          test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: 'file-loader',
         },
         {
           test: /\.json$/,
@@ -240,8 +249,7 @@ module.exports = ({ target, options }) => {
         },
         _.merge(
           { test: /(globals-css|react-select|react-toggle|rc-tree).+\.css$/ },
-          ifDevClient({ loader: ['style-loader', 'css-loader'] }),
-          ifProdClient({
+          ifClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader',
@@ -251,8 +259,7 @@ module.exports = ({ target, options }) => {
         _.merge(
           { test: /shared.+\.css$/ },
           ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
-          ifDevClient({ loader: ['style-loader', 'css-loader?modules', 'postcss-loader'] }),
-          ifProdClient({
+          ifClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader?modules!postcss-loader',

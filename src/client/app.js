@@ -46,6 +46,6 @@ renderApp();
 
 WebFont.load({
   google: {
-    families: ['Open Sans'],
+    families: ['Noto Sans'],
   },
 });
