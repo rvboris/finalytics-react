@@ -33,7 +33,7 @@ node_modules
 build
 
 # Keys files
-src/keys
+keys
 
 # Config files
 config/development.js

@@ -43,6 +43,7 @@ module.exports = ({ target, options }) => {
   const ifDevClient = ifElse(isDev && isClient);
   const ifDevServer = ifElse(isDev && isServer);
   const ifProdClient = ifElse(isProd && isClient);
+  const ifCI = ifElse(process.env.CI);
 
   const config = configs[options.mode];
   const configForClient = _.omit(config, [
@@ -59,8 +60,8 @@ module.exports = ({ target, options }) => {
   return {
     target: ifServer('node', 'web'),
     node: {
-      __dirname: true,
-      __filename: true,
+      __dirname: false,
+      __filename: false,
     },
     externals: _.compact([ifServer(nodeExternals())]),
     devtool: ifElse(isServer || isDev)(
@@ -134,7 +135,7 @@ module.exports = ({ target, options }) => {
           },
         },
       }),
-      new ProgressBarPlugin({ stream: logStream }),
+      ifCI(undefined, new ProgressBarPlugin({ stream: logStream })),
       ifClient(new LodashModuleReplacementPlugin({
         collections: true,
         paths: true,

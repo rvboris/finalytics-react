@@ -10,16 +10,7 @@ import { error } from '../../shared/log';
 import tokenExtractor from '../utils/token-extractor';
 import JwtStrategy from '../utils/jwt-strategy';
 import config from '../../shared/config';
-
-let tokenKey;
-
-if (process.env.CI) {
-  tokenKey = 'ci-token-key';
-} else {
-  tokenKey = process.env.NODE_ENV === 'development'
-    ? require('../../keys/token-private-development.pem')
-    : require('../../keys/token-private-production.pem');
-}
+import tokenKey from '../utils/token-key';
 
 const localStrategyOptions = {
   usernameField: 'email',
