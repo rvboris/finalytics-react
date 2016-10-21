@@ -44,7 +44,7 @@ module.exports = ({ target, options }) => {
   const ifDevServer = ifElse(isDev && isServer);
   const ifProdClient = ifElse(isProd && isClient);
 
-  const config = configs[process.env.CI ? 'ci' : options.mode];
+  const config = configs[options.mode];
   const configForClient = _.omit(config, [
     'sessionKeys',
     'db',

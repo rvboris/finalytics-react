@@ -11,9 +11,15 @@ import tokenExtractor from '../utils/token-extractor';
 import JwtStrategy from '../utils/jwt-strategy';
 import config from '../../shared/config';
 
-const tokenKey = process.env.NODE_ENV === 'development'
-  ? require('../../keys/token-private-development.pem')
-  : require('../../keys/token-private-production.pem');
+let tokenKey;
+
+if (process.env.CI) {
+  tokenKey = 'ci-token-key';
+} else {
+  tokenKey = process.env.NODE_ENV === 'development'
+    ? require('../../keys/token-private-development.pem')
+    : require('../../keys/token-private-production.pem');
+}
 
 const localStrategyOptions = {
   usernameField: 'email',

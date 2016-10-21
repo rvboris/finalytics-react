@@ -1,6 +1,2 @@
-if (process.env.CI) {
-  module.exports.ci = require('./ci');
-} else {
-  module.exports.development = require('./development');
-  module.exports.production = require('./production');
-}
+  module.exports.development = require(process.env.CI ? './ci' : './development');
+  module.exports.production = require(process.env.CI ? './ci' : './production');
