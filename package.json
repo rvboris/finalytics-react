@@ -9,7 +9,7 @@
     "build": "yarn run clean && webpack --env.mode production --config webpack/client-config.js && webpack --env.mode production --config webpack/server-config.js",
     "start": "cross-env DEBUG=process*,app:*,-app:db node build/server/main.js",
     "test": "yarn run test:api && yarn run test:e2e",
-    "test:api": "cross-env TEST=1 DEBUG=process*,app:error ava test/api/*.js --tap | tap-summary",
+    "test:api": "cross-env TEST=1 DEBUG=process*,app:error ava test/api/*.js",
     "test:e2e": "cross-env E2E=1 DEBUG=process*,app:error node test/e2e.js"
   },
   "ava": {
@@ -18,7 +18,9 @@
       "!build/**/*"
     ],
     "failFast": true,
-    "tap": true,
+    "tap": false,
+    "concurrency": 2,
+    "powerAssert": true,
     "require": [
       "babel-register"
     ]
@@ -164,7 +166,6 @@
     "stylelint-config-standard": "13.0.2",
     "supertest": "2.0.1",
     "supertest-as-promised": "4.0.0",
-    "tap-summary": "3.0.1",
     "url-loader": "0.5.7",
     "webpack": "2.1.0-beta.25",
     "webpack-hot-middleware": "2.13.0",

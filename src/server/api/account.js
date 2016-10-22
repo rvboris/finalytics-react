@@ -1,6 +1,6 @@
 import Router from 'koa-66';
 import mongoose from 'mongoose';
-import { pick, merge } from 'lodash';
+import { pick, merge, remove } from 'lodash';
 import big from 'big.js';
 
 import accountFixture from '../fixtures/account';
@@ -31,8 +31,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
   accounts = accounts.map(account => {
     const model = new AccountModel(account);
     model.currency = ctx.user.settings.baseCurrency;
-    model.save();
-    return model;
+    return model.save();
   });
 
   try {
@@ -245,6 +244,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
     await account.save();
 
     ctx.user.accounts.push(account._id);
+    ctx.user.markModified('accounts');
 
     await ctx.user.save();
 
@@ -284,7 +284,10 @@ router.post('/delete', { jwt: true }, async (ctx) => {
       return;
     }
 
-    account.remove();
+    await account.remove();
+
+    remove(ctx.user.accounts, accountId => accountId.equals(account._id));
+    ctx.user.markModified('accounts');
 
     await ctx.user.save();
 

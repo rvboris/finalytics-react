@@ -168,9 +168,11 @@ test.serial('add', async (t) => {
   });
 
   t.is(res.status, 200);
+  t.is(res.body.accounts.length, 3);
 
   res = await request.get('/api/account/load');
 
+  t.is(res.status, 200);
   t.is(res.body.accounts.length, 3);
 
   res = await request.post('/api/account/add').send({
@@ -314,4 +316,9 @@ test.serial('delete', async (t) => {
     t.is(res.status, 200);
     t.is(res.body.accounts.find(account => account._id === _id), undefined);
   }
+
+  res = await request.get('/api/account/load');
+
+  t.is(res.status, 200);
+  t.is(res.body.accounts.length, 0);
 });

@@ -56,7 +56,7 @@ class HotServer {
     try {
       this.instance = cp.fork(compiledOutputPath, {
         env: {
-          DEBUG: 'process*,app:*,-app:db',
+          DEBUG: 'process*,app:*',
         },
         stdio: 'inherit',
       });

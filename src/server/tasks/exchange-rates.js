@@ -26,12 +26,14 @@ export default () =>
   new Promise(async (resolve) => {
     task('shedule exchange rates updates');
 
+    const loadFixture = process.env.TEST || process.env.CI || !get(config, 'openexchangerates.key');
+
     const job = schedule.scheduleJob(rule, async () => {
       task('exchange rates updating');
 
       let result;
 
-      if (process.env.TEST || !get(config, 'openexchangerates.key')) {
+      if (loadFixture) {
         result = getFixture();
       } else {
         try {
