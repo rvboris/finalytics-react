@@ -8,7 +8,7 @@ server.once('message', (msg) => {
     execContext.env.context = msg.ctx;
     execContext.env.startPoint = `http://${msg.ctx.hostname}:${msg.ctx.port}`;
 
-    const test = cp.exec('ava test/e2e/*.js --tap | tap-summary', execContext);
+    const test = cp.exec('ava test/e2e/*.js', execContext);
 
     test.stdout.pipe(process.stdout);
     test.stderr.pipe(process.stderr);

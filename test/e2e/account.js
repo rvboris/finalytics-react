@@ -2,7 +2,7 @@ import test from 'ava';
 import Nightmare from 'nightmare';
 
 test.beforeEach(t => {
-  t.context.nm = new Nightmare({ show: true });
+  t.context.nm = new Nightmare({ show: !process.env.CI });
 });
 
 test('signup', async (t) => {
