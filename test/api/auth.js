@@ -220,6 +220,12 @@ test('oauth facebook callback', async (t) => {
   t.is(res.status, 302);
 });
 
+test('oauth twitter', async (t) => {
+  const res = await request.get('/api/auth/twitter');
+
+  t.is(res.status, 302);
+});
+
 test('oauth twitter callback', async (t) => {
   const res = await request.get('/api/auth/twitter/callback');
 

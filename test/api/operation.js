@@ -298,8 +298,8 @@ test.serial('list', async (t) => {
   t.true(res.body.operations.length > 0);
   t.true(res.body.operations.every((operation) => {
     if (operation.transfer) {
-      return operation.transfer.amount >= -50 && operation.transfer.amount <= 50 ||
-        operation.amount >= -50 && operation.amount <= 50;
+      return (operation.transfer.amount >= -50 && operation.transfer.amount <= 50) ||
+        (operation.amount >= -50 && operation.amount <= 50);
     }
 
     return operation.amount >= -50 && operation.amount <= 50;
