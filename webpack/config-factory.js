@@ -60,8 +60,8 @@ module.exports = ({ target, options }) => {
   return {
     target: ifServer('node', 'web'),
     node: {
-      __dirname: false,
-      __filename: false,
+      __dirname: true,
+      __filename: true,
     },
     externals: _.compact([ifServer(nodeExternals())]),
     devtool: ifElse(isServer || isDev)(

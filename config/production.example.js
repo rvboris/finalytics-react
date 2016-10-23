@@ -19,7 +19,7 @@ module.exports = {
   hostname,
   apiUrl,
   sessionKeys,
-  tokenKeyFile: '../../keys/production-token-key.pem',
+  tokenKeyFile: '/etc/keys/production-token-key.pem',
   db: {
     hostname,
     name: 'prod',
