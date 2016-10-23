@@ -195,39 +195,3 @@ test('login invalid email', async (t) => {
   t.is(res.status, 400);
   t.is(res.body.error, 'auth.login.error.email.invalid');
 });
-
-test('oauth google', async (t) => {
-  const res = await request.get('/api/auth/google');
-
-  t.is(res.status, 302);
-});
-
-test('oauth google callback', async (t) => {
-  const res = await request.get('/api/auth/google/callback');
-
-  t.is(res.status, 302);
-});
-
-test('oauth facebook', async (t) => {
-  const res = await request.get('/api/auth/facebook');
-
-  t.is(res.status, 302);
-});
-
-test('oauth facebook callback', async (t) => {
-  const res = await request.get('/api/auth/facebook/callback');
-
-  t.is(res.status, 302);
-});
-
-test('oauth twitter', async (t) => {
-  const res = await request.get('/api/auth/twitter');
-
-  t.is(res.status, 302);
-});
-
-test('oauth twitter callback', async (t) => {
-  const res = await request.get('/api/auth/twitter/callback');
-
-  t.is(res.status, 302);
-});
