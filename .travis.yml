@@ -4,6 +4,10 @@ node_js:
   - "6"
 services:
   - mongodb
+addons:
+  apt:
+    packages:
+      - xvfb
 before_install:
   - sudo apt-key adv --keyserver pgp.mit.edu --recv D101F7899D41F3C3
   - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -17,7 +21,10 @@ branches:
   - dev
   - master
   - feature/ci
-install: yarn
+install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+  - yarn
 script:
   - yarn run build
   - yarn run test
