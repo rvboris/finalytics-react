@@ -6,6 +6,10 @@ import { AppContainer } from 'react-hot-loader';
 import browserHistory from 'react-router/lib/browserHistory';
 import WebFont from 'webfontloader';
 import match from 'react-router/lib/match';
+
+import './bootstrap.scss';
+import './style.css';
+
 import routes from '../shared/routes';
 import { error } from '../shared/log';
 import store, { runSaga } from './store';

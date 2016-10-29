@@ -7,8 +7,8 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
 import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
 import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+import { Button } from 'reactstrap';
 import {
-  Button,
   FormControl,
   FormGroup,
   ControlLabel,

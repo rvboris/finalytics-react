@@ -53,6 +53,7 @@ module.exports = ({ target, options }) => {
     'facebook',
     'twitter',
     'openexchangerates',
+    'tokenKeyFile',
   ]);
 
   const reloadPath = `http://localhost:${config.devPort}/__webpack_hmr`;
@@ -83,13 +84,6 @@ module.exports = ({ target, options }) => {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
-          ifClient('react-select/dist/react-select.css'),
-          ifClient('react-toggle/style.css'),
-          ifClient('./src/client/globals-css/semantic.css'),
-          ifClient('./src/client/globals-css/bootstrap.css'),
-          ifClient('./src/client/globals-css/select.css'),
-          ifClient('./src/client/globals-css/toggle.css'),
-          ifClient('./src/client/globals-css/app.css'),
           ifClient('webfontloader'),
           ifServer(
             path.resolve(__dirname, `../src/${target}/bootstrap.js`),
@@ -188,6 +182,12 @@ module.exports = ({ target, options }) => {
           allChunks: true,
         })
       ),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          context: __dirname,
+          output: { path: './' },
+        },
+      }),
     ]),
     module: {
       rules: _.compact([
@@ -196,11 +196,6 @@ module.exports = ({ target, options }) => {
           test: /\.js$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'eslint',
-        },
-        {
-          test: /\.pem$/,
-          exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: 'raw-loader',
         },
         {
           test: /\.(jpg|png|svg)$/,
@@ -250,7 +245,16 @@ module.exports = ({ target, options }) => {
           ),
         },
         _.merge(
-          { test: /(globals-css|react-select|react-toggle|rc-tree).+\.css$/ },
+          { test: /.scss$/ },
+          ifClient({
+            loader: ExtractTextPlugin.extract({
+              fallbackLoader: 'style-loader',
+              loader: 'css-loader!postcss-loader!sass-loader',
+            }),
+          })
+        ),
+        _.merge(
+          { test: /node_modules.+\.css$/ },
           ifClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
@@ -259,7 +263,7 @@ module.exports = ({ target, options }) => {
           })
         ),
         _.merge(
-          { test: /shared.+\.css$/ },
+          { test: /(client|shared).+\.css$/ },
           ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifClient({
             loader: ExtractTextPlugin.extract({

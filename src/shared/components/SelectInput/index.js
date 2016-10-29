@@ -2,6 +2,9 @@ import React from 'react';
 import Select from 'react-select';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import 'react-select/dist/react-select.css';
+import './style.css';
+
 const messages = defineMessages({
   notFoud: {
     id: 'component.selectInput.notFound',

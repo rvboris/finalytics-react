@@ -1,5 +1,6 @@
-body {
+html {
   font-family: "Noto Sans";
+  font-size: 14px;
 }
 
 input::-webkit-outer-spin-button,
