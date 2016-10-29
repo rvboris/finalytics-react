@@ -1,1 +1,19 @@
+$enable-flex: true;
+$font-size-root: 14px;
+
+.btn-group-justified {
+  display: flex;
+  width: 100%;
+  .btn,
+  .btn-group {
+    flex: 1;
+    .btn {
+      width: 100%;
+    }
+    .dropdown-menu {
+      left: auto;
+    }
+  }
+}
+
 @import '~bootstrap/scss/bootstrap.scss';

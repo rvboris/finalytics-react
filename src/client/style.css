@@ -1,6 +1,9 @@
 html {
-  font-family: "Noto Sans";
   font-size: 14px;
+}
+
+.wf-active body {
+  font-family: "Noto Sans";
 }
 
 input::-webkit-outer-spin-button,

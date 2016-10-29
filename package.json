@@ -103,7 +103,7 @@
     "react-router-redux": "4.0.6",
     "react-select": "1.0.0-rc.2",
     "react-toggle": "2.1.1",
-    "reactstrap": "^3.6.0",
+    "reactstrap": "^3.7.0",
     "redux": "3.6.0",
     "redux-actions": "0.12.0",
     "redux-form": "6.1.1",

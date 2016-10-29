@@ -5,15 +5,9 @@ const AssetsPlugin = require('assets-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const log = require('debug')('webpack');
-const cssnext = require('postcss-cssnext');
-const flexbox = require('postcss-flexbox');
 const Visualizer = require('webpack-visualizer-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const stylelint = require('stylelint');
-const rucksack = require('rucksack-css');
-const mqpacker = require('css-mqpacker');
-const postcssReporter = require('postcss-reporter');
 const Writable = require('stream').Writable;
 const configs = require('../config');
 
@@ -116,14 +110,6 @@ module.exports = ({ target, options }) => {
     plugins: _.compact([
       new webpack.LoaderOptionsPlugin({
         options: {
-          postcss: () => _.compact([
-            stylelint(),
-            rucksack(),
-            flexbox(),
-            cssnext(),
-            mqpacker(),
-            postcssReporter({ clearMessages: true }),
-          ]),
           eslint: {
             configFile: '.eslintrc',
           },
@@ -134,7 +120,7 @@ module.exports = ({ target, options }) => {
         collections: true,
         paths: true,
       })),
-      new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|ru)$/),
+      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /^\.\/(en|ru)$/),
       new webpack.DefinePlugin({
         CONFIG: JSON.stringify(ifServer(config, configForClient)),
         IS_CLIENT: isClient,
@@ -254,7 +240,7 @@ module.exports = ({ target, options }) => {
           })
         ),
         _.merge(
-          { test: /node_modules.+\.css$/ },
+          { test: /(client|node_modules).+\.css$/ },
           ifClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
@@ -263,7 +249,7 @@ module.exports = ({ target, options }) => {
           })
         ),
         _.merge(
-          { test: /(client|shared).+\.css$/ },
+          { test: /shared.+\.css$/ },
           ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifClient({
             loader: ExtractTextPlugin.extract({

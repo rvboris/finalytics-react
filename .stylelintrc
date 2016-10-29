@@ -1,11 +1,8 @@
 {
   "extends": "stylelint-config-standard",
   "rules": {
-    "property-no-unknown": [
-      true,
-      {
-        "ignoreProperties": ["box", "box-item"]
-      }
-    ]
+    "selector-pseudo-class-no-unknown": [true, {
+      "ignorePseudoClasses": ["global", "local"]
+    }]
   }
 }
