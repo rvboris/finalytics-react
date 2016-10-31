@@ -1,8 +1,8 @@
 html {
-  font-size: 14px;
+  font-size: 16px;
 }
 
-.wf-active body {
+:global .wf-active body {
   font-family: "Noto Sans";
 }
 
@@ -14,4 +14,11 @@ input::-webkit-inner-spin-button {
 
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+button:focus,
+button:hover,
+a:focus,
+a:hover {
+	outline: none;
 }

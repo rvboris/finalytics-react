@@ -151,7 +151,7 @@ export default {
   'component.appBar.operations': 'Operations',
   'component.appBar.budget': 'Budget',
   'component.appBar.reports': 'Reports',
-  'component.appBar.settings': 'Settings',
+  'component.appBar.profile': 'Profile',
   'component.appBar.exit': 'Logout',
 
   'component.accountList.manage': 'Manage',

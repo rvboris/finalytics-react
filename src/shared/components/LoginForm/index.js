@@ -4,9 +4,9 @@ import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
 import { mapValues } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
-import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
-import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+import FaFacebookIcon from 'react-icons/lib/fa/facebook';
+import FaGoogleIcon from 'react-icons/lib/fa/google';
+import FaTwitterIcon from 'react-icons/lib/fa/twitter';
 import {
   Button,
   ButtonGroup,
@@ -174,15 +174,15 @@ let LoginForm = (props) => {
 
           <ButtonGroup className="btn-group-justified">
             <Button type="button" onClick={onGoogle}>
-              <TiSocialGooglePlus size={30} />
+              <FaGoogleIcon size={30} />
             </Button>
 
             <Button type="button" onClick={onFacebook}>
-              <TiSocialFacebook size={30} />
+              <FaFacebookIcon size={30} />
             </Button>
 
             <Button type="button" onClick={onTwitter}>
-              <TiSocialTwitter size={30} />
+              <FaTwitterIcon size={30} />
             </Button>
           </ButtonGroup>
         </CardBlock>

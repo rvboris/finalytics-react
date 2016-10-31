@@ -150,7 +150,7 @@ export default {
   'component.appBar.operations': 'Операции',
   'component.appBar.budget': 'Бюджет',
   'component.appBar.reports': 'Отчеты',
-  'component.appBar.settings': 'Настройки',
+  'component.appBar.profile': 'Профиль',
   'component.appBar.exit': 'Выход',
 
   'component.accountList.manage': 'Управление',

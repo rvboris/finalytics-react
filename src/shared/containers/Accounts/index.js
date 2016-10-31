@@ -2,8 +2,9 @@ import React from 'react';
 import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 
 import style from './style.css';
 import LinkedAccountList from '../../components/LinkedAccountList';
@@ -33,15 +34,15 @@ const Accounts = (props) => {
         <div className={style['account-list-container']}>
           <Button
             block
-            bsStyle="primary"
-            className={style['account-create']}
+            color="primary"
+            className="mb-1"
             onClick={props.newAccount}
           >
             <FormattedMessage {...messages.createAccount} />
           </Button>
           <LinkedAccountList onSelect={props.selectAccount} selectedAccountId={selectedAccountId} />
         </div>
-        <div className={style['account-details-container']}>
+        <div className={classnames(style['account-details-container'], 'ml-2')}>
           <AccountEditForm accountId={selectedAccountId} />
         </div>
       </div>

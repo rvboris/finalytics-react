@@ -1,7 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router';
-import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import {
+  Navbar,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+} from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 const messages = defineMessages({
@@ -20,10 +24,10 @@ const messages = defineMessages({
     description: 'AppBar reports link',
     defaultMessage: 'Reports',
   },
-  settings: {
-    id: 'component.appBar.settings',
-    description: 'AppBar settings link',
-    defaultMessage: 'Settings',
+  profile: {
+    id: 'component.appBar.profile',
+    description: 'AppBar profile link',
+    defaultMessage: 'Profile',
   },
   exit: {
     id: 'component.appBar.exit',
@@ -32,36 +36,51 @@ const messages = defineMessages({
   },
 });
 
-const AppBar = () => (
-  <Navbar staticTop>
-    <Navbar.Header>
-      <Navbar.Brand>
-        <Link to="/dashboard/operations">Finalytics</Link>
-      </Navbar.Brand>
-      <Navbar.Toggle />
-    </Navbar.Header>
-    <Navbar.Collapse>
-      <Nav>
-        <IndexLinkContainer to="/dashboard/operations">
-          <NavItem eventKey={1}><FormattedMessage {...messages.operations} /></NavItem>
-        </IndexLinkContainer>
-        <LinkContainer to="/dashboard/budget">
-          <NavItem eventKey={2}><FormattedMessage {...messages.budget} /></NavItem>
-        </LinkContainer>
-        <LinkContainer to="/dashboard/reports">
-          <NavItem eventKey={3}><FormattedMessage {...messages.reports} /></NavItem>
-        </LinkContainer>
-      </Nav>
-      <Nav pullRight>
-        <LinkContainer to="/settings">
-          <NavItem eventKey={4}><FormattedMessage {...messages.settings} /></NavItem>
-        </LinkContainer>
-        <LinkContainer to="/logout">
-          <NavItem eventKey={5}><FormattedMessage {...messages.exit} /></NavItem>
-        </LinkContainer>
-      </Nav>
-    </Navbar.Collapse>
-  </Navbar>
-);
+
+class AppBar extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.toggle = this.toggle.bind(this);
+
+    this.state = {
+      dropdownOpen: false,
+    };
+  }
+
+  toggle() {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen,
+    });
+  }
+
+  render() {
+    return (
+      <Navbar color="primary" dark>
+        <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
+        <Nav navbar>
+          <NavItem>
+            <NavLink href="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink href="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink href="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
+          </NavItem>
+        </Nav>
+
+        <Nav className="float-xs-right" navbar>
+          <NavItem>
+            <NavLink href="/dashboard/profile"><FormattedMessage {...messages.profile} /></NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink href="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+          </NavItem>
+        </Nav>
+      </Navbar>
+    );
+  }
+}
 
 export default injectIntl(AppBar);

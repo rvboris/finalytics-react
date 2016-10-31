@@ -1,3 +1,8 @@
 :global .react-toggle {
   vertical-align: middle;
 }
+
+:global .react-toggle--focus,
+:global .react-toggle-thumb {
+  box-shadow: none;
+}

@@ -17,8 +17,8 @@ class Dashboard extends React.Component {
   render() {
     return (
       <div>
-        <AppBar />
-        <div className="container">{ this.props.children }</div>
+        <div className="container"><AppBar /></div>
+        <div className="container mt-1">{ this.props.children }</div>
       </div>
     );
   }

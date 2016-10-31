@@ -240,7 +240,7 @@ module.exports = ({ target, options }) => {
           })
         ),
         _.merge(
-          { test: /(client|node_modules).+\.css$/ },
+          { test: /node_modules.+\.css$/ },
           ifClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
@@ -249,7 +249,7 @@ module.exports = ({ target, options }) => {
           })
         ),
         _.merge(
-          { test: /shared.+\.css$/ },
+          { test: /(shared|client).+\.css$/ },
           ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifClient({
             loader: ExtractTextPlugin.extract({

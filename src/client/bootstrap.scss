@@ -1,5 +1,16 @@
-$enable-flex: true;
-$font-size-root: 14px;
+@import '~bootstrap/scss/bootstrap.scss';
+
+.btn {
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      outline: 0;
+      outline-offset: 0;
+    }
+  }
+}
 
 .btn-group-justified {
   display: flex;
@@ -15,5 +26,3 @@ $font-size-root: 14px;
     }
   }
 }
-
-@import '~bootstrap/scss/bootstrap.scss';

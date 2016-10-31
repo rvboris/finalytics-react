@@ -4,19 +4,22 @@ import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
 import { mapValues } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
-import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
-import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+import FaFacebookIcon from 'react-icons/lib/fa/facebook';
+import FaGoogleIcon from 'react-icons/lib/fa/google';
+import FaTwitterIcon from 'react-icons/lib/fa/twitter';
 import {
   Button,
-  FormControl,
-  FormGroup,
-  ControlLabel,
-  Panel,
   ButtonGroup,
-  HelpBlock,
+  Form,
+  FormGroup,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
-} from 'react-bootstrap';
+  Card,
+  CardHeader,
+  CardBlock,
+} from 'reactstrap';
 
 import style from './style.css';
 import validationHandler from '../../utils/validation-handler';
@@ -88,15 +91,14 @@ const onTwitter = () => {
 };
 
 const FormField = (field) =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type={field.type}
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 let RegisterForm = (props) => {
@@ -136,66 +138,63 @@ let RegisterForm = (props) => {
 
   return (
     <div className={style.container}>
-      <Panel header={formatMessage(messages.title)} className={style['register-form']}>
-        <form onSubmit={handleSubmit(submitHandler)} noValidate>
-          <Field
-            name="email"
-            label={formatMessage(messages.email.label)}
-            placeholder={formatMessage(messages.email.placeholder)}
-            component={FormField}
-            type="email"
-          />
+      <Card className={style['register-form']}>
+        <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
+        <CardBlock>
+          <Form onSubmit={handleSubmit(submitHandler)} noValidate>
+            <Field
+              name="email"
+              label={formatMessage(messages.email.label)}
+              placeholder={formatMessage(messages.email.placeholder)}
+              component={FormField}
+              type="email"
+            />
 
-          <Field
-            name="password"
-            label={formatMessage(messages.password.label)}
-            placeholder={formatMessage(messages.password.placeholder)}
-            component={FormField}
-            type="password"
-          />
+            <Field
+              name="password"
+              label={formatMessage(messages.password.label)}
+              placeholder={formatMessage(messages.password.placeholder)}
+              component={FormField}
+              type="password"
+            />
 
-          <Field
-            name="repeatPassword"
-            label={formatMessage(messages.repeatPassword.label)}
-            placeholder={formatMessage(messages.repeatPassword.placeholder)}
-            component={FormField}
-            type="password"
-          />
+            <Field
+              name="repeatPassword"
+              label={formatMessage(messages.repeatPassword.label)}
+              placeholder={formatMessage(messages.repeatPassword.placeholder)}
+              component={FormField}
+              type="password"
+            />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+            { error && <Alert color="danger">{error}</Alert> }
 
-          <Button
-            type="submit"
-            bsStyle="primary"
-            disabled={pristine || submitting || process}
-            className={style['submit-button']}
-            block
-          >{process
-            ? <FormattedMessage {...messages.processButton} />
-            : <FormattedMessage {...messages.button} />
-          }</Button>
-        </form>
+            <Button
+              type="submit"
+              color="primary"
+              disabled={pristine || submitting || process}
+              className={style['submit-button']}
+              block
+            >{process
+              ? <FormattedMessage {...messages.processButton} />
+              : <FormattedMessage {...messages.button} />
+            }</Button>
+          </Form>
 
-        <ButtonGroup justified>
-          <ButtonGroup>
+          <ButtonGroup className="btn-group-justified">
             <Button type="button" onClick={onGoogle}>
-              <TiSocialGooglePlus size={30} />
+              <FaGoogleIcon size={30} />
             </Button>
-          </ButtonGroup>
 
-          <ButtonGroup>
             <Button type="button" onClick={onFacebook}>
-              <TiSocialFacebook size={30} />
+              <FaFacebookIcon size={30} />
             </Button>
-          </ButtonGroup>
 
-          <ButtonGroup>
             <Button type="button" onClick={onTwitter}>
-              <TiSocialTwitter size={30} />
+              <FaTwitterIcon size={30} />
             </Button>
           </ButtonGroup>
-        </ButtonGroup>
-      </Panel>
+        </CardBlock>
+      </Card>
     </div>
   );
 };

@@ -2,12 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Button } from 'react-bootstrap';
+import { Button, Card, CardHeader, CardText } from 'reactstrap';
 import { push } from 'react-router-redux';
 
-import classnames from 'classnames';
 import MoneyFormat from '../MoneyFormat';
-import style from './style.css';
 
 const messages = defineMessages({
   manage: {
@@ -28,32 +26,29 @@ const messages = defineMessages({
 });
 
 const AccountList = (props) => (
-  <div className="panel panel-default">
-    <div className="panel-heading">
-      <h3 className={classnames('panel-title', 'pull-left', style['account-list-title'])}>
-        <FormattedMessage {...messages.accounts} />
-      </h3>
-      <Button className="pull-right" onClick={props.manageAccounts}>
+  <Card>
+    <CardHeader>
+      <FormattedMessage {...messages.accounts} />
+      <Button onClick={props.manageAccounts} className="float-xs-right" size="sm">
         <FormattedMessage {...messages.manage} />
       </Button>
-      <div className="clearfix" />
-    </div>
+    </CardHeader>
     { props.accounts.length
-      ? <ul className="list-group">
-        {props.accounts.map((account) => (
-          <li className="list-group-item" key={account._id}>
-            <span className="badge">
-              <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
-            </span>
-            {account.name}
-          </li>
-        ))}
-      </ul>
-      : <p className={classnames('text-center', style['account-list-empty-txt'])}>
-        <FormattedMessage {...messages.noAccounts} />
-      </p>
-    }
-  </div>
+    ? <ul className="list-group list-group-flush">
+      {props.accounts.map((account) => (
+        <li className="list-group-item" key={account._id}>
+          <span className="float-xs-right">
+            <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
+          </span>
+          {account.name}
+        </li>
+      ))}
+    </ul>
+    : <CardText>
+      <FormattedMessage {...messages.noAccounts} />
+    </CardText>
+  }
+  </Card>
 );
 
 AccountList.propTypes = {

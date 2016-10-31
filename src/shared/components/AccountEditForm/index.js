@@ -7,14 +7,19 @@ import { mapValues, pick, invert, get, isUndefined } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import {
   Button,
-  FormControl,
+  Form,
   FormGroup,
-  ControlLabel,
-  HelpBlock,
-  InputGroup,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
   Modal,
-} from 'react-bootstrap';
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  InputGroup,
+  InputGroupAddon,
+} from 'reactstrap';
 
 import { error } from '../../log';
 import { accountActions } from '../../actions';
@@ -126,48 +131,44 @@ const messages = defineMessages({
 });
 
 const TextFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type="text"
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const NumberFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <InputGroup>
       <MoneyInput {...field} className="form-control" />
-      <InputGroup.Addon>{field.currency.code}</InputGroup.Addon>
+      <InputGroupAddon>{field.currency.code}</InputGroupAddon>
     </InputGroup>
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const SelectFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <SelectInput
       {...field}
       options={field.options}
       clearable={false}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const ToggleFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>
       <span className={style['toggle-label']}>{field.label}</span>
       <ToggleInput {...field} />
-    </ControlLabel>
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    </Label>
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const defaultValues = {
@@ -222,7 +223,7 @@ class AccountEditForm extends React.Component {
       label = <FormattedMessage {...messages.saveButton} />;
     }
 
-    return (<Button type="submit" bsStyle="primary" disabled={disabled}>{label}</Button>);
+    return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
   getDeleteButton = () => {
@@ -231,7 +232,7 @@ class AccountEditForm extends React.Component {
     }
 
     return (
-      <Button className="pull-right" bsStyle="danger" onClick={this.toggleModal}>
+      <Button className="float-xs-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
@@ -304,12 +305,12 @@ class AccountEditForm extends React.Component {
       />);
 
     if (!this.props.accountId) {
-      return (<Alert><FormattedMessage {...messages.infoAlert} /></Alert>);
+      return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
     return (
       <div>
-        <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
+        <Form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
             name="name"
             label={formatMessage(messages.name.label)}
@@ -340,39 +341,47 @@ class AccountEditForm extends React.Component {
             type="number"
           />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+          { error && <Alert color="danger">{error}</Alert> }
 
           <div className={style['action-buttons']}>
             { this.getSubmitButton() }
             { this.getDeleteButton() }
           </div>
-        </form>
+        </Form>
 
-        <Modal show={this.state.accountDeleteModal}>
-          <Modal.Header>
-            <Modal.Title><FormattedMessage {...messages.deleteModalTitle} /></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+        <Modal isOpen={this.state.accountDeleteModal} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>
+            <FormattedMessage {...messages.deleteModalTitle} />
+          </ModalHeader>
+          <ModalBody>
             <p>{deleteConfirmMessage}</p>
-            <Alert bsStyle="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
-            <Alert bsStyle="info"><FormattedMessage {...messages.deleteModalNotice} /></Alert>
-          </Modal.Body>
-          <Modal.Footer>
+            <Alert color="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
+            <Alert color="info"><FormattedMessage {...messages.deleteModalNotice} /></Alert>
+          </ModalBody>
+          <ModalFooter>
             { this.state.accountDeleteError &&
-              <p className="text-danger pull-left"><FormattedMessage {...messages.deleteModalError} /></p>
+              <p className="text-danger float-xs-left">
+                <FormattedMessage {...messages.deleteModalError} />
+              </p>
             }
 
-            <Button onClick={this.removeAccount} disabled={this.props.process} bsStyle="danger">
+            <Button
+              onClick={this.removeAccount}
+              disabled={this.props.process}
+              color="danger"
+              className="mr-1"
+            >
               {
                 this.props.process
                   ? <FormattedMessage {...messages.deleteProcessButton} />
                   : <FormattedMessage {...messages.deleteButton} />
               }
             </Button>
+
             <Button onClick={this.toggleModal} disabled={this.props.process}>
               <FormattedMessage {...messages.cancelButton} />
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
       </div>
     );

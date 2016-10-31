@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Alert, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Alert } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   noAccounts: {
@@ -15,25 +16,31 @@ const messages = defineMessages({
 const LinkedAccountList = (props) => {
   if (props.accounts.length) {
     return (
-      <ListGroup>
+      <div className="list-group">
         {props.accounts.map((account) => {
           const onSelect = () => props.onSelect(account._id);
+          const btnClassess = ['list-group-item', 'list-group-item-action'];
+
+          if (account._id === props.selectedAccountId) {
+            btnClassess.push('active');
+          }
 
           return (
-            <ListGroupItem
-              onClick={onSelect}
-              active={account._id === props.selectedAccountId}
+            <button
               key={account._id}
+              type="button"
+              className={classnames(...btnClassess)}
+              onClick={onSelect}
             >
               {account.name}
-            </ListGroupItem>
+            </button>
           );
         })}
-      </ListGroup>
+      </div>
     );
   }
 
-  return (<Alert><FormattedMessage {...messages.noAccounts} /></Alert>);
+  return (<Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>);
 };
 
 LinkedAccountList.propTypes = {
