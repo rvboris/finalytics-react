@@ -20,5 +20,5 @@ button:focus,
 button:hover,
 a:focus,
 a:hover {
-	outline: none;
+  outline: none;
 }

@@ -78,7 +78,11 @@ module.exports = ({ target, options }) => {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
+
           ifClient('webfontloader'),
+          ifClient('react-toggle/style.css'),
+          ifClient('react-select/dist/react-select.css'),
+
           ifServer(
             path.resolve(__dirname, `../src/${target}/bootstrap.js`),
             path.resolve(__dirname, `../src/${target}/app.js`)
@@ -241,21 +245,30 @@ module.exports = ({ target, options }) => {
         ),
         _.merge(
           { test: /node_modules.+\.css$/ },
-          ifClient({
+          ifServer({ loader: 'css-loader/locals' }),
+          ifProdClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader',
             }),
-          })
+          }),
+          ifDevClient({ loaders: ['style-loader', 'css-loader'] })
         ),
         _.merge(
           { test: /(shared|client).+\.css$/ },
-          ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
-          ifClient({
+          ifServer({ loaders: ['css-loader/locals?modules', 'postcss-loader'] }),
+          ifProdClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader?modules!postcss-loader',
             }),
+          }),
+          ifDevClient({
+            loaders: [
+              'style-loader',
+              'css-loader?modules',
+              'postcss-loader',
+            ],
           })
         ),
       ]),

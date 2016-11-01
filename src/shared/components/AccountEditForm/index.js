@@ -164,17 +164,15 @@ const SelectFormField = field =>
 
 const ToggleFormField = field =>
   <FormGroup color={field.meta.error ? 'danger' : null}>
-    <Label>
-      <span className={style['toggle-label']}>{field.label}</span>
-      <ToggleInput {...field} />
-    </Label>
+    <Label>{field.label}</Label>
+    <ToggleInput {...field} />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const defaultValues = {
   name: null,
   currency: null,
-  startBalance: null,
+  startBalance: 0,
   type: null,
 };
 

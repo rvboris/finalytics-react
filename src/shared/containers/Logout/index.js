@@ -12,7 +12,7 @@ const messages = defineMessages({
   done: {
     id: 'container.logout.done',
     description: 'Logout exit message',
-    defaultMessage: 'The logout is complete, return to the main page',
+    defaultMessage: 'The logout is complete',
   },
   process: {
     id: 'container.logout.process',
@@ -24,7 +24,7 @@ const messages = defineMessages({
 class Logout extends React.Component {
   static propTypes = {
     logout: React.PropTypes.func.isRequired,
-    goMain: React.PropTypes.func.isRequired,
+    goToLogin: React.PropTypes.func.isRequired,
     process: React.PropTypes.bool.isRequired,
   };
 
@@ -32,7 +32,7 @@ class Logout extends React.Component {
     super(...args);
 
     if (IS_CLIENT) {
-      this.props.logout().finally(Promise.delay(2000).then(this.props.goMain));
+      this.props.logout().finally(Promise.delay(2000).then(this.props.goToLogin));
     }
   }
 
@@ -43,8 +43,8 @@ class Logout extends React.Component {
 
         {
           this.props.process
-            ? <h4><FormattedMessage {...messages.process} /></h4>
-            : <h4><FormattedMessage {...messages.done} /></h4>
+            ? <h4 className="mt-1"><FormattedMessage {...messages.process} /></h4>
+            : <h4 className="mt-1"><FormattedMessage {...messages.done} /></h4>
         }
       </div>
     );
@@ -53,7 +53,7 @@ class Logout extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(authActions.logout()),
-  goMain: () => dispatch(push('/')),
+  goToLogin: () => dispatch(push('/login')),
 });
 
 const selector = createSelector(

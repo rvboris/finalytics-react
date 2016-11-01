@@ -1,3 +1,8 @@
 :global .Select-menu-outer {
   z-index: 10;
 }
+
+:global .is-focused:not(.is-open) > .Select-control,
+:global .Select-control:hover {
+  box-shadow: none;
+}

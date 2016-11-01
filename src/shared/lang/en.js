@@ -199,7 +199,7 @@ export default {
   'container.accounts.manageAccounts': 'Account management',
   'container.accounts.createAccount': 'Create new account',
 
-  'container.logout.done': 'The logout is complete, return to the main page...',
+  'container.logout.done': 'Exit successfully completed',
   'container.logout.process': 'Logout...',
 
   'component.linkedAccountList.noAccounts': 'You have no accounts',

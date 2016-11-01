@@ -12,7 +12,7 @@ const Spinner = (props) => {
   };
 
   const styleColor = {
-    'border-color': color,
+    borderColor: color,
   };
 
   return (

@@ -198,7 +198,7 @@ export default {
   'container.accounts.manageAccounts': 'Управление счетами',
   'container.accounts.createAccount': 'Создать новый счет',
 
-  'container.logout.done': 'Выход выполнен, возвращаемся на главную...',
+  'container.logout.done': 'Выход успешно выполнен',
   'container.logout.process': 'Выход...',
 
   'component.linkedAccountList.noAccounts': 'У вас пока нет счетов',

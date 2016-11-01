@@ -60,6 +60,8 @@ const onAuth = function* onAuth(action) {
   yield put(authActions.setToken(get(action, 'payload.data.token')));
   yield put(authActions.getProfile());
 
+  yield take('AUTH_GET_PROFILE_RESOLVED');
+
   const auth = yield select((state) => state.auth);
 
   if (get(auth, 'profile.status') === 'init') {

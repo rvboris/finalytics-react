@@ -28,7 +28,7 @@ const Accounts = (props) => {
 
   return (
     <div>
-      <h3><FormattedMessage {...messages.manageAccounts} /></h3>
+      <h4><FormattedMessage {...messages.manageAccounts} /></h4>
       <hr />
       <div className={style.accounts}>
         <div className={style['account-list-container']}>
