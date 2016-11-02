@@ -8,19 +8,22 @@ import TreeModel from 'tree-model';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import {
   Button,
-  FormControl,
+  Form,
   FormGroup,
-  ControlLabel,
-  HelpBlock,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
   Modal,
-} from 'react-bootstrap';
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from 'reactstrap';
 
 import { categoryActions } from '../../actions';
 import { error } from '../../log';
 import SelectInput from '../SelectInput';
 import validationHandler from '../../utils/validation-handler';
-import style from './style.css';
 
 const messages = defineMessages({
   infoAlert: {
@@ -109,30 +112,43 @@ const messages = defineMessages({
     description: 'Label of cancel button',
     defaultMessage: 'Cancel',
   },
+  expense: {
+    id: 'component.categoryEditForm.expense',
+    description: 'Expense type option',
+    defaultMessage: 'Expense',
+  },
+  income: {
+    id: 'component.categoryEditForm.income',
+    description: 'Income type option',
+    defaultMessage: 'Income',
+  },
+  any: {
+    id: 'component.categoryEditForm.any',
+    description: 'Any type option',
+    defaultMessage: 'Any',
+  },
 });
 
 const TextFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type="text"
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const SelectFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <SelectInput
       {...field}
       clearable={false}
       options={field.options}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const defaultValues = {
@@ -199,7 +215,7 @@ class CategoryEditForm extends React.Component {
       label = <FormattedMessage {...messages.saveButton} />;
     }
 
-    return (<Button type="submit" bsStyle="primary" disabled={disabled}>{label}</Button>);
+    return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
   getDeleteButton = () => {
@@ -208,7 +224,7 @@ class CategoryEditForm extends React.Component {
     }
 
     return (
-      <Button className="pull-right" bsStyle="danger" onClick={this.toggleModal}>
+      <Button className="float-xs-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
@@ -280,7 +296,7 @@ class CategoryEditForm extends React.Component {
 
   render() {
     const { formatMessage } = this.props.intl;
-    const { handleSubmit, error, initialValues } = this.props.form;
+    const { handleSubmit, error: formError, initialValues } = this.props.form;
     const deleteConfirmMessage =
       (<FormattedMessage
         {
@@ -291,16 +307,16 @@ class CategoryEditForm extends React.Component {
       />);
 
     if (!this.props.categoryId) {
-      return (<Alert><FormattedMessage {...messages.infoAlert} /></Alert>);
+      return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
     if (this.props.isSystemCategory) {
-      return (<Alert><FormattedMessage {...messages.isSystemAlert} /></Alert>);
+      return (<Alert color="info"><FormattedMessage {...messages.isSystemAlert} /></Alert>);
     }
 
     return (
       <div>
-        <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
+        <Form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
             label={formatMessage(messages.parent.label)}
             name="parent"
@@ -324,28 +340,33 @@ class CategoryEditForm extends React.Component {
             type="text"
           />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+          { formError && <Alert color="danger">{formError}</Alert> }
 
-          <div className={style['action-buttons']}>
+          <div>
             { this.getSubmitButton() }
             { this.getDeleteButton() }
           </div>
-        </form>
+        </Form>
 
-        <Modal show={this.state.categoryDeleteModal}>
-          <Modal.Header>
-            <Modal.Title><FormattedMessage {...messages.deleteModalTitle} /></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+        <Modal isOpen={this.state.categoryDeleteModal} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>
+            <FormattedMessage {...messages.deleteModalTitle} />
+          </ModalHeader>
+          <ModalBody>
             <p>{deleteConfirmMessage}</p>
-            <Alert bsStyle="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
-          </Modal.Body>
-          <Modal.Footer>
+            <Alert color="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
+          </ModalBody>
+          <ModalFooter>
             { this.state.accountDeleteError &&
-              <p className="text-danger pull-left"><FormattedMessage {...messages.deleteModalError} /></p>
+              <p className="text-danger"><FormattedMessage {...messages.deleteModalError} /></p>
             }
 
-            <Button onClick={this.removeCategory} disabled={this.props.process} bsStyle="danger">
+            <Button
+              onClick={this.removeCategory}
+              disabled={this.props.process}
+              color="danger"
+              className="mr-1"
+            >
               {
                 this.props.process
                   ? <FormattedMessage {...messages.deleteProcessButton} />
@@ -355,7 +376,7 @@ class CategoryEditForm extends React.Component {
             <Button onClick={this.toggleModal} disabled={this.props.process}>
               <FormattedMessage {...messages.cancelButton} />
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
       </div>
     );
@@ -489,15 +510,21 @@ const availableParentsListSelector = createSelector(
 const availableTypesListSelector = createSelector(
   initialValuesSelector,
   categoryTreeSelector,
-  (initialValues, categoryTree) => {
+  (_, props) => props.intl.formatMessage,
+  (initialValues, categoryTree, formatMessage) => {
     const values = Object.assign({}, initialValues);
     const selectedParent = categoryTree.first(node => node.model._id === values.parent);
 
     if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
-      return [{ label: selectedParent.model.type, value: selectedParent.model.type }];
+      return [{
+        label: formatMessage(messages[selectedParent.model.type]),
+        value: selectedParent.model.type,
+      }];
     }
 
-    return availableTypesListLabeled;
+    return availableTypesListLabeled.map(type =>
+      Object.assign({}, type, { label: formatMessage(messages[type.label]) })
+    );
   }
 );
 

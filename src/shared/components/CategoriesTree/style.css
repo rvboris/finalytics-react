@@ -27,7 +27,7 @@
 .tree-type-label-any,
 .tree-type-label-expense,
 .tree-type-label-income {
-  font-size: 11px;
+  font-size: 0.9rem;
   text-transform: lowercase;
 }
 

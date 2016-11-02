@@ -194,6 +194,13 @@ export default {
   'component.categoryEditForm.deleteModalWarning': 'При удалении категории все операции связанные с ней будут перемещены в "Без категории"',
   'component.categoryEditForm.deleteModalError': 'При удалении категории произошла ошибка',
   'component.categoryEditForm.cancelButton': 'Отмена',
+  'component.categoryEditForm.expense': 'Расход',
+  'component.categoryEditForm.income': 'Доход',
+  'component.categoryEditForm.any': 'Любая',
+
+  'component.categoriesTree.expense': 'расход',
+  'component.categoriesTree.income': 'доход',
+  'component.categoriesTree.any': 'любая',
 
   'container.accounts.manageAccounts': 'Управление счетами',
   'container.accounts.createAccount': 'Создать новый счет',

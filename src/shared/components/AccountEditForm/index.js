@@ -27,7 +27,6 @@ import validationHandler from '../../utils/validation-handler';
 import SelectInput from '../SelectInput';
 import ToggleInput from '../ToggleInput';
 import MoneyInput from '../MoneyInput';
-import style from './style.css';
 
 const messages = defineMessages({
   infoAlert: {
@@ -292,7 +291,7 @@ class AccountEditForm extends React.Component {
 
   render() {
     const { formatMessage } = this.props.intl;
-    const { handleSubmit, error, initialValues } = this.props.form;
+    const { handleSubmit, error: formError, initialValues } = this.props.form;
     const deleteConfirmMessage =
       (<FormattedMessage
         {
@@ -339,9 +338,9 @@ class AccountEditForm extends React.Component {
             type="number"
           />
 
-          { error && <Alert color="danger">{error}</Alert> }
+          { formError && <Alert color="danger">{formError}</Alert> }
 
-          <div className={style['action-buttons']}>
+          <div>
             { this.getSubmitButton() }
             { this.getDeleteButton() }
           </div>
@@ -358,7 +357,7 @@ class AccountEditForm extends React.Component {
           </ModalBody>
           <ModalFooter>
             { this.state.accountDeleteError &&
-              <p className="text-danger float-xs-left">
+              <p className="text-danger">
                 <FormattedMessage {...messages.deleteModalError} />
               </p>
             }

@@ -1,10 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router';
 import {
   Navbar,
   NavbarBrand,
   Nav,
   NavItem,
-  NavLink,
 } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
@@ -36,6 +36,15 @@ const messages = defineMessages({
   },
 });
 
+const NavLink = (props) => (
+  <Link {...props} className="nav-link" activeClassName="active">
+    {props.children}
+  </Link>
+);
+
+NavLink.propTypes = {
+  children: React.PropTypes.object.isRequired,
+};
 
 class AppBar extends React.Component {
   constructor(props) {
@@ -60,22 +69,22 @@ class AppBar extends React.Component {
         <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
         <Nav navbar>
           <NavItem>
-            <NavLink href="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+            <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
+            <NavLink to="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
+            <NavLink to="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
           </NavItem>
         </Nav>
 
         <Nav className="float-xs-right" navbar>
           <NavItem>
-            <NavLink href="/dashboard/profile"><FormattedMessage {...messages.profile} /></NavLink>
+            <NavLink to="/dashboard/profile"><FormattedMessage {...messages.profile} /></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+            <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
           </NavItem>
         </Nav>
       </Navbar>

@@ -2,8 +2,9 @@ import React from 'react';
 import { push } from 'react-router-redux';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 
 import CategoriesTree from '../../components/CategoriesTree';
 import CategoryEditForm from '../../components/CategoryEditForm';
@@ -27,14 +28,14 @@ const Categories = (props) => {
 
   return (
     <div>
-      <h3><FormattedMessage {...messages.manageCategories} /></h3>
+      <h4><FormattedMessage {...messages.manageCategories} /></h4>
       <hr />
       <div className={style.categories}>
         <div className={style['categories-tree-container']}>
           <Button
             block
-            bsStyle="primary"
-            className={style['category-create']}
+            color="primary"
+            className="mb-1"
             onClick={props.newCategory}
           >
             <FormattedMessage {...messages.createCategory} />
@@ -42,7 +43,7 @@ const Categories = (props) => {
 
           <CategoriesTree onSelect={props.selectCategory} selectedCategoryId={selectedCategoryId} />
         </div>
-        <div className={style['category-details-container']}>
+        <div className={classnames(style['category-details-container'], 'ml-2')}>
           <CategoryEditForm categoryId={selectedCategoryId} />
         </div>
       </div>

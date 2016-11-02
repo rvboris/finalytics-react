@@ -219,18 +219,12 @@ module.exports = ({ target, options }) => {
                 },
               },
               plugins: [
-                'lodash',
                 'transform-promise-to-bluebird',
-                [
-                  'transform-runtime',
-                  {
-                    polyfill: true,
-                    regenerator: true,
-                  },
-                ],
+                'transform-runtime',
+                'lodash',
               ],
             },
-            ifServer({ presets: ['react', 'es2016', 'es2017', 'stage-1'] }),
+            ifServer({ presets: ['react', 'es2017', 'stage-1'] }),
             ifClient({ presets: ['react', 'latest', 'stage-1'] })
           ),
         },

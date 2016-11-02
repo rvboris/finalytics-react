@@ -2,15 +2,28 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import classnames from 'classnames';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import TreeView from '../TreeView';
 import style from './style.css';
 
-const categoryTypeMap = {
-  expense: 'Расход',
-  income: 'Доход',
-  any: 'Любые',
-};
+const messages = defineMessages({
+  expense: {
+    id: 'component.categoriesTree.expense',
+    description: 'Expense type label',
+    defaultMessage: 'expense',
+  },
+  income: {
+    id: 'component.categoriesTree.income',
+    description: 'Income type label',
+    defaultMessage: 'income',
+  },
+  any: {
+    id: 'component.categoriesTree.any',
+    description: 'Any type label',
+    defaultMessage: 'any',
+  },
+});
 
 const CategoriesTree = (props) => {
   const { categories, onSelect, selectedCategoryId } = props;
@@ -19,7 +32,9 @@ const CategoriesTree = (props) => {
     const label = (
       <span>
         <span className={style['tree-text-label']}>{item.name}</span>
-        <span className={classnames('pull-right', style[`tree-type-label-${item.type}`])}>{categoryTypeMap[item.type]}</span>
+        <span className={classnames('float-xs-right', style[`tree-type-label-${item.type}`])}>
+          <FormattedMessage {...messages[item.type]} />
+        </span>
       </span>
     );
 
@@ -62,4 +77,4 @@ const selector = createSelector(
   }),
 );
 
-export default connect(selector)(CategoriesTree);
+export default injectIntl(connect(selector)(CategoriesTree));

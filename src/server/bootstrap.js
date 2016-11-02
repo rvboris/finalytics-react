@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import { get } from 'lodash';
 
 import app from './app';

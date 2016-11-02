@@ -35,6 +35,7 @@ const SelectInput = (props) => {
       onChange={onChange}
       options={props.options}
       noResultsText={formatMessage(messages.notFoud)}
+      instanceId={props.name}
     />
   );
 };
@@ -43,6 +44,7 @@ SelectInput.propTypes = {
   intl: React.PropTypes.object.isRequired,
   input: React.PropTypes.object.isRequired,
   options: React.PropTypes.array.isRequired,
+  name: React.PropTypes.string.isRequired,
 };
 
 export default injectIntl(SelectInput);

@@ -195,6 +195,13 @@ export default {
   'component.categoryEditForm.deleteModalWarning': 'All your operations for this category will be moved in "no category"',
   'component.categoryEditForm.deleteModalError': 'When you delete an category error occurred',
   'component.categoryEditForm.cancelButton': 'Cancel',
+  'component.categoryEditForm.expense': 'Expense',
+  'component.categoryEditForm.income': 'Income',
+  'component.categoryEditForm.any': 'Any',
+
+  'component.categoriesTree.expense': 'expense',
+  'component.categoriesTree.income': 'income',
+  'component.categoriesTree.any': 'any',
 
   'container.accounts.manageAccounts': 'Account management',
   'container.accounts.createAccount': 'Create new account',
