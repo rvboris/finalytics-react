@@ -106,9 +106,7 @@ module.exports = ({ target, options }) => {
     resolve: {
       extensions: ['.js', '.json'],
       alias: {
-        react: ifElse(isDev)('react', 'react-lite'),
         'react/lib/ReactDOM': 'react-dom', // redbox-react fix
-        'react-dom': ifElse(isDev)('react-dom', 'react-lite'),
       },
     },
     plugins: _.compact([

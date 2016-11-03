@@ -12,6 +12,7 @@ const ToggleInput = (props) => {
 
   return (
     <Toggle
+      disabled={props.disabled}
       onChange={onChange}
       checked={props.input.value}
     />
@@ -20,6 +21,7 @@ const ToggleInput = (props) => {
 
 ToggleInput.propTypes = {
   input: React.PropTypes.object.isRequired,
+  disabled: React.PropTypes.bool,
 };
 
 export default ToggleInput;

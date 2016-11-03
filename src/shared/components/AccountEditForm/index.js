@@ -321,12 +321,14 @@ class AccountEditForm extends React.Component {
             name="currency"
             options={this.props.currencyList}
             component={SelectFormField}
+            disabled={!this.props.isNewAccount}
           />
 
           <Field
             label={formatMessage(messages.type.label)}
             name="type"
             component={ToggleFormField}
+            disabled={!this.props.isNewAccount}
           />
 
           <Field

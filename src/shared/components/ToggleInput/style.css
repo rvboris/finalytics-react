@@ -12,10 +12,8 @@
   border-radius: 0.25rem;
 }
 
-:global .react-toggle--focus .react-toggle-thumb {
-  box-shadow: none;
-}
-
-:global .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
+:global .react-toggle--focus .react-toggle-thumb,
+:global .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb,
+:global .react-toggle:active .react-toggle-thumb {
   box-shadow: none;
 }
