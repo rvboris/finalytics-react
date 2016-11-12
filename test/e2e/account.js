@@ -1,11 +1,17 @@
 import test from 'ava';
 import Nightmare from 'nightmare';
 
-const nm = new Nightmare({ show: !process.env.CI });
+const nm = new Nightmare({
+  show: !process.env.CI,
+  webPreferences: {
+    partition: 'account'
+  }
+});
 
 test.before(async () => {
   await nm
     .goto(`${process.env.startPoint}/register`)
+    .wait(1000)
     .insert('form input[name=email]', 'account@account.ru')
     .insert('form input[name=password]', '12345678')
     .insert('form input[name=repeatPassword]', '12345678')
@@ -32,7 +38,7 @@ test.serial('remove default accounts', async (t) => {
     .wait(500)
     .evaluate(() => document.querySelectorAll('.list-group-item.list-group-item-action').length);
 
-  await nm.goto(`${process.env.startPoint}/dashboard/accounts`);
+  await nm.goto(`${process.env.startPoint}/dashboard/accounts`).wait(20000);
 
   await selectAccount(nm)
     .then((defaultAccountsCount) => {

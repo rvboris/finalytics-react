@@ -1,7 +1,12 @@
 import test from 'ava';
 import Nightmare from 'nightmare';
 
-const nm = new Nightmare({ show: !process.env.CI });
+const nm = new Nightmare({
+  show: !process.env.CI,
+  webPreferences: {
+    partition: 'auth'
+  }
+});
 
 test.serial('register', async (t) => {
   await nm
