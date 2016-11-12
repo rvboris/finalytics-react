@@ -4,8 +4,8 @@ import Nightmare from 'nightmare';
 const nm = new Nightmare({
   show: !process.env.CI,
   webPreferences: {
-    partition: 'auth'
-  }
+    partition: 'auth',
+  },
 });
 
 test.serial('register', async (t) => {

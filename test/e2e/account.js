@@ -4,8 +4,8 @@ import Nightmare from 'nightmare';
 const nm = new Nightmare({
   show: !process.env.CI,
   webPreferences: {
-    partition: 'account'
-  }
+    partition: 'account',
+  },
 });
 
 test.before(async () => {
@@ -16,7 +16,7 @@ test.before(async () => {
     .insert('form input[name=password]', '12345678')
     .insert('form input[name=repeatPassword]', '12345678')
     .click('form button[type=submit]')
-    .wait(2000);
+    .wait(3000);
 });
 
 test.serial('default accounts', async (t) => {
@@ -38,7 +38,7 @@ test.serial('remove default accounts', async (t) => {
     .wait(500)
     .evaluate(() => document.querySelectorAll('.list-group-item.list-group-item-action').length);
 
-  await nm.goto(`${process.env.startPoint}/dashboard/accounts`).wait(20000);
+  await nm.goto(`${process.env.startPoint}/dashboard/accounts`);
 
   await selectAccount(nm)
     .then((defaultAccountsCount) => {
