@@ -9,7 +9,7 @@ const languagesBCP47Map = {
 
 acceptLanguage.languages(Object.keys(languagesBCP47Map));
 
-export default async(ctx, next) => {
+export default async (ctx, next) => {
   const header = ctx.request.header['accept-language'];
 
   ctx.language = config.defaultLang;

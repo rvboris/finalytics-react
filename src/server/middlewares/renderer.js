@@ -31,7 +31,7 @@ const runRouter = (location, routes) =>
   new Promise((resolve) =>
     match({ routes, location }, (...args) => resolve(args)));
 
-export default async(ctx, next) => {
+export default async (ctx, next) => {
   if (ctx.request.url.startsWith('/api')) {
     await next();
     return;

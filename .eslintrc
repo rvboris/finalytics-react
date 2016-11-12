@@ -3,8 +3,14 @@
   "extends": "airbnb",
   "rules": {
     "global-require": 0,
-    "strict": 0,
-    "no-param-reassign": 0,
+    "comma-dangle": ["error", {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "ignore",
+    }],
+    "no-param-reassign": ["error", { "props": false }],
     "no-shadow": 0,
     "arrow-parens": 0,
     "new-cap": 0,

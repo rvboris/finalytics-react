@@ -12,8 +12,8 @@ const publicFields =
   ['_id', 'account', 'type', 'category', 'amount', 'balance', 'created', 'transfer'];
 
 const filterProps = (operation) => {
-  operation = pick(operation, ...publicFields);
-  return mapValues(operation, (prop) => (prop._id ? prop._id.toString() : prop));
+  const publicOperation = pick(operation, ...publicFields);
+  return mapValues(publicOperation, (prop) => (prop._id ? prop._id.toString() : prop));
 };
 
 router.post('/add', { jwt: true }, async (ctx) => {

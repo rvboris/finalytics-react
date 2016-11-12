@@ -2,7 +2,9 @@ import { get } from 'lodash';
 import axios from 'axios';
 
 export default store => next => action => {
-  if (get(action, 'meta.request')) {
+  const newAction = Object.assign({}, action);
+
+  if (get(newAction, 'meta.request')) {
     const state = store.getState();
     const token = get(state, 'auth.token');
 
@@ -12,17 +14,17 @@ export default store => next => action => {
       req = axios.create({ headers: { Authorization: `JWT ${token}` } });
     }
 
-    const method = get(action, 'meta.request.method');
-    const url = get(action, 'meta.request.url');
-    const values = get(action, 'meta.request.values');
+    const method = get(newAction, 'meta.request.method');
+    const url = get(newAction, 'meta.request.url');
+    const values = get(newAction, 'meta.request.values');
 
     if (req[method]) {
-      action.meta.promise = new Promise((...args) => req[method](url, values).then(...args));
-      action.meta.optimist = true;
+      newAction.meta.promise = new Promise((...args) => req[method](url, values).then(...args));
+      newAction.meta.optimist = true;
 
-      delete action.meta.request;
+      delete newAction.meta.request;
     }
   }
 
-  return next(action);
+  return next(newAction);
 };
