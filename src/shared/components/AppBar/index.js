@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import { Link } from 'react-router';
 import {
   Navbar,
@@ -43,53 +45,46 @@ const NavLink = (props) => (
 );
 
 NavLink.propTypes = {
-  children: React.PropTypes.object.isRequired,
+  children: React.PropTypes.any,
 };
 
-class AppBar extends React.Component {
-  constructor(props) {
-    super(props);
+const AppBar = (props) => {
+  const { userLogin } = props;
 
-    this.toggle = this.toggle.bind(this);
+  return (
+    <Navbar color="primary" dark>
+      <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
+      <Nav navbar>
+        <NavItem>
+          <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink to="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink to="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
+        </NavItem>
+      </Nav>
 
-    this.state = {
-      dropdownOpen: false,
-    };
-  }
+      <Nav className="float-xs-right" navbar>
+        <NavItem>
+          <NavLink to="/dashboard/profile"><FormattedMessage {...messages.profile} /> ({userLogin})</NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+        </NavItem>
+      </Nav>
+    </Navbar>
+  );
+};
 
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
+AppBar.propTypes = {
+  userLogin: React.PropTypes.string.isRequired,
+};
 
-  render() {
-    return (
-      <Navbar color="primary" dark>
-        <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
-        <Nav navbar>
-          <NavItem>
-            <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink to="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink to="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
-          </NavItem>
-        </Nav>
+const userLoginSelector = createSelector(
+  state => state.auth.profile.email,
+  userLogin => ({ userLogin }),
+);
 
-        <Nav className="float-xs-right" navbar>
-          <NavItem>
-            <NavLink to="/dashboard/profile"><FormattedMessage {...messages.profile} /></NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
-          </NavItem>
-        </Nav>
-      </Navbar>
-    );
-  }
-}
-
-export default injectIntl(AppBar);
+export default injectIntl(connect(userLoginSelector)(AppBar));

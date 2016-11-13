@@ -82,6 +82,7 @@ module.exports = ({ target, options }) => {
           ifClient('webfontloader'),
           ifClient('react-toggle/style.css'),
           ifClient('react-select/dist/react-select.css'),
+          ifClient('react-day-picker/lib/style.css'),
 
           ifServer(
             path.resolve(__dirname, `../src/${target}/bootstrap.js`),
@@ -228,12 +229,13 @@ module.exports = ({ target, options }) => {
         },
         _.merge(
           { test: /.scss$/ },
-          ifClient({
+          ifProdClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader!postcss-loader!sass-loader',
             }),
-          })
+          }),
+          ifDevClient({ loaders: ['style-loader', 'css-loader', 'sass-loader'] })
         ),
         _.merge(
           { test: /node_modules.+\.css$/ },

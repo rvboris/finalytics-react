@@ -16,9 +16,7 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-button:focus,
-button:hover,
-a:focus,
-a:hover {
+*:focus,
+*:hover {
   outline: none;
 }

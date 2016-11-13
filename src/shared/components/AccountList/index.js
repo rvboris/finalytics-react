@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Button, Card, CardHeader, CardText } from 'reactstrap';
+import { Button, Card, CardHeader, CardBlock } from 'reactstrap';
 import { push } from 'react-router-redux';
 
 import MoneyFormat from '../MoneyFormat';
@@ -44,9 +44,9 @@ const AccountList = (props) => (
         </li>
       ))}
     </ul>
-    : <CardText>
-      <FormattedMessage {...messages.noAccounts} />
-    </CardText>
+    : <CardBlock>
+      <p className="text-xs-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
+    </CardBlock>
   }
   </Card>
 );
