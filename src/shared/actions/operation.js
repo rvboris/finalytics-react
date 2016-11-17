@@ -61,10 +61,11 @@ export const updateTransfer = createAction('OPERATION_UPDATE_TRANSFER',
 
 export const list = createAction('OPERATION_LIST',
   null,
-  () => ({
+  (values) => ({
     request: {
       url: `${OPERATION_API}/list`,
       method: 'get',
+      values,
     },
   })
 );

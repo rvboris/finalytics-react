@@ -6,7 +6,7 @@ import optimistPromiseMiddleware from 'redux-optimist-promise';
 import Immutable from 'seamless-immutable';
 import createSagaMiddleware from 'redux-saga';
 
-import * as sagas from '../shared/sagas';
+import sagas from '../shared/sagas';
 import * as reducers from '../shared/reducers';
 import * as middlewares from '../shared/middlewares';
 
@@ -38,4 +38,4 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 
 export default store;
 export const history = syncHistoryWithStore(browserHistory, store);
-export const runSaga = () => sagaMiddleware.run(...values(sagas));
+export const runSaga = () => sagaMiddleware.run(sagas);

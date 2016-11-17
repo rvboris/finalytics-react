@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { reduxForm, Field, formValueSelector } from 'redux-form';
+import { reduxForm, Field, formValueSelector, SubmissionError } from 'redux-form';
 import { get, isUndefined } from 'lodash';
 import { injectIntl } from 'react-intl';
 import classnames from 'classnames';
@@ -19,10 +19,12 @@ import {
   Label,
   InputGroup,
   InputGroupAddon,
+  Alert,
 } from 'reactstrap';
 
 import config from '../../config';
 import { operationActions } from '../../actions';
+import { error } from '../../log';
 import DatePicker from '../DatePicker';
 import MoneyInput from '../MoneyInput';
 import SelectInput from '../SelectInput';
@@ -53,9 +55,10 @@ const defaultValues = {
   account: null,
   accountFrom: null,
   accountTo: null,
-  created: moment.utc().toString(),
+  created: moment().utc().format(),
   category: null,
   amount: null,
+  type: null,
 };
 
 const fieldsToEdit = Object.keys(defaultValues);
@@ -67,11 +70,11 @@ class OperationEditForm extends React.Component {
     isNewOperation: React.PropTypes.bool.isRequired,
     form: React.PropTypes.object.isRequired,
     intl: React.PropTypes.object.isRequired,
-    createOperation: React.PropTypes.func.isRequired,
-    saveOperation: React.PropTypes.func.isRequired,
+    addOperation: React.PropTypes.func.isRequired,
+    updateOperation: React.PropTypes.func.isRequired,
     removeOperation: React.PropTypes.func.isRequired,
     locale: React.PropTypes.string.isRequired,
-    mode: React.PropTypes.string.isRequired,
+    initialType: React.PropTypes.string.isRequired,
     accountList: React.PropTypes.array.isRequired,
     categoryList: React.PropTypes.array.isRequired,
     selectedAccountCurrency: React.PropTypes.object,
@@ -81,43 +84,106 @@ class OperationEditForm extends React.Component {
     super(props);
 
     this.state = {
-      mode: props.mode,
+      type: props.initialType,
     };
   }
 
-  getCategoriesList(mode) {
-    if (!['expense', 'income'].includes(mode)) {
+  getCategoryList(type) {
+    if (!['expense', 'income'].includes(type)) {
       return [];
     }
 
     const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
 
     const categoryList = this.props.categoryList
-      .filter(node => node.model.type === node.model.type === 'any' || node.model.type === mode);
+      .filter(node => node.model.type === node.model.type === 'any' || node.model.type === type);
 
     return categoryList.map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
   }
 
-  getAccountsList() {
+  getSubmitButton = () => {
+    const { submitting } = this.props.form;
+    const disabled = submitting || this.props.process;
+
+    let label;
+
+    if (submitting || this.props.process) {
+      label = 'Сохранение';
+    } else if (this.props.isNewOperation) {
+      label = 'Создать';
+    } else {
+      label = 'Сохранить';
+    }
+
+    return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
+  };
+
+  getAccountList() {
     return this.props.accountList.map(account => ({ value: account._id, label: account.name }));
   }
 
-  toggleMode(mode) {
-    this.setState(Object.assign({}, this.state, { mode }));
+  toggleType(type) {
+    this.setState(Object.assign({}, this.state, { type }));
   }
+
+  toNegative(txt) {
+    return `-${this.toPositive(txt)}`;
+  }
+
+  toPositive(txt) {
+    return txt.replace('-', '');
+  }
+
+  submitHandler = (values) => new Promise(async (resolve, reject) => {
+    const toValidate = Object.assign({}, defaultValues, values);
+
+    toValidate.type = this.state.type;
+
+    if (toValidate.type === 'expense') {
+      toValidate.amount = this.toNegative(toValidate.amount);
+    }
+
+    if (toValidate.type === 'income') {
+      toValidate.amount = this.toPositive(toValidate.amount);
+    }
+
+    let result;
+
+    console.log(toValidate);
+
+    try {
+      if (this.props.isNewOperation) {
+        result = await this.props.addOperation(toValidate);
+      } else {
+        // Update, Remove
+      }
+    } catch (err) {
+      error(err);
+
+      reject(new SubmissionError());
+
+      return;
+    }
+
+    resolve(result);
+  }).then(() => {
+    // Highlight operation
+  });
 
   render() {
     const { locale } = this.props;
-    const { mode } = this.state;
+    const { type } = this.state;
 
-    const categoriesList = this.getCategoriesList(mode);
-    const accountsList = this.getAccountsList();
+    const categoryList = this.getCategoryList(type);
+    const accountList = this.getAccountList();
+
+    const { handleSubmit, error: formError } = this.props.form;
 
     return (
       <Card>
         <CardHeader>Добавить операцию</CardHeader>
         <CardBlock>
-          <Form className={style['content-container']}>
+          <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
             <div className={style['datepicker-container']}>
               <Field
                 name="created"
@@ -128,51 +194,54 @@ class OperationEditForm extends React.Component {
             <div className={classnames(style['form-container'], 'ml-1')}>
               <ButtonGroup className="btn-group-justified mb-1">
                 <Button
-                  onClick={() => this.toggleMode('expense')}
+                  onClick={() => this.toggleType('expense')}
                   color="primary"
                   type="button"
                   outline
-                  active={mode === 'expense'}
+                  active={type === 'expense'}
                 >
                   Расход
                 </Button>
                 <Button
-                  onClick={() => this.toggleMode('transfer')}
+                  onClick={() => this.toggleType('transfer')}
                   color="primary"
                   type="button"
                   outline
-                  active={mode === 'transfer'}
+                  active={type === 'transfer'}
                 >
                   Перевод
                 </Button>
                 <Button
-                  onClick={() => this.toggleMode('income')}
+                  onClick={() => this.toggleType('income')}
                   color="primary"
                   type="button"
                   outline
-                  active={mode === 'income'}
+                  active={type === 'income'}
                 >
                   Доход
                 </Button>
               </ButtonGroup>
 
-              {['expense', 'income'].includes(mode) && [
+              {['expense', 'income'].includes(type) && [
                 <Field
+                  key="category"
                   label="Категория"
                   placeholder="Выбрать категорию"
                   name="category"
-                  options={categoriesList}
+                  options={categoryList}
                   component={SelectFormField}
                 />,
                 <Field
+                  key="account"
                   label="Счет"
                   placeholder="Выбрать счет"
                   name="account"
-                  options={accountsList}
+                  options={accountList}
                   component={SelectFormField}
-                  disabled={accountsList.length === 1}
+                  disabled={accountList.length === 1}
                 />,
                 <Field
+                  key="amount"
                   name="amount"
                   label="Сумма"
                   component={NumberFormField}
@@ -181,36 +250,46 @@ class OperationEditForm extends React.Component {
                 />,
               ]}
 
-              {this.state.mode === 'transfer' && [
+              {this.state.type === 'transfer' && [
                 <Field
+                  key="accountFrom"
                   label="Счет откуда"
                   placeholder="Выбрать счет"
                   name="accountFrom"
-                  options={accountsList}
+                  options={accountList}
                   component={SelectFormField}
                 />,
                 <Field
+                  key="accountTo"
                   label="Счет куда"
                   placeholder="Выбрать счет"
                   name="accountTo"
-                  options={accountsList}
+                  options={accountList}
                   component={SelectFormField}
                 />,
                 <Field
-                  name="amount"
+                  key="amountFrom"
+                  name="amountFrom"
                   label="Сумма ушла"
                   component={NumberFormField}
                   currency={this.props.selectedAccountCurrency}
                   type="number"
                 />,
                 <Field
-                  name="amount"
+                  key="amountTo"
+                  name="amountTo"
                   label="Сумма пришла"
                   component={NumberFormField}
                   currency={this.props.selectedAccountCurrency}
                   type="number"
                 />,
               ]}
+
+              { formError && <Alert color="danger">{formError}</Alert> }
+
+              <div>
+                { this.getSubmitButton() }
+              </div>
             </div>
           </Form>
         </CardBlock>
@@ -226,8 +305,8 @@ let operationForm = reduxForm({
 })(OperationEditForm);
 
 const mapDispatchToProps = dispatch => ({
-  saveOperation: (...args) => dispatch(operationActions.save(...args)),
-  createOperation: (...args) => dispatch(operationActions.create(...args)),
+  updateOperation: (...args) => dispatch(operationActions.update(...args)),
+  addOperation: (...args) => dispatch(operationActions.add(...args)),
   removeOperation: (...args) => dispatch(operationActions.remove(...args)),
 });
 
@@ -275,7 +354,7 @@ const operationDefaultsSelector = createSelector(
   }
 );
 
-const initialModeSelector = createSelector(
+const initialTypeSelector = createSelector(
   isNewOperationSelector,
   operationDefaultsSelector,
   (isNewOperation, operation) => {
@@ -323,7 +402,7 @@ const selector = createSelector(
   categoryListSelector,
   operationDefaultsSelector,
   isNewOperationSelector,
-  initialModeSelector,
+  initialTypeSelector,
   selectedAccountCurrencySelector,
   (
     locale,
@@ -332,7 +411,7 @@ const selector = createSelector(
     categoryList,
     initialValues,
     isNewOperation,
-    mode,
+    initialType,
     selectedAccountCurrency
   ) => ({
     locale,
@@ -341,7 +420,7 @@ const selector = createSelector(
     categoryList,
     initialValues,
     isNewOperation,
-    mode,
+    initialType,
     selectedAccountCurrency,
   })
 );

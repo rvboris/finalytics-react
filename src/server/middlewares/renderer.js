@@ -2,11 +2,11 @@ import { renderToString } from 'react-dom/server';
 import { RouterContext, match } from 'react-router';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
-import { pick, values } from 'lodash';
+import { pick } from 'lodash';
 import passport from 'koa-passport';
 import React from 'react';
 
-import * as sagas from '../../shared/sagas';
+import sagas from '../../shared/sagas';
 import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
@@ -100,7 +100,7 @@ export default async (ctx, next) => {
       </Provider>
     );
 
-    await store.runSaga(...values(sagas));
+    await store.runSaga(sagas);
     store.dispatch(push(ctx.request.url));
     await fetcher(store.dispatch, renderProps.components, renderProps.params);
 

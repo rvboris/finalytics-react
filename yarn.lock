@@ -2207,6 +2207,10 @@ doiuse@^2.4.1:
     through2 "^0.6.3"
     yargs "^3.5.4"
 
+dom-helpers@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-2.4.0.tgz#9bb4b245f637367b1fa670274272aa28fe06c367"
+
 dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
@@ -5939,6 +5943,10 @@ react-addons-pure-render-mixin@>=0.14.0:
   version "15.3.2"
   resolved "https://registry.yarnpkg.com/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.3.2.tgz#c5f54764667ead26e6cdf7178b6c8dbbd8463ec2"
 
+react-addons-shallow-compare:
+  version "15.4.0"
+  resolved "https://registry.yarnpkg.com/react-addons-shallow-compare/-/react-addons-shallow-compare-15.4.0.tgz#17b2cced1928937bbcdb4832fb200bc34bd47871"
+
 react-addons-transition-group@^15.3.2:
   version "15.3.2"
   resolved "https://registry.yarnpkg.com/react-addons-transition-group/-/react-addons-transition-group-15.3.2.tgz#64f758d18bd1e59128726b1c9a4db79127c4f1ed"
@@ -6043,6 +6051,14 @@ react-toggle@2.1.1:
   dependencies:
     classnames "~2.2"
     react-addons-pure-render-mixin ">=0.14.0"
+
+react-virtualized:
+  version "8.5.2"
+  resolved "https://registry.yarnpkg.com/react-virtualized/-/react-virtualized-8.5.2.tgz#66a80557b573d0d820dcbd6c5ba8010121b4ed45"
+  dependencies:
+    babel-runtime "^6.11.6"
+    classnames "^2.2.3"
+    dom-helpers "^2.4.0"
 
 react@^0.14.0:
   version "0.14.8"

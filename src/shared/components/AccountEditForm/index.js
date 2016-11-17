@@ -171,7 +171,7 @@ const ToggleFormField = field =>
 const defaultValues = {
   name: null,
   currency: null,
-  startBalance: 0,
+  startBalance: null,
   type: null,
 };
 

@@ -1,15 +1,16 @@
 import React from 'react';
 import DayPicker, { DateUtils } from 'react-day-picker';
 import LocaleUtils from 'react-day-picker/moment';
+import moment from 'moment';
 
 const DatePicker = (props) => {
   const onChange = (event, date) => {
     if (props.input.onChange && event) {
-      props.input.onChange(date.toString());
+      props.input.onChange(moment(date).utc().format());
     }
   };
 
-  const selectedDays = (day) => DateUtils.isSameDay(new Date(props.input.value), day);
+  const selectedDays = (day) => DateUtils.isSameDay(moment(props.input.value).utc().toDate(), day);
 
   return (
     <DayPicker

@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 import { Alert } from 'reactstrap';
 
 import AccountList from '../../components/AccountList';
+import OperationList from '../../components/OperationList';
 import OperationEditForm from '../../components/OperationEditForm';
 import style from './style.css';
 
@@ -12,6 +13,7 @@ const Operations = (props) => (
   <div className={style.operations}>
     <div className={classnames(style['operations-container'], 'mr-2')}>
       { props.accountsExist && <OperationEditForm /> }
+      { props.accountsExist && <OperationList /> }
       { !props.accountsExist && <Alert color="info">Счета не найдены</Alert> }
     </div>
     <div className={style['balance-container']}>
