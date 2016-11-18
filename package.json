@@ -104,6 +104,8 @@
     "react-select": "1.0.0-rc.2",
     "react-toggle": "2.1.1",
     "react-virtualized": "^8.5.2",
+    "react-virtualized-select": "^2.1.0",
+    "react-visibility-sensor": "^3.4.0",
     "reactstrap": "^3.8.1",
     "redux": "3.6.0",
     "redux-actions": "0.13.0",

@@ -4,7 +4,7 @@ import { operationActions, accountActions } from '../actions';
 
 function* onOperationListChange() {
   const query = yield select((state) => state.operation.query);
-  yield [put(operationActions.list(query)), put(accountActions.load())];
+  yield [put(operationActions.list(query.asMutable())), put(accountActions.load())];
 }
 
 export default function* () {

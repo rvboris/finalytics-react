@@ -1,5 +1,6 @@
 import Immutable from 'seamless-immutable';
 import { handleActions } from 'redux-actions';
+import { assignIn, get } from 'lodash';
 
 const initialState = Immutable({
   process: false,
@@ -8,6 +9,13 @@ const initialState = Immutable({
   query: {
     limit: 10,
     skip: 0,
+    account: null,
+    type: null,
+    category: null,
+    amountFrom: null,
+    amountTo: null,
+    dateFrom: null,
+    dateTo: null,
   },
 });
 
@@ -15,13 +23,15 @@ export default handleActions({
   OPERATION_LIST: (state) => state.set('process', true),
 
   OPERATION_LIST_RESOLVED: (state, action) => {
-    console.log(action);
+    const newList = state.list.concat(Immutable(get(action, 'payload.data.operations', [])));
+    const lastQuery = assignIn(state.query.asMutable(), get(action, 'payload.config.params', {}));
+    const total = get(action, 'payload.data.total', 0);
 
     return state
       .set('process', false)
-      .set('list', state.list.concat(Immutable(action.payload.data.operations)))
-      .set('total', action.payload.data.total)
-      .merge({ query: action.payload });
+      .set('list', newList)
+      .set('total', total)
+      .merge({ query: lastQuery });
   },
 
   OPERATION_LIST_REJECTED: (state) => state.set('process', false),

@@ -1,14 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { List, InfiniteLoader } from 'react-virtualized';
+import { List, InfiniteLoader, AutoSizer, WindowScroller } from 'react-virtualized';
 import { createSelector } from 'reselect';
+import { noop } from 'lodash';
 
 import { operationActions } from '../../actions';
 
-const OperationList = ({ hasNextPage, process, list, loadNextPage }) => {
-  const rowCount = hasNextPage ? list.size + 1 : list.size;
-  const loadMoreRows = process ? () => {} : loadNextPage;
-  const isRowLoaded = ({ index }) => !hasNextPage || index < list.size;
+const OperationList = ({ process, list, listQuery, listTotal, loadNextPage }) => {
+  const loadQuery = ({ startIndex, stopIndex }) =>
+    loadNextPage(listQuery.merge({ limit: stopIndex, skip: startIndex }).asMutable());
+
+  const loadMoreRows = process ? noop : loadQuery;
+  const isRowLoaded = ({ index }) => !!list[index];
 
   const rowRenderer = ({ index, key, style }) => {
     let content;
@@ -16,7 +19,7 @@ const OperationList = ({ hasNextPage, process, list, loadNextPage }) => {
     if (!isRowLoaded({ index })) {
       content = 'Loading...';
     } else {
-      content = list.getIn([index, 'name']);
+      content = list[index].created;
     }
 
     return (<div key={key} style={style}>{content}</div>);
@@ -32,27 +35,39 @@ const OperationList = ({ hasNextPage, process, list, loadNextPage }) => {
     <InfiniteLoader
       isRowLoaded={isRowLoaded}
       loadMoreRows={loadMoreRows}
-      rowCount={rowCount}
+      rowCount={listTotal}
     >
       {({ onRowsRendered, registerChild }) => (
-        <List
-          ref={registerChild}
-          onRowsRendered={onRowsRendered}
-          rowRenderer={rowRenderer}
-          height="500"
-          width="400"
-          rowHeight="30"
-          rowCount={rowCount}
-        />
+        <WindowScroller>
+          {({ height, scrollTop }) => (
+            <AutoSizer disableHeight>
+              {({ width }) => (
+                <List
+                  ref={registerChild}
+                  onRowsRendered={onRowsRendered}
+                  rowRenderer={rowRenderer}
+                  rowCount={list.length}
+                  estimatedRowSize={listTotal}
+                  scrollTop={scrollTop}
+                  width={width}
+                  height={height}
+                  autoHeight
+                  rowHeight={30}
+                />
+              )}
+            </AutoSizer>
+          )}
+        </WindowScroller>
       )}
     </InfiniteLoader>
   );
 };
 
 OperationList.propTypes = {
-  hasNextPage: React.PropTypes.bool.isRequired,
   process: React.PropTypes.bool.isRequired,
   list: React.PropTypes.array.isRequired,
+  listQuery: React.PropTypes.object.isRequired,
+  listTotal: React.PropTypes.number.isRequired,
   loadNextPage: React.PropTypes.func.isRequired,
 };
 
@@ -61,25 +76,31 @@ const processSelector = createSelector(
   process => process,
 );
 
+const listQuerySelector = createSelector(
+  state => state.operation.query,
+  (query) => query,
+);
+
 const listSelector = createSelector(
-  state => state.operation.list.asMutable(),
+  state => state.operation.list,
   (operations) => operations,
 );
 
-const hasNextPageSelector = createSelector(
-  listSelector,
+const listTotalSelector = createSelector(
   state => state.operation.total,
-  (list, total) => list.length < total,
+  (total) => total,
 );
 
 const selector = createSelector(
   processSelector,
-  hasNextPageSelector,
   listSelector,
-  (process, hasNextPage, list) => ({
+  listQuerySelector,
+  listTotalSelector,
+  (process, list, listQuery, listTotal) => ({
     process,
-    hasNextPage,
     list,
+    listQuery,
+    listTotal,
   })
 );
 

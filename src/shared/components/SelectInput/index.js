@@ -1,5 +1,5 @@
 import React from 'react';
-import Select from 'react-select';
+import VirtualizedSelect from 'react-virtualized-select';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import './style.css';
@@ -28,7 +28,7 @@ const SelectInput = (props) => {
   };
 
   return (
-    <Select
+    <VirtualizedSelect
       {...props}
       value={props.input.value || ''}
       onBlur={onBlur}

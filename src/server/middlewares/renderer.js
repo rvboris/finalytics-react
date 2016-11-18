@@ -101,21 +101,44 @@ export default async (ctx, next) => {
     );
 
     await store.runSaga(sagas);
+
     store.dispatch(push(ctx.request.url));
+
     await fetcher(store.dispatch, renderProps.components, renderProps.params);
 
-    const state = store.getState();
+    const initialState = store.getState();
+
+    let body;
+
+    try {
+      body = renderToString(initialView);
+    } catch (err) {
+      ctx.log.error(err);
+
+      ctx.status = 500;
+      ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
+      store.close();
+
+      return;
+    }
 
     const layoutProps = {
-      initialState: state,
-      body: renderToString(initialView),
+      initialState,
+      body,
       locale: ctx.language,
       title: 'koa-universal-react-redux',
       description: 'koa-universal-react-redux',
       assets,
     };
 
-    ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
+    try {
+      ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
+    } catch (err) {
+      ctx.log.error(err);
+
+      ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
+      ctx.status = 500;
+    }
 
     store.close();
   })(ctx, next);
