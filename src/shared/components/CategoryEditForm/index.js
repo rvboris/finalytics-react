@@ -20,6 +20,7 @@ import {
   ModalFooter,
 } from 'reactstrap';
 
+import { virtualizedOptionRenderer, valueRenderer } from '../../utils/category-select';
 import { categoryActions } from '../../actions';
 import { error } from '../../log';
 import SelectInput from '../SelectInput';
@@ -322,6 +323,8 @@ class CategoryEditForm extends React.Component {
             name="parent"
             options={this.props.availableParentsList}
             component={SelectFormField}
+            optionRenderer={virtualizedOptionRenderer(true)}
+            valueRenderer={valueRenderer(true)}
           />
 
           <Field
@@ -488,8 +491,6 @@ const initialValuesSelector = createSelector(
   }
 );
 
-const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
-
 const availableParentsListSelector = createSelector(
   initialValuesSelector,
   categoryListSelector,
@@ -503,7 +504,11 @@ const availableParentsListSelector = createSelector(
         && node.model._id !== values._id
       );
 
-    return filteredList.map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
+    return filteredList.map(node => ({
+      value: node.model._id,
+      label: node.model.name,
+      node,
+    }));
   }
 );
 

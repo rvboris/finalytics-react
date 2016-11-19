@@ -6,3 +6,11 @@
 :global .Select-control:hover {
   box-shadow: none;
 }
+
+:global .Select-menu-outer {
+  max-height: 300px;
+
+  & * {
+    max-height: 298px;
+  }
+}

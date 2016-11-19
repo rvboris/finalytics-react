@@ -23,6 +23,8 @@ import {
 } from 'reactstrap';
 
 import config from '../../config';
+import { toNegative, toPositive } from '../../utils/money-input';
+import { optionRenderer, valueRenderer } from '../../utils/category-select';
 import { operationActions } from '../../actions';
 import { error } from '../../log';
 import DatePicker from '../DatePicker';
@@ -93,12 +95,14 @@ class OperationEditForm extends React.Component {
       return [];
     }
 
-    const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
-
     const categoryList = this.props.categoryList
-      .filter(node => node.model.type === node.model.type === 'any' || node.model.type === type);
+      .filter(node => (node.model.type === 'any' || node.model.type === type) && !node.isRoot());
 
-    return categoryList.map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
+    return categoryList.map(node => ({
+      value: node.model._id,
+      label: node.model.name,
+      node,
+    }));
   }
 
   getSubmitButton = () => {
@@ -126,25 +130,17 @@ class OperationEditForm extends React.Component {
     this.setState(Object.assign({}, this.state, { type }));
   }
 
-  toNegative(txt) {
-    return `-${this.toPositive(txt)}`;
-  }
-
-  toPositive(txt) {
-    return txt.replace('-', '');
-  }
-
   submitHandler = (values) => new Promise(async (resolve, reject) => {
     const toValidate = Object.assign({}, defaultValues, values);
 
     toValidate.type = this.state.type;
 
     if (toValidate.type === 'expense') {
-      toValidate.amount = this.toNegative(toValidate.amount);
+      toValidate.amount = toNegative(toValidate.amount);
     }
 
     if (toValidate.type === 'income') {
-      toValidate.amount = this.toPositive(toValidate.amount);
+      toValidate.amount = toPositive(toValidate.amount);
     }
 
     let result;
@@ -181,7 +177,12 @@ class OperationEditForm extends React.Component {
 
     return (
       <Card>
-        <CardHeader>Добавить операцию</CardHeader>
+        <CardHeader>
+          <span>Добавить операцию</span>
+          <Button className="float-xs-right" size="sm">
+            Категории
+          </Button>
+        </CardHeader>
         <CardBlock>
           <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
             <div className={style['datepicker-container']}>
@@ -230,6 +231,9 @@ class OperationEditForm extends React.Component {
                   name="category"
                   options={categoryList}
                   component={SelectFormField}
+                  optionRenderer={optionRenderer()}
+                  valueRenderer={valueRenderer()}
+                  virtualized={false}
                 />,
                 <Field
                   key="account"

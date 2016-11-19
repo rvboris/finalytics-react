@@ -40,13 +40,13 @@ class Operations extends React.Component {
 
     return (
       <div className={style.operations}>
-        <div className={classnames(style['operations-container'], 'mr-2')}>
+        <div className={style['operations-container']}>
           { accountsExist && <OperationEditForm /> }
           { accountsExist && <OperationList /> }
           { !accountsExist && <Alert color="info">Счета не найдены</Alert> }
         </div>
-        <div className={accountListVisible && style['balance-container']}>
-          { accountListVisible && <AccountList /> }
+        <div className={accountListVisible && classnames(style['balance-container'], 'ml-2')}>
+          {accountListVisible && <AccountList />}
           <VisibilitySensor onChange={this.onAccountVisibleChange} />
         </div>
       </div>
@@ -56,7 +56,7 @@ class Operations extends React.Component {
 
 const accountsExistSelector = createSelector(
   state => state.account.accounts,
-  accountList => accountList.length > 0
+  accountList => accountList && accountList.length > 0
 );
 
 const selector = createSelector(

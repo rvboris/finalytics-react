@@ -1,5 +1,6 @@
 import React from 'react';
 import VirtualizedSelect from 'react-virtualized-select';
+import Select from 'react-select';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import './style.css';
@@ -27,8 +28,23 @@ const SelectInput = (props) => {
     }
   };
 
+  if (props.virtualized) {
+    return (
+      <VirtualizedSelect
+        {...props}
+        value={props.input.value || ''}
+        onBlur={onBlur}
+        onChange={onChange}
+        options={props.options}
+        noResultsText={formatMessage(messages.notFoud)}
+        instanceId={props.name}
+        maxHeight={300}
+      />
+    );
+  }
+
   return (
-    <VirtualizedSelect
+    <Select
       {...props}
       value={props.input.value || ''}
       onBlur={onBlur}
@@ -45,6 +61,11 @@ SelectInput.propTypes = {
   input: React.PropTypes.object.isRequired,
   options: React.PropTypes.array.isRequired,
   name: React.PropTypes.string.isRequired,
+  virtualized: React.PropTypes.bool,
+};
+
+SelectInput.defaultProps = {
+  virtualized: true,
 };
 
 export default injectIntl(SelectInput);
