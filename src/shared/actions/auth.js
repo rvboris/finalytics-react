@@ -6,7 +6,7 @@ const USER_API = `${config.apiUrl}/user`;
 const AUTH_API = `${config.apiUrl}/auth`;
 
 export const login = createAction('AUTH_LOGIN',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${AUTH_API}/login`,
@@ -17,7 +17,7 @@ export const login = createAction('AUTH_LOGIN',
 );
 
 export const logout = createAction('AUTH_LOGOUT',
-  null,
+  undefined,
   () => ({
     request: {
       url: `${AUTH_API}/logout`,
@@ -27,7 +27,7 @@ export const logout = createAction('AUTH_LOGOUT',
 );
 
 export const register = createAction('AUTH_REGISTER',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${AUTH_API}/register`,
@@ -38,7 +38,7 @@ export const register = createAction('AUTH_REGISTER',
 );
 
 export const getProfile = createAction('AUTH_GET_PROFILE',
-  null,
+  undefined,
   () => ({
     request: {
       url: `${USER_API}/profile`,
@@ -52,7 +52,7 @@ export const getProfileResolved = createAction('AUTH_GET_PROFILE_RESOLVED',
 );
 
 export const setSettings = createAction('AUTH_SET_SETTINGS',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${USER_API}/settings`,
@@ -75,7 +75,7 @@ export const setUserAgent = createAction('AUTH_SET_USER_AGENT',
 );
 
 export const setStatus = createAction('AUTH_SET_STATUS',
-  null,
+  undefined,
   (status) => ({
     request: {
       url: `${USER_API}/status`,

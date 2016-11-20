@@ -2,7 +2,6 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 import { values } from 'lodash';
-import optimistPromiseMiddleware from 'redux-optimist-promise';
 import Immutable from 'seamless-immutable';
 import createSagaMiddleware from 'redux-saga';
 
@@ -19,7 +18,6 @@ const sagaStoreEnhancer = [
   sagaMiddleware,
   routerMiddleware(browserHistory),
   ...values(middlewares),
-  optimistPromiseMiddleware(),
 ];
 
 const storeEnchancers = [

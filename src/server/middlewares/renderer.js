@@ -100,46 +100,27 @@ export default async (ctx, next) => {
       </Provider>
     );
 
-    await store.runSaga(sagas);
-
-    store.dispatch(push(ctx.request.url));
-
-    await fetcher(store.dispatch, renderProps.components, renderProps.params);
-
-    const initialState = store.getState();
-
-    let body;
-
     try {
-      body = renderToString(initialView);
-    } catch (err) {
-      ctx.log.error(err);
+      await store.runSaga(sagas);
+      store.dispatch(push(ctx.request.url));
+      await fetcher(store.dispatch, renderProps.components, renderProps.params);
 
-      ctx.status = 500;
-      ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
-      store.close();
+      const layoutProps = {
+        initialState: store.getState(),
+        body: renderToString(initialView),
+        locale: ctx.language,
+        title: 'koa-universal-react-redux',
+        description: 'koa-universal-react-redux',
+        assets,
+      };
 
-      return;
-    }
-
-    const layoutProps = {
-      initialState,
-      body,
-      locale: ctx.language,
-      title: 'koa-universal-react-redux',
-      description: 'koa-universal-react-redux',
-      assets,
-    };
-
-    try {
       ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
     } catch (err) {
       ctx.log.error(err);
 
       ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
       ctx.status = 500;
+      store.close();
     }
-
-    store.close();
   })(ctx, next);
 };

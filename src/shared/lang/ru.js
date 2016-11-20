@@ -152,8 +152,10 @@ export default {
   'component.appBar.reports': 'Отчеты',
   'component.appBar.profile': 'Профиль',
   'component.appBar.exit': 'Выход',
+  'component.appBar.manageAccounts': 'Счета',
+  'component.appBar.manageCategories': 'Категории',
+  'component.appBar.more': 'Еще',
 
-  'component.accountList.manage': 'Управление',
   'component.accountList.accounts': 'Счета',
   'component.accountList.noAccounts': 'У вас пока нет счетов',
 
@@ -212,4 +214,6 @@ export default {
 
   'container.categories.manageCategories': 'Управление категориями',
   'container.categories.createCategory': 'Создать категорию',
+
+  'container.operations.noAccounts': 'Для добавление операций необходимо создать счет',
 };

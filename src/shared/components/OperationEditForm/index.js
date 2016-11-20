@@ -177,12 +177,7 @@ class OperationEditForm extends React.Component {
 
     return (
       <Card>
-        <CardHeader>
-          <span>Добавить операцию</span>
-          <Button className="float-xs-right" size="sm">
-            Категории
-          </Button>
-        </CardHeader>
+        <CardHeader>Добавить операцию</CardHeader>
         <CardBlock>
           <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
             <div className={style['datepicker-container']}>

@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Alert } from 'reactstrap';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import VisibilitySensor from 'react-visibility-sensor';
 
 import { operationActions } from '../../actions';
@@ -11,14 +12,19 @@ import OperationList from '../../components/OperationList';
 import OperationEditForm from '../../components/OperationEditForm';
 import style from './style.css';
 
+const messages = defineMessages({
+  noAccounts: {
+    id: 'container.operations.noAccounts',
+    description: 'Account not found alert',
+    defaultMessage: 'Accounts not found',
+  },
+});
+
 class Operations extends React.Component {
   static propTypes = {
     accountsExist: React.PropTypes.bool.isRequired,
+    listOperations: React.PropTypes.func.isRequired,
   }
-
-  static needs = [
-    operationActions.list,
-  ];
 
   constructor(props) {
     super(props);
@@ -28,6 +34,10 @@ class Operations extends React.Component {
     };
 
     this.onAccountVisibleChange = this.onAccountVisibleChange.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.listOperations();
   }
 
   onAccountVisibleChange(accountListVisible) {
@@ -43,7 +53,9 @@ class Operations extends React.Component {
         <div className={style['operations-container']}>
           { accountsExist && <OperationEditForm /> }
           { accountsExist && <OperationList /> }
-          { !accountsExist && <Alert color="info">Счета не найдены</Alert> }
+          { !accountsExist &&
+            <Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>
+          }
         </div>
         <div className={accountListVisible && classnames(style['balance-container'], 'ml-2')}>
           {accountListVisible && <AccountList />}
@@ -55,8 +67,8 @@ class Operations extends React.Component {
 }
 
 const accountsExistSelector = createSelector(
-  state => state.account.accounts,
-  accountList => accountList && accountList.length > 0
+  state => state.account.accounts || [],
+  (accountList = []) => accountList.length > 0
 );
 
 const selector = createSelector(
@@ -64,4 +76,8 @@ const selector = createSelector(
   accountsExist => ({ accountsExist })
 );
 
-export default connect(selector)(Operations);
+const mapDispatchToProps = dispatch => ({
+  listOperations: (...args) => dispatch(operationActions.list(...args)),
+});
+
+export default injectIntl(connect(selector, mapDispatchToProps)(Operations));

@@ -5,7 +5,7 @@ import MongooseStore from 'koa-session-mongoose';
 export const cookieSettings = {
   path: '/',
   httpOnly: true,
-  maxage: 24 * 60 * 60 * 1000,
+  maxAge: 24 * 60 * 60 * 1000,
   rewrite: true,
   signed: true,
 };

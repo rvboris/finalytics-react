@@ -5,7 +5,7 @@ import config from '../config';
 const CATEGORY_API = `${config.apiUrl}/category`;
 
 export const load = createAction('CATEGORY_LOAD',
-  null,
+  undefined,
   () => ({
     request: {
       url: `${CATEGORY_API}/load`,
@@ -15,7 +15,7 @@ export const load = createAction('CATEGORY_LOAD',
 );
 
 export const update = createAction('CATEGORY_UPDATE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${CATEGORY_API}/update`,
@@ -26,7 +26,7 @@ export const update = createAction('CATEGORY_UPDATE',
 );
 
 export const remove = createAction('CATEGORY_REMOVE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${CATEGORY_API}/delete`,
@@ -37,7 +37,7 @@ export const remove = createAction('CATEGORY_REMOVE',
 );
 
 export const add = createAction('CATEGORY_ADD',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${CATEGORY_API}/add`,
@@ -48,7 +48,7 @@ export const add = createAction('CATEGORY_ADD',
 );
 
 export const move = createAction('CATEGORY_MOVE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${CATEGORY_API}/move`,

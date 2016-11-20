@@ -5,7 +5,7 @@ import config from '../config';
 const ACCOUNT_API = `${config.apiUrl}/account`;
 
 export const load = createAction('ACCOUNT_LOAD',
-  null,
+  undefined,
   () => ({
     request: {
       url: `${ACCOUNT_API}/load`,
@@ -15,7 +15,7 @@ export const load = createAction('ACCOUNT_LOAD',
 );
 
 export const create = createAction('ACCOUNT_CREATE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${ACCOUNT_API}/add`,
@@ -26,7 +26,7 @@ export const create = createAction('ACCOUNT_CREATE',
 );
 
 export const save = createAction('ACCOUNT_SAVE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${ACCOUNT_API}/update`,
@@ -37,7 +37,7 @@ export const save = createAction('ACCOUNT_SAVE',
 );
 
 export const remove = createAction('ACCOUNT_REMOVE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${ACCOUNT_API}/delete`,

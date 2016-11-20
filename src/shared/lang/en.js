@@ -153,8 +153,10 @@ export default {
   'component.appBar.reports': 'Reports',
   'component.appBar.profile': 'Profile',
   'component.appBar.exit': 'Logout',
+  'component.appBar.manageAccounts': 'Accounts',
+  'component.appBar.manageCategories': 'Categories',
+  'component.appBar.more': 'More',
 
-  'component.accountList.manage': 'Manage',
   'component.accountList.accounts': 'Accounts',
   'component.accountList.noAccounts': 'You have no accounts',
 
@@ -213,4 +215,6 @@ export default {
 
   'container.categories.manageCategories': 'Categories management',
   'container.categories.createCategory': 'Create new category',
+
+  'container.operations.noAccounts': 'To add operations, you must create an account',
 };

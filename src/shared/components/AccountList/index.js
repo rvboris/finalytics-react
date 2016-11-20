@@ -2,17 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Button, Card, CardHeader, CardBlock } from 'reactstrap';
-import { push } from 'react-router-redux';
+import { Card, CardHeader, CardBlock } from 'reactstrap';
 
 import MoneyFormat from '../MoneyFormat';
 
 const messages = defineMessages({
-  manage: {
-    id: 'component.accountList.manage',
-    description: 'AccountList manage button',
-    defaultMessage: 'Manage',
-  },
   accounts: {
     id: 'component.accountList.accounts',
     description: 'AccountList panel title',
@@ -27,12 +21,7 @@ const messages = defineMessages({
 
 const AccountList = (props) => (
   <Card>
-    <CardHeader>
-      <FormattedMessage {...messages.accounts} />
-      <Button onClick={props.manageAccounts} className="float-xs-right" size="sm">
-        <FormattedMessage {...messages.manage} />
-      </Button>
-    </CardHeader>
+    <CardHeader><FormattedMessage {...messages.accounts} /></CardHeader>
     { props.accounts.length
     ? <ul className="list-group list-group-flush">
       {props.accounts.map((account) => (
@@ -53,12 +42,7 @@ const AccountList = (props) => (
 
 AccountList.propTypes = {
   accounts: React.PropTypes.array.isRequired,
-  manageAccounts: React.PropTypes.func.isRequired,
 };
-
-const mapDispatchToProps = (dispatch) => ({
-  manageAccounts: () => dispatch(push('/dashboard/accounts')),
-});
 
 const selector = createSelector(
   state => state.account.accounts,
@@ -69,4 +53,4 @@ const selector = createSelector(
   }),
 );
 
-export default injectIntl(connect(selector, mapDispatchToProps)(AccountList));
+export default injectIntl(connect(selector)(AccountList));

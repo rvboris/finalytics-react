@@ -5,7 +5,7 @@ import config from '../config';
 const CURRENCY_API = `${config.apiUrl}/currency`;
 
 export const load = createAction('CURRENCY_LOAD',
-  null,
+  undefined,
   () => ({
     request: {
       url: `${CURRENCY_API}/load`,

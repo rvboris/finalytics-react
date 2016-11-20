@@ -5,7 +5,7 @@ import config from '../config';
 const OPERATION_API = `${config.apiUrl}/operation`;
 
 export const add = createAction('OPERATION_ADD',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/add`,
@@ -16,7 +16,7 @@ export const add = createAction('OPERATION_ADD',
 );
 
 export const remove = createAction('OPERATION_REMOVE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/delete`,
@@ -27,7 +27,7 @@ export const remove = createAction('OPERATION_REMOVE',
 );
 
 export const update = createAction('OPERATION_UPDATE',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/update`,
@@ -38,7 +38,7 @@ export const update = createAction('OPERATION_UPDATE',
 );
 
 export const addTransfer = createAction('OPERATION_ADD_TRANSFER',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/addTransfer`,
@@ -49,7 +49,7 @@ export const addTransfer = createAction('OPERATION_ADD_TRANSFER',
 );
 
 export const updateTransfer = createAction('OPERATION_UPDATE_TRANSFER',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/updateTransfer`,
@@ -60,7 +60,7 @@ export const updateTransfer = createAction('OPERATION_UPDATE_TRANSFER',
 );
 
 export const list = createAction('OPERATION_LIST',
-  null,
+  undefined,
   (values) => ({
     request: {
       url: `${OPERATION_API}/list`,
