@@ -29,6 +29,10 @@ const CategoriesTree = (props) => {
   const { categories, onSelect, selectedCategoryId } = props;
 
   const loopNodes = data => data.map((item) => {
+    if (item.transfer) {
+      return null;
+    }
+
     const label = (
       <span>
         <span className={style['tree-text-label']}>{item.name}</span>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { reduxForm, Field, formValueSelector, SubmissionError } from 'redux-form';
-import { get, isUndefined } from 'lodash';
+import { reduxForm, Field, formValueSelector, SubmissionError, change } from 'redux-form';
+import { get, isUndefined, omitBy, isNil, mapValues } from 'lodash';
 import { injectIntl } from 'react-intl';
 import classnames from 'classnames';
 import TreeModel from 'tree-model';
@@ -23,6 +23,7 @@ import {
 } from 'reactstrap';
 
 import config from '../../config';
+import validationHandler from '../../utils/validation-handler';
 import { toNegative, toPositive } from '../../utils/money-input';
 import { optionRenderer, valueRenderer } from '../../utils/category-select';
 import { operationActions } from '../../actions';
@@ -53,6 +54,42 @@ const NumberFormField = field =>
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
+const TypeFormField = field => {
+  const { input } = field;
+
+  return (
+    <ButtonGroup className="btn-group-justified mb-1">
+      <Button
+        onClick={() => input.onChange('expense')}
+        color="primary"
+        type="button"
+        outline
+        active={input.value === 'expense'}
+      >
+        Расход
+      </Button>
+      <Button
+        onClick={() => input.onChange('transfer')}
+        color="primary"
+        type="button"
+        outline
+        active={input.value === 'transfer'}
+      >
+        Перевод
+      </Button>
+      <Button
+        onClick={() => input.onChange('income')}
+        color="primary"
+        type="button"
+        outline
+        active={input.value === 'income'}
+      >
+        Доход
+      </Button>
+    </ButtonGroup>
+  );
+};
+
 const defaultValues = {
   account: null,
   accountFrom: null,
@@ -60,7 +97,9 @@ const defaultValues = {
   created: moment().utc().format(),
   category: null,
   amount: null,
-  type: null,
+  amountFrom: null,
+  amountTo: null,
+  type: 'expense',
 };
 
 const fieldsToEdit = Object.keys(defaultValues);
@@ -76,33 +115,18 @@ class OperationEditForm extends React.Component {
     updateOperation: React.PropTypes.func.isRequired,
     removeOperation: React.PropTypes.func.isRequired,
     locale: React.PropTypes.string.isRequired,
-    initialType: React.PropTypes.string.isRequired,
     accountList: React.PropTypes.array.isRequired,
-    categoryList: React.PropTypes.array.isRequired,
+    availableCategoryList: React.PropTypes.array.isRequired,
     selectedAccountCurrency: React.PropTypes.object,
+    selectedType: React.PropTypes.string.isRequired,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      type: props.initialType,
+      type: 'expense',
     };
-  }
-
-  getCategoryList(type) {
-    if (!['expense', 'income'].includes(type)) {
-      return [];
-    }
-
-    const categoryList = this.props.categoryList
-      .filter(node => (node.model.type === 'any' || node.model.type === type) && !node.isRoot());
-
-    return categoryList.map(node => ({
-      value: node.model._id,
-      label: node.model.name,
-      node,
-    }));
   }
 
   getSubmitButton = () => {
@@ -122,16 +146,8 @@ class OperationEditForm extends React.Component {
     return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
-  getAccountList() {
-    return this.props.accountList.map(account => ({ value: account._id, label: account.name }));
-  }
-
-  toggleType(type) {
-    this.setState(Object.assign({}, this.state, { type }));
-  }
-
   submitHandler = (values) => new Promise(async (resolve, reject) => {
-    const toValidate = Object.assign({}, defaultValues, values);
+    const toValidate = omitBy(Object.assign({}, defaultValues, values), isNil);
 
     toValidate.type = this.state.type;
 
@@ -141,6 +157,11 @@ class OperationEditForm extends React.Component {
 
     if (toValidate.type === 'income') {
       toValidate.amount = toPositive(toValidate.amount);
+    }
+
+    if (toValidate.type === 'transfer') {
+      toValidate.amountFrom = toNegative(toValidate.amountFrom);
+      toValidate.amountTo = toPositive(toValidate.amountFrom);
     }
 
     let result;
@@ -156,23 +177,22 @@ class OperationEditForm extends React.Component {
     } catch (err) {
       error(err);
 
-      reject(new SubmissionError());
+      const validationResult =
+          mapValues(validationHandler(toValidate, err),
+            val => this.props.intl.formatMessage({ id: val }));
+
+      reject(new SubmissionError(validationResult));
 
       return;
     }
 
     resolve(result);
-  }).then(() => {
-    // Highlight operation
+  }).then((operation) => {
+    console.log(operation);
   });
 
   render() {
-    const { locale } = this.props;
-    const { type } = this.state;
-
-    const categoryList = this.getCategoryList(type);
-    const accountList = this.getAccountList();
-
+    const { locale, availableCategoryList, accountList, selectedType } = this.props;
     const { handleSubmit, error: formError } = this.props.form;
 
     return (
@@ -188,48 +208,22 @@ class OperationEditForm extends React.Component {
               />
             </div>
             <div className={classnames(style['form-container'], 'ml-1')}>
-              <ButtonGroup className="btn-group-justified mb-1">
-                <Button
-                  onClick={() => this.toggleType('expense')}
-                  color="primary"
-                  type="button"
-                  outline
-                  active={type === 'expense'}
-                >
-                  Расход
-                </Button>
-                <Button
-                  onClick={() => this.toggleType('transfer')}
-                  color="primary"
-                  type="button"
-                  outline
-                  active={type === 'transfer'}
-                >
-                  Перевод
-                </Button>
-                <Button
-                  onClick={() => this.toggleType('income')}
-                  color="primary"
-                  type="button"
-                  outline
-                  active={type === 'income'}
-                >
-                  Доход
-                </Button>
-              </ButtonGroup>
+              <Field name="type" component={TypeFormField} />
 
-              {['expense', 'income'].includes(type) && [
-                <Field
-                  key="category"
-                  label="Категория"
-                  placeholder="Выбрать категорию"
-                  name="category"
-                  options={categoryList}
-                  component={SelectFormField}
-                  optionRenderer={optionRenderer()}
-                  valueRenderer={valueRenderer()}
-                  virtualized={false}
-                />,
+              <Field
+                key="category"
+                label="Категория"
+                placeholder="Выбрать категорию"
+                name="category"
+                options={availableCategoryList}
+                disabled={availableCategoryList.length === 1}
+                component={SelectFormField}
+                optionRenderer={optionRenderer()}
+                valueRenderer={valueRenderer()}
+                virtualized={false}
+              />
+
+              {['expense', 'income'].includes(selectedType) && [
                 <Field
                   key="account"
                   label="Счет"
@@ -249,7 +243,7 @@ class OperationEditForm extends React.Component {
                 />,
               ]}
 
-              {this.state.type === 'transfer' && [
+              {selectedType === 'transfer' && [
                 <Field
                   key="accountFrom"
                   label="Счет откуда"
@@ -307,6 +301,7 @@ const mapDispatchToProps = dispatch => ({
   updateOperation: (...args) => dispatch(operationActions.update(...args)),
   addOperation: (...args) => dispatch(operationActions.add(...args)),
   removeOperation: (...args) => dispatch(operationActions.remove(...args)),
+  changeFieldValue: (...args) => dispatch(change(...args)),
 });
 
 const formFieldSelector = formValueSelector('operationEdit');
@@ -323,7 +318,7 @@ const localeSelector = createSelector(
 
 const accountListSelector = createSelector(
   state => state.account.accounts,
-  accountList => accountList
+  accountList => accountList.map(account => ({ value: account._id, label: account.name }))
 );
 
 const operationSelector = createSelector(
@@ -343,25 +338,13 @@ const operationDefaultsSelector = createSelector(
   (isNewOperation, operation, accountList) => {
     if (isNewOperation) {
       if (accountList.length) {
-        defaultValues.account = accountList[0]._id;
+        defaultValues.account = accountList[0].value;
       }
 
       return defaultValues;
     }
 
     return operation;
-  }
-);
-
-const initialTypeSelector = createSelector(
-  isNewOperationSelector,
-  operationDefaultsSelector,
-  (isNewOperation, operation) => {
-    if (isNewOperation) {
-      return 'expense';
-    }
-
-    return operation.type;
   }
 );
 
@@ -380,11 +363,51 @@ const categoryListSelector = createSelector(
   categoryTree => categoryTree.all()
 );
 
+const selectedTypeSelector = createSelector(
+  operationDefaultsSelector,
+  state => formFieldSelector(state, 'type'),
+  ({ type: defaultType }, currentType) => currentType || defaultType
+);
+
+const availableCategoryListSelector = createSelector(
+  selectedTypeSelector,
+  categoryListSelector,
+  (type, categoryList) => {
+    let availableCategoryList;
+
+    if (!['expense', 'income'].includes(type)) {
+      availableCategoryList = categoryList.filter(node => node.model.transfer);
+    } else {
+      availableCategoryList = categoryList
+        .filter(node =>
+          (node.model.type === 'any' || node.model.type === type)
+          && !node.isRoot()
+          && !node.model.transfer);
+    }
+
+    return availableCategoryList.map(node => ({
+      value: node.model._id,
+      label: node.model.name,
+      node,
+    }));
+  }
+);
+
+const initialValuesSelector = createSelector(
+  operationDefaultsSelector,
+  availableCategoryListSelector,
+  (operation, availableCategoryList) => {
+    operation.category = get(availableCategoryList, '0.value', operation.category);
+
+    return operation;
+  }
+);
+
 const selectedAccountCurrencySelector = createSelector(
   operationDefaultsSelector,
   state => formFieldSelector(state, ...fieldsToEdit),
   state => state.currency.currencyList,
-  accountListSelector,
+  state => state.account.accounts,
   (initialValues, currentValues, currencyList, accountList) => {
     const values = Object.assign({}, initialValues, currentValues);
     const account = accountList.find(account => account._id === values.account);
@@ -398,29 +421,29 @@ const selector = createSelector(
   localeSelector,
   processSelector,
   accountListSelector,
-  categoryListSelector,
-  operationDefaultsSelector,
+  availableCategoryListSelector,
+  initialValuesSelector,
   isNewOperationSelector,
-  initialTypeSelector,
   selectedAccountCurrencySelector,
+  selectedTypeSelector,
   (
     locale,
     process,
     accountList,
-    categoryList,
+    availableCategoryList,
     initialValues,
     isNewOperation,
-    initialType,
-    selectedAccountCurrency
+    selectedAccountCurrency,
+    selectedType,
   ) => ({
     locale,
     process,
     accountList,
-    categoryList,
+    availableCategoryList,
     initialValues,
     isNewOperation,
-    initialType,
     selectedAccountCurrency,
+    selectedType,
   })
 );
 

@@ -7,6 +7,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import VisibilitySensor from 'react-visibility-sensor';
 
 import { operationActions } from '../../actions';
+import { defaultQuery } from '../../reducers/operation';
 import AccountList from '../../components/AccountList';
 import OperationList from '../../components/OperationList';
 import OperationEditForm from '../../components/OperationEditForm';
@@ -37,7 +38,7 @@ class Operations extends React.Component {
   }
 
   componentDidMount() {
-    this.props.listOperations();
+    this.props.listOperations(defaultQuery);
   }
 
   onAccountVisibleChange(accountListVisible) {
@@ -73,7 +74,7 @@ const accountsExistSelector = createSelector(
 
 const selector = createSelector(
   accountsExistSelector,
-  accountsExist => ({ accountsExist })
+  (accountsExist) => ({ accountsExist })
 );
 
 const mapDispatchToProps = dispatch => ({

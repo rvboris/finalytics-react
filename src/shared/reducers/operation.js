@@ -1,30 +1,53 @@
 import Immutable from 'seamless-immutable';
 import { handleActions } from 'redux-actions';
-import { assignIn, get } from 'lodash';
+import { assignIn, get, omit } from 'lodash';
+import deepEqual from 'deep-equal';
+
+export const defaultQuery = {
+  limit: 10,
+  skip: 0,
+  account: null,
+  type: null,
+  category: null,
+  amountFrom: null,
+  amountTo: null,
+  dateFrom: null,
+  dateTo: null,
+};
 
 const initialState = Immutable({
   process: false,
   list: [],
   total: 0,
-  query: {
-    limit: 10,
-    skip: 0,
-    account: null,
-    type: null,
-    category: null,
-    amountFrom: null,
-    amountTo: null,
-    dateFrom: null,
-    dateTo: null,
-  },
+  query: defaultQuery,
 });
+
+const queryIsEqual = (currentQuery, newQuery) => {
+  const toOmit = ['limit', 'skip'];
+  return deepEqual(omit(currentQuery, toOmit), omit(newQuery, toOmit));
+};
 
 export default handleActions({
   OPERATION_LIST: (state) => state.set('process', true),
 
   OPERATION_LIST_RESOLVED: (state, action) => {
-    const newList = state.list.concat(Immutable(get(action, 'payload.data.operations', [])));
-    const lastQuery = assignIn(state.query.asMutable(), get(action, 'payload.config.params', {}));
+    const currentQuery = state.query.asMutable();
+    const newQuery = get(action, 'payload.config.params', {});
+    const data = get(action, 'payload.data.operations', []);
+
+    const isSameLimit = currentQuery.limit === newQuery.limit;
+    const isSameSkip = currentQuery.skip === newQuery.skip;
+    const isSamePage = isSameLimit && isSameSkip;
+
+    let newList;
+
+    if (queryIsEqual(currentQuery, newQuery) && !isSamePage) {
+      newList = state.list.concat(Immutable(data));
+    } else {
+      newList = data;
+    }
+
+    const lastQuery = assignIn(currentQuery, newQuery);
     const total = get(action, 'payload.data.total', 0);
 
     return state

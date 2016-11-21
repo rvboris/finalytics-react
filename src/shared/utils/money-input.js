@@ -1,3 +1,3 @@
-export const toPositive = (txt) => txt.replace('-', '');
+export const toPositive = (txt = '') => txt.replace('-', '');
 
-export const toNegative = (txt) => `-${toPositive(txt)}`;
+export const toNegative = (txt = '') => `-${toPositive(txt)}`;

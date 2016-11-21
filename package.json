@@ -68,6 +68,7 @@
     "co": "4.6.0",
     "cookies": "0.6.2",
     "debug": "2.3.3",
+    "deep-equal": "^1.0.1",
     "flux-standard-action": "^1.0.0",
     "jsonwebtoken": "7.1.9",
     "koa": "2.0.0",
