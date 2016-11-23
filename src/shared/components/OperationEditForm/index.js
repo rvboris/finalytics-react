@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, formValueSelector, SubmissionError, change } from 'redux-form';
-import { get, isUndefined, omitBy, isNil, mapValues } from 'lodash';
+import { get, isUndefined, omitBy, mapValues } from 'lodash';
 import { injectIntl } from 'react-intl';
 import classnames from 'classnames';
 import TreeModel from 'tree-model';
@@ -74,6 +74,7 @@ const TypeFormField = field => {
         type="button"
         outline
         active={input.value === 'transfer'}
+        disabled={field.transferDisabled}
       >
         Перевод
       </Button>
@@ -119,14 +120,39 @@ class OperationEditForm extends React.Component {
     availableCategoryList: React.PropTypes.array.isRequired,
     selectedAccountCurrency: React.PropTypes.object,
     selectedType: React.PropTypes.string.isRequired,
+    selectedCategory: React.PropTypes.string.isRequired,
+    availableAccountListFrom: React.PropTypes.array.isRequired,
+    availableAccountListTo: React.PropTypes.array.isRequired,
+    selectedTransferAccounts: React.PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
+  componentWillReceiveProps(nextProps) {
+    const {
+      availableCategoryList,
+      accountList,
+      selectedCategory,
+      selectedType,
+      selectedTransferAccounts,
+    } = nextProps;
 
-    this.state = {
-      type: 'expense',
-    };
+    const categoryExist = availableCategoryList
+      .some(category => category.value === selectedCategory);
+
+    if (!categoryExist) {
+      nextProps.changeFieldValue('operationEdit', 'category', availableCategoryList[0].value);
+    }
+
+    if (selectedType === 'transfer'
+      && (!selectedTransferAccounts.accountFrom || !selectedTransferAccounts.accountTo)) {
+      nextProps.changeFieldValue('operationEdit', 'accountFrom', accountList[0].value);
+      nextProps.changeFieldValue('operationEdit', 'accountTo', accountList[1].value);
+    }
+
+    if (selectedType !== 'transfer'
+      && (selectedTransferAccounts.accountFrom || selectedTransferAccounts.accountTo)) {
+      nextProps.changeFieldValue('operationEdit', 'accountFrom', null);
+      nextProps.changeFieldValue('operationEdit', 'accountTo', null);
+    }
   }
 
   getSubmitButton = () => {
@@ -147,9 +173,8 @@ class OperationEditForm extends React.Component {
   };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
-    const toValidate = omitBy(Object.assign({}, defaultValues, values), isNil);
-
-    toValidate.type = this.state.type;
+    console.log(values);
+    const toValidate = omitBy(Object.assign({}, defaultValues, values), val => !val);
 
     if (toValidate.type === 'expense') {
       toValidate.amount = toNegative(toValidate.amount);
@@ -192,7 +217,15 @@ class OperationEditForm extends React.Component {
   });
 
   render() {
-    const { locale, availableCategoryList, accountList, selectedType } = this.props;
+    const {
+      locale,
+      availableCategoryList,
+      accountList,
+      selectedType,
+      availableAccountListFrom,
+      availableAccountListTo,
+    } = this.props;
+
     const { handleSubmit, error: formError } = this.props.form;
 
     return (
@@ -208,22 +241,25 @@ class OperationEditForm extends React.Component {
               />
             </div>
             <div className={classnames(style['form-container'], 'ml-1')}>
-              <Field name="type" component={TypeFormField} />
-
               <Field
-                key="category"
-                label="Категория"
-                placeholder="Выбрать категорию"
-                name="category"
-                options={availableCategoryList}
-                disabled={availableCategoryList.length === 1}
-                component={SelectFormField}
-                optionRenderer={optionRenderer()}
-                valueRenderer={valueRenderer()}
-                virtualized={false}
+                name="type"
+                component={TypeFormField}
+                transferDisabled={accountList.length <= 1}
               />
 
-              {['expense', 'income'].includes(selectedType) && [
+              {selectedType !== 'transfer' && [
+                <Field
+                  key="category"
+                  label="Категория"
+                  placeholder="Выбрать категорию"
+                  name="category"
+                  options={availableCategoryList}
+                  disabled={availableCategoryList.length === 1}
+                  component={SelectFormField}
+                  optionRenderer={optionRenderer()}
+                  valueRenderer={valueRenderer()}
+                  virtualized={false}
+                />,
                 <Field
                   key="account"
                   label="Счет"
@@ -249,7 +285,7 @@ class OperationEditForm extends React.Component {
                   label="Счет откуда"
                   placeholder="Выбрать счет"
                   name="accountFrom"
-                  options={accountList}
+                  options={availableAccountListFrom}
                   component={SelectFormField}
                 />,
                 <Field
@@ -257,7 +293,7 @@ class OperationEditForm extends React.Component {
                   label="Счет куда"
                   placeholder="Выбрать счет"
                   name="accountTo"
-                  options={accountList}
+                  options={availableAccountListTo}
                   component={SelectFormField}
                 />,
                 <Field
@@ -295,6 +331,7 @@ let operationForm = reduxForm({
   form: 'operationEdit',
   propNamespace: 'form',
   enableReinitialize: true,
+  fields: Object.keys(defaultValues),
 })(OperationEditForm);
 
 const mapDispatchToProps = dispatch => ({
@@ -369,13 +406,38 @@ const selectedTypeSelector = createSelector(
   ({ type: defaultType }, currentType) => currentType || defaultType
 );
 
+const selectedCategorySelector = createSelector(
+  operationDefaultsSelector,
+  state => formFieldSelector(state, 'category'),
+  ({ category: defaultCategory }, currentCategory) => currentCategory || defaultCategory
+);
+
+const selectedTransferAccountsSelector = createSelector(
+  state => formFieldSelector(state, 'accountFrom', 'accountTo'),
+  (accounts) => accounts
+);
+
+const availableAccountListFromSelector = createSelector(
+  selectedTransferAccountsSelector,
+  accountListSelector,
+  ({ accountTo }, accountList) =>
+    accountList.filter(account => account.value !== accountTo)
+);
+
+const availableAccountListToSelector = createSelector(
+  selectedTransferAccountsSelector,
+  accountListSelector,
+  ({ accountFrom }, accountList) =>
+    accountList.filter(account => account.value !== accountFrom)
+);
+
 const availableCategoryListSelector = createSelector(
   selectedTypeSelector,
   categoryListSelector,
   (type, categoryList) => {
     let availableCategoryList;
 
-    if (!['expense', 'income'].includes(type)) {
+    if (type === 'transfer') {
       availableCategoryList = categoryList.filter(node => node.model.transfer);
     } else {
       availableCategoryList = categoryList
@@ -426,6 +488,10 @@ const selector = createSelector(
   isNewOperationSelector,
   selectedAccountCurrencySelector,
   selectedTypeSelector,
+  selectedCategorySelector,
+  selectedTransferAccountsSelector,
+  availableAccountListFromSelector,
+  availableAccountListToSelector,
   (
     locale,
     process,
@@ -435,6 +501,10 @@ const selector = createSelector(
     isNewOperation,
     selectedAccountCurrency,
     selectedType,
+    selectedCategory,
+    selectedTransferAccounts,
+    availableAccountListFrom,
+    availableAccountListTo
   ) => ({
     locale,
     process,
@@ -444,6 +514,10 @@ const selector = createSelector(
     isNewOperation,
     selectedAccountCurrency,
     selectedType,
+    selectedCategory,
+    selectedTransferAccounts,
+    availableAccountListFrom,
+    availableAccountListTo,
   })
 );
 
