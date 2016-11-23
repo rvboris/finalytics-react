@@ -103,7 +103,7 @@ const defaultValues = {
   type: 'expense',
 };
 
-const fieldsToEdit = Object.keys(defaultValues);
+const formId = 'operationEdit';
 
 class OperationEditForm extends React.Component {
   static propTypes = {
@@ -113,17 +113,20 @@ class OperationEditForm extends React.Component {
     form: React.PropTypes.object.isRequired,
     intl: React.PropTypes.object.isRequired,
     addOperation: React.PropTypes.func.isRequired,
+    addTransferOperation: React.PropTypes.func.isRequired,
     updateOperation: React.PropTypes.func.isRequired,
     removeOperation: React.PropTypes.func.isRequired,
     locale: React.PropTypes.string.isRequired,
     accountList: React.PropTypes.array.isRequired,
-    availableCategoryList: React.PropTypes.array.isRequired,
-    selectedAccountCurrency: React.PropTypes.object,
-    selectedType: React.PropTypes.string.isRequired,
-    selectedCategory: React.PropTypes.string.isRequired,
     availableAccountListFrom: React.PropTypes.array.isRequired,
     availableAccountListTo: React.PropTypes.array.isRequired,
-    selectedTransferAccounts: React.PropTypes.object.isRequired,
+    availableCategoryList: React.PropTypes.array.isRequired,
+    selectedAccountCurrency: React.PropTypes.object,
+    selectedType: React.PropTypes.string,
+    selectedCategory: React.PropTypes.string,
+    selectedAccount: React.PropTypes.string,
+    selectedTransferAccounts: React.PropTypes.object,
+    changeFieldValue: React.PropTypes.func.isRequired,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -132,6 +135,7 @@ class OperationEditForm extends React.Component {
       accountList,
       selectedCategory,
       selectedType,
+      selectedAccount,
       selectedTransferAccounts,
     } = nextProps;
 
@@ -139,19 +143,27 @@ class OperationEditForm extends React.Component {
       .some(category => category.value === selectedCategory);
 
     if (!categoryExist) {
-      nextProps.changeFieldValue('operationEdit', 'category', availableCategoryList[0].value);
+      nextProps.changeFieldValue(formId, 'category', availableCategoryList[0].value);
     }
 
-    if (selectedType === 'transfer'
-      && (!selectedTransferAccounts.accountFrom || !selectedTransferAccounts.accountTo)) {
-      nextProps.changeFieldValue('operationEdit', 'accountFrom', accountList[0].value);
-      nextProps.changeFieldValue('operationEdit', 'accountTo', accountList[1].value);
-    }
+    if (selectedType === 'transfer') {
+      if (!selectedTransferAccounts.accountFrom || !selectedTransferAccounts.accountTo) {
+        nextProps.changeFieldValue(formId, 'accountFrom', accountList[0].value);
+        nextProps.changeFieldValue(formId, 'accountTo', accountList[1].value);
+      }
 
-    if (selectedType !== 'transfer'
-      && (selectedTransferAccounts.accountFrom || selectedTransferAccounts.accountTo)) {
-      nextProps.changeFieldValue('operationEdit', 'accountFrom', null);
-      nextProps.changeFieldValue('operationEdit', 'accountTo', null);
+      if (selectedAccount) {
+        nextProps.changeFieldValue(formId, 'account', null);
+      }
+    } else {
+      if (selectedTransferAccounts.accountFrom || selectedTransferAccounts.accountTo) {
+        nextProps.changeFieldValue(formId, 'accountFrom', null);
+        nextProps.changeFieldValue(formId, 'accountTo', null);
+      }
+
+      if (!selectedAccount) {
+        nextProps.changeFieldValue(formId, 'account', accountList[0].value);
+      }
     }
   }
 
@@ -173,7 +185,6 @@ class OperationEditForm extends React.Component {
   };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
-    console.log(values);
     const toValidate = omitBy(Object.assign({}, defaultValues, values), val => !val);
 
     if (toValidate.type === 'expense') {
@@ -185,17 +196,21 @@ class OperationEditForm extends React.Component {
     }
 
     if (toValidate.type === 'transfer') {
-      toValidate.amountFrom = toNegative(toValidate.amountFrom);
-      toValidate.amountTo = toPositive(toValidate.amountFrom);
+      toValidate.amountFrom = toPositive(toValidate.amountFrom);
+      toValidate.amountTo = toPositive(toValidate.amountTo);
     }
-
-    let result;
 
     console.log(toValidate);
 
+    let result;
+
     try {
       if (this.props.isNewOperation) {
-        result = await this.props.addOperation(toValidate);
+        if (toValidate.type === 'transfer') {
+          result = await this.props.addTransferOperation(toValidate);
+        } else {
+          result = await this.props.addOperation(toValidate);
+        }
       } else {
         // Update, Remove
       }
@@ -213,6 +228,15 @@ class OperationEditForm extends React.Component {
 
     resolve(result);
   }).then((operation) => {
+    const { changeFieldValue } = this.props;
+
+    if (operation.type === 'transfer') {
+      changeFieldValue(formId, 'amountFrom', null);
+      changeFieldValue(formId, 'amountTo', null);
+    } else {
+      changeFieldValue(formId, 'amount', null);
+    }
+
     console.log(operation);
   });
 
@@ -221,9 +245,9 @@ class OperationEditForm extends React.Component {
       locale,
       availableCategoryList,
       accountList,
-      selectedType,
       availableAccountListFrom,
       availableAccountListTo,
+      selectedType,
     } = this.props;
 
     const { handleSubmit, error: formError } = this.props.form;
@@ -328,15 +352,14 @@ class OperationEditForm extends React.Component {
 }
 
 let operationForm = reduxForm({
-  form: 'operationEdit',
+  form: formId,
   propNamespace: 'form',
-  enableReinitialize: true,
-  fields: Object.keys(defaultValues),
 })(OperationEditForm);
 
 const mapDispatchToProps = dispatch => ({
   updateOperation: (...args) => dispatch(operationActions.update(...args)),
   addOperation: (...args) => dispatch(operationActions.add(...args)),
+  addTransferOperation: (...args) => dispatch(operationActions.addTransfer(...args)),
   removeOperation: (...args) => dispatch(operationActions.remove(...args)),
   changeFieldValue: (...args) => dispatch(change(...args)),
 });
@@ -368,23 +391,6 @@ const isNewOperationSelector = createSelector(
   operation => isUndefined(operation),
 );
 
-const operationDefaultsSelector = createSelector(
-  isNewOperationSelector,
-  operationSelector,
-  accountListSelector,
-  (isNewOperation, operation, accountList) => {
-    if (isNewOperation) {
-      if (accountList.length) {
-        defaultValues.account = accountList[0].value;
-      }
-
-      return defaultValues;
-    }
-
-    return operation;
-  }
-);
-
 const categoryTreeSelector = createSelector(
   state => state.category.data,
   categoryData => {
@@ -401,20 +407,23 @@ const categoryListSelector = createSelector(
 );
 
 const selectedTypeSelector = createSelector(
-  operationDefaultsSelector,
   state => formFieldSelector(state, 'type'),
-  ({ type: defaultType }, currentType) => currentType || defaultType
+  currentType => currentType
 );
 
 const selectedCategorySelector = createSelector(
-  operationDefaultsSelector,
   state => formFieldSelector(state, 'category'),
-  ({ category: defaultCategory }, currentCategory) => currentCategory || defaultCategory
+  currentCategory => currentCategory
+);
+
+const selectedAccountSelector = createSelector(
+  state => formFieldSelector(state, 'account'),
+  account => account
 );
 
 const selectedTransferAccountsSelector = createSelector(
   state => formFieldSelector(state, 'accountFrom', 'accountTo'),
-  (accounts) => accounts
+  accounts => accounts
 );
 
 const availableAccountListFromSelector = createSelector(
@@ -456,23 +465,40 @@ const availableCategoryListSelector = createSelector(
 );
 
 const initialValuesSelector = createSelector(
-  operationDefaultsSelector,
+  isNewOperationSelector,
+  (_, props) => props.operation,
   availableCategoryListSelector,
-  (operation, availableCategoryList) => {
-    operation.category = get(availableCategoryList, '0.value', operation.category);
+  accountListSelector,
+  selectedTypeSelector,
+  (isNewOperation, operation, availableCategoryList, accountList, selectedType) => {
+    const newOperation = Object.assign({}, defaultValues);
+
+    if (isNewOperation) {
+      if (selectedType === 'transfer') {
+        newOperation.accountFrom = get(availableCategoryList, '0.value');
+        newOperation.accountTo = get(accountList, '1.value');
+      } else {
+        newOperation.category = get(availableCategoryList, '0.value');
+        newOperation.account = get(accountList, '0.value');
+      }
+
+      return newOperation;
+    }
 
     return operation;
   }
 );
 
 const selectedAccountCurrencySelector = createSelector(
-  operationDefaultsSelector,
-  state => formFieldSelector(state, ...fieldsToEdit),
+  selectedAccountSelector,
   state => state.currency.currencyList,
   state => state.account.accounts,
-  (initialValues, currentValues, currencyList, accountList) => {
-    const values = Object.assign({}, initialValues, currentValues);
-    const account = accountList.find(account => account._id === values.account);
+  (selectedAccount, currencyList, accountList) => {
+    if (!selectedAccount) {
+      return currencyList[0];
+    }
+
+    const account = accountList.find(account => account._id === selectedAccount);
     const selectedCurrency = currencyList.find(currency => currency._id === account.currency);
 
     return selectedCurrency;
@@ -489,6 +515,7 @@ const selector = createSelector(
   selectedAccountCurrencySelector,
   selectedTypeSelector,
   selectedCategorySelector,
+  selectedAccountSelector,
   selectedTransferAccountsSelector,
   availableAccountListFromSelector,
   availableAccountListToSelector,
@@ -502,6 +529,7 @@ const selector = createSelector(
     selectedAccountCurrency,
     selectedType,
     selectedCategory,
+    selectedAccount,
     selectedTransferAccounts,
     availableAccountListFrom,
     availableAccountListTo
@@ -515,6 +543,7 @@ const selector = createSelector(
     selectedAccountCurrency,
     selectedType,
     selectedCategory,
+    selectedAccount,
     selectedTransferAccounts,
     availableAccountListFrom,
     availableAccountListTo,

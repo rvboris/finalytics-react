@@ -64,4 +64,10 @@ export default handleActions({
   OPERATION_ADD_RESOLVED: (state) => state.set('process', false),
 
   OPERATION_ADD_REJECTED: (state) => state.set('process', false),
+
+  OPERATION_ADD_TRANSFER: (state) => state.set('process', true),
+
+  OPERATION_ADD_TRANSFER_RESOLVED: (state) => state.set('process', false),
+
+  OPERATION_ADD_TRANSFER_REJECTED: (state) => state.set('process', false),
 }, initialState);
