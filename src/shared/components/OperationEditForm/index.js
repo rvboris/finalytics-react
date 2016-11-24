@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, formValueSelector, SubmissionError, change } from 'redux-form';
 import { get, isUndefined, omitBy, mapValues } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import TreeModel from 'tree-model';
 import moment from 'moment';
@@ -32,6 +32,125 @@ import DatePicker from '../DatePicker';
 import MoneyInput from '../MoneyInput';
 import SelectInput from '../SelectInput';
 import style from './style.css';
+
+const messages = defineMessages({
+  expense: {
+    id: 'component.operationEditForm.expense',
+    description: 'Label of expense type button',
+    defaultMessage: 'Expense',
+  },
+  transfer: {
+    id: 'component.operationEditForm.transfer',
+    description: 'Label of transfer type button',
+    defaultMessage: 'Transfer',
+  },
+  income: {
+    id: 'component.operationEditForm.income',
+    description: 'Label of income type button',
+    defaultMessage: 'Income',
+  },
+  saveProcessButton: {
+    id: 'component.operationEditForm.saveProcessButton',
+    description: 'Label of button in process',
+    defaultMessage: 'Saving...',
+  },
+  createButton: {
+    id: 'component.operationEditForm.createButton',
+    description: 'Label of create button',
+    defaultMessage: 'Create',
+  },
+  saveButton: {
+    id: 'component.operationEditForm.saveButton',
+    description: 'Label of save button',
+    defaultMessage: 'Save',
+  },
+  addOperationHeader: {
+    id: 'component.operationEditForm.addOperationHeader',
+    description: 'Header of form',
+    defaultMessage: 'Add new operation',
+  },
+  editOperationHeader: {
+    id: 'component.operationEditForm.editOperationHeader',
+    description: 'Header of form',
+    defaultMessage: 'Edit operation',
+  },
+  category: {
+    placeholder: {
+      id: 'component.operationEditForm.category.placeholder',
+      description: 'Placeholder of category selector',
+      defaultMessage: 'Select category',
+    },
+    label: {
+      id: 'component.operationEditForm.category.label',
+      description: 'Label of category selector',
+      defaultMessage: 'Category',
+    },
+  },
+  account: {
+    placeholder: {
+      id: 'component.operationEditForm.account.placeholder',
+      description: 'Placeholder of account selector',
+      defaultMessage: 'Select account',
+    },
+    label: {
+      id: 'component.operationEditForm.account.label',
+      description: 'Label of account selector',
+      defaultMessage: 'Account',
+    },
+  },
+  amount: {
+    label: {
+      id: 'component.operationEditForm.amount.label',
+      description: 'Label of amount input',
+      defaultMessage: 'Amount',
+    },
+  },
+  amountFrom: {
+    label: {
+      id: 'component.operationEditForm.amountFrom.label',
+      description: 'Label of amount from input',
+      defaultMessage: 'Amount from',
+    },
+  },
+  amountTo: {
+    label: {
+      id: 'component.operationEditForm.amountTo.label',
+      description: 'Label of amount to input',
+      defaultMessage: 'Amount to',
+    },
+  },
+  accountFrom: {
+    label: {
+      id: 'component.operationEditForm.accountFrom.label',
+      description: 'Label of account from selector',
+      defaultMessage: 'Account from',
+    },
+    placeholder: {
+      id: 'component.operationEditForm.accountFrom.placeholder',
+      description: 'Placeholder of account from selector',
+      defaultMessage: 'Select account',
+    },
+  },
+  accountTo: {
+    label: {
+      id: 'component.operationEditForm.accountTo.label',
+      description: 'Label of account to selector',
+      defaultMessage: 'Account to',
+    },
+    placeholder: {
+      id: 'component.operationEditForm.accountTo.placeholder',
+      description: 'Placeholder of account to selector',
+      defaultMessage: 'Select account',
+    },
+  },
+  operationDate: {
+    label: {
+      id: 'component.operationEditForm.operationDate.label',
+      description: 'Label of datepicker',
+      defaultMessage: 'Date of operation',
+    },
+  },
+});
 
 const SelectFormField = field =>
   <FormGroup color={field.meta.error ? 'danger' : null}>
@@ -66,7 +185,7 @@ const TypeFormField = field => {
         outline
         active={input.value === 'expense'}
       >
-        Расход
+        <FormattedMessage {...messages.expense} />
       </Button>
       <Button
         onClick={() => input.onChange('transfer')}
@@ -76,7 +195,7 @@ const TypeFormField = field => {
         active={input.value === 'transfer'}
         disabled={field.transferDisabled}
       >
-        Перевод
+        <FormattedMessage {...messages.transfer} />
       </Button>
       <Button
         onClick={() => input.onChange('income')}
@@ -85,7 +204,7 @@ const TypeFormField = field => {
         outline
         active={input.value === 'income'}
       >
-        Доход
+        <FormattedMessage {...messages.income} />
       </Button>
     </ButtonGroup>
   );
@@ -122,6 +241,7 @@ class OperationEditForm extends React.Component {
     availableAccountListTo: React.PropTypes.array.isRequired,
     availableCategoryList: React.PropTypes.array.isRequired,
     selectedAccountCurrency: React.PropTypes.object,
+    selectedTransferAccountsCurrency: React.PropTypes.object,
     selectedType: React.PropTypes.string,
     selectedCategory: React.PropTypes.string,
     selectedAccount: React.PropTypes.string,
@@ -169,22 +289,29 @@ class OperationEditForm extends React.Component {
 
   getSubmitButton = () => {
     const { submitting } = this.props.form;
-    const disabled = submitting || this.props.process;
+    const { process, isNewOperation } = this.props;
+    const disabled = submitting || process;
 
     let label;
 
-    if (submitting || this.props.process) {
-      label = 'Сохранение';
-    } else if (this.props.isNewOperation) {
-      label = 'Создать';
+    if (submitting || process) {
+      label = <FormattedMessage {...messages.saveProcessButton} />;
+    } else if (isNewOperation) {
+      label = <FormattedMessage {...messages.createButton} />;
     } else {
-      label = 'Сохранить';
+      label = <FormattedMessage {...messages.saveButton} />;
     }
 
     return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
+    const {
+      addTransferOperation,
+      addOperation,
+      isNewOperation,
+    } = this.props;
+
     const toValidate = omitBy(Object.assign({}, defaultValues, values), val => !val);
 
     if (toValidate.type === 'expense') {
@@ -205,11 +332,11 @@ class OperationEditForm extends React.Component {
     let result;
 
     try {
-      if (this.props.isNewOperation) {
+      if (isNewOperation) {
         if (toValidate.type === 'transfer') {
-          result = await this.props.addTransferOperation(toValidate);
+          result = await addTransferOperation(toValidate);
         } else {
-          result = await this.props.addOperation(toValidate);
+          result = await addOperation(toValidate);
         }
       } else {
         // Update, Remove
@@ -236,8 +363,6 @@ class OperationEditForm extends React.Component {
     } else {
       changeFieldValue(formId, 'amount', null);
     }
-
-    console.log(operation);
   });
 
   render() {
@@ -248,16 +373,29 @@ class OperationEditForm extends React.Component {
       availableAccountListFrom,
       availableAccountListTo,
       selectedType,
+      selectedAccountCurrency,
+      selectedTransferAccountsCurrency,
+      isNewOperation,
     } = this.props;
 
+    const { formatMessage } = this.props.intl;
     const { handleSubmit, error: formError } = this.props.form;
 
     return (
       <Card>
-        <CardHeader>Добавить операцию</CardHeader>
+        <CardHeader>
+          { isNewOperation
+            ? <FormattedMessage {...messages.addOperationHeader} />
+            : <FormattedMessage {...messages.editOperationHeader} />
+          }
+        </CardHeader>
         <CardBlock>
           <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
             <div className={style['datepicker-container']}>
+              <h6 className={classnames('text-xs-center', style['datepicker-label'])}>
+                <FormattedMessage {...messages.operationDate.label} />
+              </h6>
+
               <Field
                 name="created"
                 locale={locale}
@@ -274,8 +412,8 @@ class OperationEditForm extends React.Component {
               {selectedType !== 'transfer' && [
                 <Field
                   key="category"
-                  label="Категория"
-                  placeholder="Выбрать категорию"
+                  label={formatMessage(messages.category.label)}
+                  placeholder={formatMessage(messages.category.placeholder)}
                   name="category"
                   options={availableCategoryList}
                   disabled={availableCategoryList.length === 1}
@@ -286,8 +424,8 @@ class OperationEditForm extends React.Component {
                 />,
                 <Field
                   key="account"
-                  label="Счет"
-                  placeholder="Выбрать счет"
+                  label={formatMessage(messages.account.label)}
+                  placeholder={formatMessage(messages.account.placeholder)}
                   name="account"
                   options={accountList}
                   component={SelectFormField}
@@ -296,9 +434,9 @@ class OperationEditForm extends React.Component {
                 <Field
                   key="amount"
                   name="amount"
-                  label="Сумма"
+                  label={formatMessage(messages.amount.label)}
                   component={NumberFormField}
-                  currency={this.props.selectedAccountCurrency}
+                  currency={selectedAccountCurrency}
                   type="number"
                 />,
               ]}
@@ -306,16 +444,16 @@ class OperationEditForm extends React.Component {
               {selectedType === 'transfer' && [
                 <Field
                   key="accountFrom"
-                  label="Счет откуда"
-                  placeholder="Выбрать счет"
+                  label={formatMessage(messages.accountFrom.label)}
+                  placeholder={formatMessage(messages.accountFrom.placeholder)}
                   name="accountFrom"
                   options={availableAccountListFrom}
                   component={SelectFormField}
                 />,
                 <Field
                   key="accountTo"
-                  label="Счет куда"
-                  placeholder="Выбрать счет"
+                  label={formatMessage(messages.accountTo.label)}
+                  placeholder={formatMessage(messages.accountTo.placeholder)}
                   name="accountTo"
                   options={availableAccountListTo}
                   component={SelectFormField}
@@ -323,17 +461,17 @@ class OperationEditForm extends React.Component {
                 <Field
                   key="amountFrom"
                   name="amountFrom"
-                  label="Сумма ушла"
+                  label={formatMessage(messages.amountFrom.label)}
                   component={NumberFormField}
-                  currency={this.props.selectedAccountCurrency}
+                  currency={selectedTransferAccountsCurrency.accountFrom}
                   type="number"
                 />,
                 <Field
                   key="amountTo"
                   name="amountTo"
-                  label="Сумма пришла"
+                  label={formatMessage(messages.amountTo.label)}
                   component={NumberFormField}
-                  currency={this.props.selectedAccountCurrency}
+                  currency={selectedTransferAccountsCurrency.accountTo}
                   type="number"
                 />,
               ]}
@@ -505,6 +643,41 @@ const selectedAccountCurrencySelector = createSelector(
   },
 );
 
+const selectedTransferAccountsCurrencySelector = createSelector(
+  selectedTransferAccountsSelector,
+  state => state.currency.currencyList,
+  state => state.account.accounts,
+  ({ accountFrom, accountTo }, currencyList, accountList) => {
+    if (!accountFrom || !accountTo) {
+      return { accountFrom: currencyList[0], accountTo: currencyList[0] };
+    }
+
+    const accounts = accountList.reduce((acc, account) => {
+      if (account._id === accountFrom) {
+        acc.accountFrom = account;
+      }
+
+      if (account._id === accountTo) {
+        acc.accountTo = account;
+      }
+
+      return acc;
+    }, {});
+
+    return currencyList.reduce((acc, currency) => {
+      if (currency._id === accounts.accountFrom.currency) {
+        acc.accountFrom = currency;
+      }
+
+      if (currency._id === accounts.accountTo.currency) {
+        acc.accountTo = currency;
+      }
+
+      return acc;
+    }, {});
+  },
+);
+
 const selector = createSelector(
   localeSelector,
   processSelector,
@@ -513,6 +686,7 @@ const selector = createSelector(
   initialValuesSelector,
   isNewOperationSelector,
   selectedAccountCurrencySelector,
+  selectedTransferAccountsCurrencySelector,
   selectedTypeSelector,
   selectedCategorySelector,
   selectedAccountSelector,
@@ -527,6 +701,7 @@ const selector = createSelector(
     initialValues,
     isNewOperation,
     selectedAccountCurrency,
+    selectedTransferAccountsCurrency,
     selectedType,
     selectedCategory,
     selectedAccount,
@@ -541,6 +716,7 @@ const selector = createSelector(
     initialValues,
     isNewOperation,
     selectedAccountCurrency,
+    selectedTransferAccountsCurrency,
     selectedType,
     selectedCategory,
     selectedAccount,

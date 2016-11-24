@@ -25,11 +25,11 @@ const AccountList = (props) => (
     { props.accounts.length
     ? <ul className="list-group list-group-flush">
       {props.accounts.map((account) => (
-        <li className="list-group-item" key={account._id}>
+        <li className="list-group-item clearfix" key={account._id}>
+          <span className="float-xs-left">{account.name}</span>
           <span className="float-xs-right">
             <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
           </span>
-          {account.name}
         </li>
       ))}
     </ul>

@@ -6,6 +6,10 @@
   width: 250px;
 }
 
+.datepicker-label {
+  margin: 10px 0;
+}
+
 .form-container {
   box-item: flex-1;
 }
