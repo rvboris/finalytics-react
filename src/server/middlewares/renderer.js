@@ -11,7 +11,7 @@ import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
 import ServerLayout from '../components/ServerLayout';
-import { authActions } from '../../shared/actions';
+import { authActions, dashboardActions } from '../../shared/actions';
 
 import ClientBundleAssets from '../../../build/client/assets.json';
 
@@ -58,6 +58,7 @@ export default async (ctx, next) => {
     if (token && user) {
       store.dispatch(authActions.setToken(token));
       store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings', 'status'])));
+      store.dispatch(dashboardActions.ready());
     } else {
       store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
     }

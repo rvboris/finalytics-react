@@ -7,36 +7,31 @@ import {
   categoryActions,
   accountActions,
   currencyActions,
+  dashboardActions,
 } from '../actions';
 
-function* userTimezoneLocale() {
+function* prepareDashboard() {
+  const dashboardRequiredData = [
+    'CATEGORY_LOAD_RESOLVED',
+    'ACCOUNT_LOAD_RESOLVED',
+    'CURRENCY_LOAD_RESOLVED',
+  ];
+
   if (IS_CLIENT) {
-    yield put(authActions.setSettings({
-      timezone: new Date().getTimezoneOffset(),
-      locale: 'auto',
-    }));
-  }
-}
+    yield [
+      put(categoryActions.load()),
+      put(accountActions.load()),
+      put(currencyActions.load()),
+    ];
 
-function* prepareUser() {
-  if (IS_CLIENT) {
-    const category = yield select((state) => state.category);
-
-    if (!category.data) {
-      yield put(categoryActions.load());
+    while (true) {
+      yield take(dashboardRequiredData);
+      yield take(dashboardRequiredData);
+      yield take(dashboardRequiredData);
+      break;
     }
 
-    const accounts = yield select((state) => get(state, 'account.accounts'));
-
-    if (!accounts) {
-      yield put(accountActions.load());
-    }
-
-    const currencyList = yield select((state) => get(state, 'currency.currencyList'));
-
-    if (!currencyList) {
-      yield put(currencyActions.load());
-    }
+    yield put(dashboardActions.ready());
   }
 }
 
@@ -51,9 +46,27 @@ function* onUserReady() {
     yield take(initUserActions);
     yield take(initUserActions);
     yield take(initUserActions);
-    yield put(authActions.setStatus('ready'));
     break;
   }
+
+  yield put(authActions.setStatus('ready'));
+}
+
+function* userTimezoneLocale() {
+  if (IS_CLIENT) {
+    yield put(authActions.setSettings({
+      timezone: new Date().getTimezoneOffset(),
+      locale: 'auto',
+    }));
+  }
+}
+
+function* onProfile(action) {
+  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
+}
+
+function* onSettings(action) {
+  yield put(localeActions.load(get(action, 'payload.data.locale')));
 }
 
 function* onAuth(action) {
@@ -68,15 +81,7 @@ function* onAuth(action) {
     yield fork(userTimezoneLocale);
   }
 
-  yield fork(prepareUser);
-}
-
-function* onProfile(action) {
-  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
-}
-
-function* onSettings(action) {
-  yield put(localeActions.load(get(action, 'payload.data.locale')));
+  yield fork(prepareDashboard);
 }
 
 export default function* () {
