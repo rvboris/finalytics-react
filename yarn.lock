@@ -99,6 +99,10 @@ anymatch@^1.3.0:
     arrify "^1.0.0"
     micromatch "^2.1.5"
 
+app-root-path@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.0.1.tgz#cd62dcf8e4fd5a417efc664d2e5b10653c651b46"
+
 aproba@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.0.4.tgz#2713680775e7614c8ba186c065d4e2e52d1072c0"
@@ -2599,8 +2603,8 @@ esprima@^2.6.0:
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
 
 esprima@~3.1.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.1.tgz#02dbcc5ac3ece81070377f99158ec742ab5dda06"
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.2.tgz#954b5d19321ca436092fa90f06d6798531fe8184"
 
 espurify@^1.6.0:
   version "1.6.0"
@@ -3844,7 +3848,7 @@ koa-body@1.6.0:
     extend "1.3.0"
     formidable "1.0.17"
 
-koa-compose@^3.0.0:
+koa-compose@^3.0.0, koa-compose@^3.1.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/koa-compose/-/koa-compose-3.2.1.tgz#a85ccb40b7d986d8e5a345b3a1ace8eabcf54de7"
   dependencies:
@@ -3912,12 +3916,14 @@ koa-static-cache@3.1.7:
     mime-types "~2.1.8"
     mz "~2.4.0"
 
-koa-webpack-middleware@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/koa-webpack-middleware/-/koa-webpack-middleware-1.0.3.tgz#4ccdc7338ca3b21fc5f9c5a2f7af49a72f1f0431"
+koa-webpack@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/koa-webpack/-/koa-webpack-0.1.9.tgz#4f9401e95a0f6f3c1cf19b575ec0bf1ed445610c"
   dependencies:
-    webpack-dev-middleware "1.8.4"
-    webpack-hot-middleware "2.13.1"
+    app-root-path "^2.0.1"
+    koa-compose "^3.1.0"
+    webpack-dev-middleware "^1.8.4"
+    webpack-hot-middleware "^2.13.0"
 
 koa@2.0.0:
   version "2.0.0"
@@ -4499,7 +4505,24 @@ mongoose-unique-validator@1.0.2:
     lodash.foreach "^4.1.0"
     lodash.get "^4.0.2"
 
-mongoose@^4.0.1, mongoose@4.6.8:
+mongoose@^4.0.1:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.7.0.tgz#adb7c6b73dfb76f204a70ba6cd364f887dcc2012"
+  dependencies:
+    async "2.1.2"
+    bson "~0.5.4"
+    hooks-fixed "1.2.0"
+    kareem "1.1.3"
+    mongodb "2.2.11"
+    mpath "0.2.1"
+    mpromise "0.5.5"
+    mquery "2.0.0"
+    ms "0.7.1"
+    muri "1.1.1"
+    regexp-clone "0.0.1"
+    sliced "1.0.1"
+
+mongoose@4.6.8:
   version "4.6.8"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.6.8.tgz#1fbb69b4de8623a3e3ee63a89425a227c5d24da9"
   dependencies:
@@ -5290,8 +5313,8 @@ postcss-colormin@^2.1.8:
     postcss-value-parser "^3.2.3"
 
 postcss-convert-values@^2.3.4:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/postcss-convert-values/-/postcss-convert-values-2.4.1.tgz#45dce4d4e33b7d967b97a4d937f270ea98d2fe7a"
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/postcss-convert-values/-/postcss-convert-values-2.5.0.tgz#570aceb04b3061fb25f6f46bd0329e7ab6263c0b"
   dependencies:
     postcss "^5.0.11"
     postcss-value-parser "^3.1.2"
@@ -5946,8 +5969,8 @@ random-bytes@~1.0.0:
   resolved "https://registry.yarnpkg.com/random-bytes/-/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
 
 randomatic@^1.1.3:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-1.1.5.tgz#5e9ef5f2d573c67bd2b8124ae90b5156e457840b"
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-1.1.6.tgz#110dcabff397e9dcff7c0789ccc0a49adf1ec5bb"
   dependencies:
     is-number "^2.0.2"
     kind-of "^3.0.2"
@@ -6111,8 +6134,8 @@ react-virtualized@^8.0.5, react-virtualized@^8.5.2:
     dom-helpers "^2.4.0"
 
 react-visibility-sensor@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/react-visibility-sensor/-/react-visibility-sensor-3.4.0.tgz#dbe64e7cc2ef811347f01c1392acecc606a7b771"
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/react-visibility-sensor/-/react-visibility-sensor-3.5.0.tgz#2cc70eb618bde8d7cb190b4a18575e6df3a5ac51"
 
 react@^0.14.0:
   version "0.14.8"
@@ -7400,7 +7423,7 @@ webfontloader@1.6.26:
   version "1.6.26"
   resolved "https://registry.yarnpkg.com/webfontloader/-/webfontloader-1.6.26.tgz#04909e273e913c9d7e4856f42c4e69fd7b3d5f28"
 
-webpack-dev-middleware@1.8.4:
+webpack-dev-middleware@^1.8.4:
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-1.8.4.tgz#e8765c9122887ce9e3abd4cc9c3eb31b61e0948d"
   dependencies:
@@ -7409,16 +7432,7 @@ webpack-dev-middleware@1.8.4:
     path-is-absolute "^1.0.0"
     range-parser "^1.0.3"
 
-webpack-hot-middleware@2.13.1:
-  version "2.13.1"
-  resolved "https://registry.yarnpkg.com/webpack-hot-middleware/-/webpack-hot-middleware-2.13.1.tgz#104350e044be58ba3b7ef1c39513d69562841975"
-  dependencies:
-    ansi-html "0.0.6"
-    html-entities "^1.2.0"
-    querystring "^0.2.0"
-    strip-ansi "^3.0.0"
-
-webpack-hot-middleware@2.13.2:
+webpack-hot-middleware@^2.13.0, webpack-hot-middleware@2.13.2:
   version "2.13.2"
   resolved "https://registry.yarnpkg.com/webpack-hot-middleware/-/webpack-hot-middleware-2.13.2.tgz#6500b15e6d4f1a9590f8df708183f4d2ac2c3e9e"
   dependencies:

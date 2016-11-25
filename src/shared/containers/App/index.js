@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { IntlProvider } from 'react-intl';
-import classnames from 'classnames';
 
 import config from '../../config';
 import styles from './style.css';
@@ -20,7 +19,7 @@ const ConnectedIntlProvider = connect(intlSelector)(IntlProvider);
 
 const App = (props) => (
   <ConnectedIntlProvider>
-    <div id="app" className={classnames(styles.app, 'pt-1')}>{props.children}</div>
+    <div id="app" className={styles.app}>{props.children}</div>
   </ConnectedIntlProvider>
 );
 

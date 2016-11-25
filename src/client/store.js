@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 import { values } from 'lodash';
@@ -7,10 +7,11 @@ import createSagaMiddleware from 'redux-saga';
 
 import sagas from '../shared/sagas';
 import * as reducers from '../shared/reducers';
+import { createRootReducer } from '../shared/reducers/root';
 import * as middlewares from '../shared/middlewares';
 
 const initialState = Immutable(window.INITIAL_STATE);
-const reducer = combineReducers({ ...reducers, routing: routerReducer });
+const reducer = createRootReducer({ ...reducers, routing: routerReducer });
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -31,7 +32,10 @@ if (process.env.NODE_ENV === 'development') {
 const store = createStore(reducer, initialState, compose(...storeEnchancers));
 
 if (process.env.NODE_ENV === 'development' && module.hot) {
-  module.hot.accept('../shared/reducers', () => store.replaceReducer(reducers.default));
+  module.hot.accept('../shared/reducers', () => {
+    const nextRootReducer = require('../shared/reducers/index');
+    store.replaceReducer(createRootReducer({ ...nextRootReducer, routing: routerReducer }));
+  });
 }
 
 export default store;

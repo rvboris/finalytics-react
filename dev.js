@@ -9,7 +9,7 @@ const cp = require('child_process');
 const chokidar = require('chokidar');
 const webpack = require('webpack');
 const Koa = require('koa');
-const koaWebpackMiddleware = require('koa-webpack-middleware');
+const middleware = require('koa-webpack');
 const log = require('debug')('dev');
 const config = require('./config/development');
 
@@ -92,15 +92,13 @@ class HotClient {
   constructor(compiler) {
     const app = new Koa();
 
-    app.use(koaWebpackMiddleware.devMiddleware(compiler, {
-      quiet: true,
-      noInfo: true,
-      stats: { colors: true },
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      publicPath: compiler.options.output.publicPath,
+    app.use(middleware({
+      compiler,
+      dev: {
+        quiet: true,
+        noInfo: true,
+      },
     }));
-
-    app.use(koaWebpackMiddleware.hotMiddleware(compiler));
 
     this.listenerManager = new ListenerManager(app.listen(config.devPort));
   }

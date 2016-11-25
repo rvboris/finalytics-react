@@ -17,6 +17,7 @@ export const store = new MongooseStore();
 
 export default convert(session({
   store,
+  rolling: true,
   cookie: cookieSettings,
   prefix: sessionPrefix,
   key: cookiePrefix,

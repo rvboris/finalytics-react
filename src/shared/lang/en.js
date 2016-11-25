@@ -232,6 +232,8 @@ export default {
   'container.logout.done': 'Exit successfully completed',
   'container.logout.process': 'Logout...',
 
+  'container.dashboard.loading': 'Loading, please wait...',
+
   'component.linkedAccountList.noAccounts': 'You have no accounts',
 
   'container.categories.manageCategories': 'Categories management',

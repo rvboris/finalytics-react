@@ -231,6 +231,8 @@ export default {
   'container.logout.done': 'Выход успешно выполнен',
   'container.logout.process': 'Выход...',
 
+  'container.dashboard.loading': 'Загрузка, подождите еще не много...',
+
   'component.linkedAccountList.noAccounts': 'У вас пока нет счетов',
 
   'container.categories.manageCategories': 'Управление категориями',

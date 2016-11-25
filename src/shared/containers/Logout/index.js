@@ -28,12 +28,8 @@ class Logout extends React.Component {
     process: React.PropTypes.bool.isRequired,
   };
 
-  constructor(...args) {
-    super(...args);
-
-    if (IS_CLIENT) {
-      this.props.logout().finally(Promise.delay(2000).then(this.props.goToLogin));
-    }
+  componentDidMount() {
+    this.props.logout().finally(Promise.delay(2000).then(this.props.goToLogin));
   }
 
   render() {

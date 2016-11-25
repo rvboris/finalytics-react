@@ -75,8 +75,8 @@ class AppBar extends React.Component {
     manageCategories: React.PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(...args) {
+    super(...args);
 
     this.menuToggle = this.menuToggle.bind(this);
 

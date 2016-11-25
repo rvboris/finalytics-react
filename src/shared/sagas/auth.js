@@ -31,7 +31,11 @@ function* prepareDashboard() {
       break;
     }
 
-    yield put(dashboardActions.ready());
+    const auth = yield select((state) => state.auth);
+
+    if (get(auth, 'profile.status') === 'ready') {
+      yield put(dashboardActions.ready());
+    }
   }
 }
 
