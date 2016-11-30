@@ -1,9 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import moment from 'moment';
 
 import style from './style.css';
+import config from '../../config';
 import { accountActions, categoryActions, currencyActions } from '../../actions';
 import AppBar from '../../components/AppBar';
 import Spinner from '../../components/Spinner';
@@ -26,6 +29,12 @@ class Dashboard extends React.Component {
   static propTypes = {
     children: React.PropTypes.object.isRequired,
     isReady: React.PropTypes.bool.isRequired,
+    locale: React.PropTypes.string.isRequired,
+  }
+
+  constructor(props) {
+    super(props);
+    moment.locale(props.locale);
   }
 
   render() {
@@ -49,6 +58,11 @@ class Dashboard extends React.Component {
   }
 }
 
+const localeSelector = createSelector(
+  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
+  locale => locale,
+);
+
 const isReadySelector = createSelector(
   state => state.dashboard.ready,
   ready => ready,
@@ -56,7 +70,8 @@ const isReadySelector = createSelector(
 
 const selector = createSelector(
   isReadySelector,
-  isReady => ({ isReady })
+  localeSelector,
+  (isReady, locale) => ({ isReady, locale })
 );
 
 export default injectIntl(connect(selector)(Dashboard));

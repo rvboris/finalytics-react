@@ -1,0 +1,26 @@
+.operation-list-item {
+  height: 68px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  box: horizontal;
+}
+
+.operation-date {
+  box-item: flex-1;
+  line-height: 46px;
+}
+
+.operation-category {
+  box-item: flex-2;
+  line-height: 46px;
+}
+
+.operation-account {
+  box-item: flex-2;
+}
+
+.operation-amount {
+  box-item: flex-1;
+}

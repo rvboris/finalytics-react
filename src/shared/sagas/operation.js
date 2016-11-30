@@ -1,10 +1,11 @@
 import { takeLatest } from 'redux-saga';
-import { select, put } from 'redux-saga/effects';
+import { put } from 'redux-saga/effects';
 import { operationActions, accountActions } from '../actions';
+import { defaultQuery } from '../reducers/operation';
 
 function* onOperationListChange() {
-  const query = yield select((state) => state.operation.query);
-  yield [put(operationActions.list(query.asMutable())), put(accountActions.load())];
+  yield [put(operationActions.list(defaultQuery)), put(accountActions.load())];
+  yield put(operationActions.needUpdate());
 }
 
 export default function* () {

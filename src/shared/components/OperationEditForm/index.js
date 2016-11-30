@@ -263,13 +263,13 @@ class OperationEditForm extends React.Component {
       .some(category => category.value === selectedCategory);
 
     if (!categoryExist) {
-      nextProps.changeFieldValue(formId, 'category', availableCategoryList[0].value);
+      nextProps.changeFieldValue(formId, 'category', get(availableCategoryList, '0.value'));
     }
 
     if (selectedType === 'transfer') {
       if (!selectedTransferAccounts.accountFrom || !selectedTransferAccounts.accountTo) {
-        nextProps.changeFieldValue(formId, 'accountFrom', accountList[0].value);
-        nextProps.changeFieldValue(formId, 'accountTo', accountList[1].value);
+        nextProps.changeFieldValue(formId, 'accountFrom', get(accountList, '0.value'));
+        nextProps.changeFieldValue(formId, 'accountTo', get(accountList, '1.value'));
       }
 
       if (selectedAccount) {
@@ -282,7 +282,7 @@ class OperationEditForm extends React.Component {
       }
 
       if (!selectedAccount) {
-        nextProps.changeFieldValue(formId, 'account', accountList[0].value);
+        nextProps.changeFieldValue(formId, 'account', get(accountList, '0.value'));
       }
     }
   }
@@ -326,6 +326,14 @@ class OperationEditForm extends React.Component {
       toValidate.amountFrom = toPositive(toValidate.amountFrom);
       toValidate.amountTo = toPositive(toValidate.amountTo);
     }
+
+    const nowTime = moment().utc();
+
+    toValidate.created = moment(toValidate.created).set({
+      hours: nowTime.hours(),
+      minutes: nowTime.minutes(),
+      seconds: nowTime.seconds(),
+    }).format();
 
     console.log(toValidate);
 

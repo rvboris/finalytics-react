@@ -70,6 +70,8 @@ export const list = createAction('OPERATION_LIST',
   })
 );
 
+export const needUpdate = createAction('OPERATION_NEED_UPDATE', undefined);
+
 export default {
   add,
   remove,
@@ -77,4 +79,5 @@ export default {
   addTransfer,
   updateTransfer,
   list,
+  needUpdate,
 };

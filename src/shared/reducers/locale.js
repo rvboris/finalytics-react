@@ -3,6 +3,7 @@ import Immutable from 'seamless-immutable';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ru from 'react-intl/locale-data/ru';
+import moment from 'moment';
 
 import * as langs from '../lang';
 import config from '../config';
@@ -17,6 +18,7 @@ const initialState = Immutable({
 export default handleActions({
   LOCALE_LOAD: (state, action) => {
     if (langs[action.payload]) {
+      moment.locale(action.payload);
       return state.set('messages', langs[action.payload]);
     }
 

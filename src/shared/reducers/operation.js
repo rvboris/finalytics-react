@@ -20,6 +20,7 @@ const initialState = Immutable({
   list: [],
   total: 0,
   query: defaultQuery,
+  needUpdate: false,
 });
 
 const queryIsEqual = (currentQuery, newQuery) => {
@@ -35,13 +36,14 @@ export default handleActions({
     const newQuery = get(action, 'payload.config.params', {});
     const data = get(action, 'payload.data.operations', []);
 
+    const { needUpdate } = state;
     const isSameLimit = currentQuery.limit === newQuery.limit;
     const isSameSkip = currentQuery.skip === newQuery.skip;
     const isSamePage = isSameLimit && isSameSkip;
 
     let newList;
 
-    if (queryIsEqual(currentQuery, newQuery) && !isSamePage) {
+    if (!needUpdate && !isSamePage && queryIsEqual(currentQuery, newQuery)) {
       newList = state.list.concat(Immutable(data));
     } else {
       newList = data;
@@ -54,6 +56,7 @@ export default handleActions({
       .set('process', false)
       .set('list', newList)
       .set('total', total)
+      .set('needUpdate', false)
       .merge({ query: lastQuery });
   },
 
@@ -70,4 +73,6 @@ export default handleActions({
   OPERATION_ADD_TRANSFER_RESOLVED: (state) => state.set('process', false),
 
   OPERATION_ADD_TRANSFER_REJECTED: (state) => state.set('process', false),
+
+  OPERATION_NEED_UPDATE: (state) => state.set('needUpdate', true),
 }, initialState);
