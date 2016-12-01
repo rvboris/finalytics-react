@@ -222,6 +222,8 @@ export default {
   'component.operationEditForm.accountTo.placeholder': 'Select account',
   'component.operationEditForm.operationDate.label': 'Date of operation',
 
+  'component.operationList.loading': 'Loading...',
+
   'component.categoriesTree.expense': 'expense',
   'component.categoriesTree.income': 'income',
   'component.categoriesTree.any': 'any',

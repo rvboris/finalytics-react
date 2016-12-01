@@ -221,6 +221,8 @@ export default {
   'component.operationEditForm.accountTo.placeholder': 'Выбрать счет',
   'component.operationEditForm.operationDate.label': 'Дата операции',
 
+  'component.operationList.loading': 'Загрузка...',
+
   'component.categoriesTree.expense': 'расход',
   'component.categoriesTree.income': 'доход',
   'component.categoriesTree.any': 'любая',

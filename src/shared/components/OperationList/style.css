@@ -1,26 +1,82 @@
 .operation-list-item {
   height: 68px;
   margin-bottom: 12px;
-  padding: 10px;
+  padding: 10px 10px 10px 14px;
   border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
-  box: horizontal;
+  box: horizontal left;
+  position: relative;
 }
 
 .operation-date {
-  box-item: flex-1;
-  line-height: 46px;
+  width: 15%;
+  box: vertical;
 }
 
 .operation-category {
-  box-item: flex-2;
-  line-height: 46px;
+  margin-left: 12px;
+  width: 30%;
+  display: flex;
+
+  & div {
+    box-item: center;
+  }
 }
 
-.operation-account {
-  box-item: flex-2;
+.operation-details {
+  width: 55%;
+  box: horizontal;
+  margin-left: 12px;
 }
 
+.operation-transfer-account,
+.operation-transfer-amount {
+  box: vertical;
+  width: 50%;
+
+  & div {
+    box-item: flex-auto;
+    text-align: right;
+  }
+}
+
+.operation-account,
 .operation-amount {
-  box-item: flex-1;
+  display: flex;
+  text-align: right;
+  width: 50%;
+
+  & div {
+    box-item: flex-auto center;
+  }
+}
+
+.operation-transfer-amount,
+.operation-amount {
+  margin-left: 12px;
+}
+
+.operation-color-mark {
+  width: 4px;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  border-radius: 0.25rem;
+  position: absolute;
+}
+
+.operation-color-mark-expense {
+  background: red;
+}
+
+.operation-color-mark-income {
+  background: green;
+}
+
+.operation-color-mark-transfer {
+  background: gray;
+}
+
+.operation-loading {
+  box-item: center;
 }

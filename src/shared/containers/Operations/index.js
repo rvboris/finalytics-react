@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Alert } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import VisibilitySensor from 'react-visibility-sensor';
 
 import { operationActions } from '../../actions';
 import { defaultQuery } from '../../reducers/operation';
@@ -27,27 +26,12 @@ class Operations extends React.Component {
     listOperations: React.PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      accountListVisible: true,
-    };
-
-    this.onAccountVisibleChange = this.onAccountVisibleChange.bind(this);
-  }
-
   componentDidMount() {
     this.props.listOperations(defaultQuery);
   }
 
-  onAccountVisibleChange(accountListVisible) {
-    this.setState(Object.assign({}, this.state, { accountListVisible }));
-  }
-
   render() {
     const { accountsExist } = this.props;
-    const { accountListVisible } = this.state;
 
     return (
       <div className={style.operations}>
@@ -58,9 +42,8 @@ class Operations extends React.Component {
             <Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>
           }
         </div>
-        <div className={accountListVisible && classnames(style['balance-container'], 'ml-2')}>
-          {accountListVisible && <AccountList />}
-          <VisibilitySensor onChange={this.onAccountVisibleChange} />
+        <div className={classnames(style['balance-container'], 'ml-2')}>
+          <AccountList />
         </div>
       </div>
     );
