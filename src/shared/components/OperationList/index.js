@@ -7,6 +7,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import TreeModel from 'tree-model';
 import moment from 'moment';
 import classnames from 'classnames';
+import { ButtonGroup, Button } from 'reactstrap';
 
 import style from './style.css';
 import InfiniteLoader from '../InfiniteLoader';
@@ -92,6 +93,17 @@ class OperationList extends React.Component {
     return <div className={className} />;
   }
 
+  getControls() {
+    return (
+      <div className={style['operation-controls']}>
+        <ButtonGroup>
+          <Button outline color="danger" size="sm">Удалить</Button>{' '}
+          <Button outline color="primary" size="sm">Редактировать</Button>{' '}
+        </ButtonGroup>
+      </div>
+    );
+  }
+
   getOperationDetails(operation) {
     if (operation.transfer) {
       return (
@@ -149,6 +161,7 @@ class OperationList extends React.Component {
 
       content = (
         <div key={key} className={style['operation-list-item']}>
+          {this.getControls()}
           {this.getColorMark(operation.type)}
           {this.getDate(operation.created)}
           <div className={style['operation-category']}>
@@ -193,6 +206,7 @@ class OperationList extends React.Component {
                     height={height}
                     autoHeight
                     rowHeight={80}
+                    style={{ overflow: 'visible' }}
                   />
                 )}
               </AutoSizer>

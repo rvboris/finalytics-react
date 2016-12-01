@@ -57,26 +57,40 @@
 }
 
 .operation-color-mark {
-  width: 4px;
-  top: 1px;
-  left: 1px;
-  bottom: 1px;
-  border-radius: 0.25rem;
+  width: 10px;
+  height: 10px;
+  top: -6px;
+  left: -6px;
   position: absolute;
+  border-radius: 10px;
 }
 
 .operation-color-mark-expense {
-  background: red;
+  background: #d9534f;
 }
 
 .operation-color-mark-income {
-  background: green;
+  background: #5cb85c;
 }
 
 .operation-color-mark-transfer {
-  background: gray;
+  background: #31b0d5;
 }
 
 .operation-loading {
   box-item: center;
+}
+
+.operation-controls {
+	position: absolute;
+	left: 15%;
+	top: 0;
+	bottom: 0;
+	width: 30%;
+	background: #fff;
+	display: flex;
+
+	& > div {
+		box-item: center;
+	}
 }
