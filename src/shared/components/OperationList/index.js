@@ -3,25 +3,12 @@ import { connect } from 'react-redux';
 import { List, AutoSizer, WindowScroller } from 'react-virtualized';
 import { createSelector } from 'reselect';
 import { noop, memoize } from 'lodash';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import TreeModel from 'tree-model';
-import moment from 'moment';
-import classnames from 'classnames';
-import { ButtonGroup, Button } from 'reactstrap';
 
-import style from './style.css';
 import InfiniteLoader from '../InfiniteLoader';
-import MoneyFormat from '../MoneyFormat';
+import OperationListItem from '../OperationListItem';
 import { operationActions } from '../../actions';
 import { defaultQuery } from '../../reducers/operation';
-
-const messages = defineMessages({
-  loading: {
-    id: 'component.operationList.loading',
-    description: 'Loading item status text',
-    defaultMessage: 'Loading...',
-  },
-});
 
 class OperationList extends React.Component {
   static propTypes = {
@@ -31,6 +18,7 @@ class OperationList extends React.Component {
     operationListTotal: React.PropTypes.number.isRequired,
     operationNeedUpdate: React.PropTypes.bool.isRequired,
     loadNextPage: React.PropTypes.func.isRequired,
+    toggleOperationDeleteModal: React.PropTypes.func.isRequired,
   };
 
   constructor(...args) {
@@ -51,93 +39,6 @@ class OperationList extends React.Component {
     this.loadQuery({ startIndex: skip, stopIndex: limit });
   }
 
-  getDate(date) {
-    const now = moment().utc();
-    const mDate = moment(date);
-    let firstRow;
-    let secondRow;
-
-    if (now.diff(mDate, 'days') <= 7) {
-      firstRow = mDate.format('dddd');
-      secondRow = mDate.format('DD MMM');
-    } else if (now.diff(mDate, 'years') >= 1) {
-      firstRow = mDate.format('MMMM');
-      secondRow = mDate.format('DD.MM.YY');
-    } else {
-      firstRow = mDate.format('MMMM');
-      secondRow = mDate.format('DD ddd');
-    }
-
-    return (
-      <div className={style['operation-date']}>
-        <div>{firstRow}</div>
-        <div>{secondRow}</div>
-      </div>
-    );
-  }
-
-  getAmount(amount, currencyId) {
-    if (amount < 0) {
-      return <MoneyFormat sum={amount} currencyId={currencyId} />;
-    }
-
-    return (<span>+<MoneyFormat sum={amount} currencyId={currencyId} /></span>);
-  }
-
-  getColorMark(operationType) {
-    const className = classnames(
-      style['operation-color-mark'],
-      style[`operation-color-mark-${operationType}`]
-    );
-
-    return <div className={className} />;
-  }
-
-  getControls() {
-    return (
-      <div className={style['operation-controls']}>
-        <ButtonGroup>
-          <Button outline color="danger" size="sm">Удалить</Button>{' '}
-          <Button outline color="primary" size="sm">Редактировать</Button>{' '}
-        </ButtonGroup>
-      </div>
-    );
-  }
-
-  getOperationDetails(operation) {
-    if (operation.transfer) {
-      return (
-        <div className={style['operation-details']}>
-          <div className={style['operation-transfer-account']}>
-            <div>{operation.account.name}</div>
-            <div>{operation.transfer.account.name}</div>
-          </div>
-          <div className={style['operation-transfer-amount']}>
-            <div>
-              {this.getAmount(operation.amount, operation.account.currency)}
-            </div>
-            <div>
-              {this.getAmount(operation.transfer.amount, operation.transfer.account.currency)}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={style['operation-details']}>
-        <div className={style['operation-account']}>
-          <div>{operation.account.name}</div>
-        </div>
-        <div className={style['operation-amount']}>
-          <div>
-            {this.getAmount(operation.amount, operation.account.currency)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   loadQuery({ startIndex, stopIndex }) {
     const query = { limit: stopIndex, skip: startIndex };
     const fullQuery = this.props.operationListQuery.merge(query);
@@ -146,33 +47,27 @@ class OperationList extends React.Component {
   }
 
   rowRenderer({ index, key, style: positionStyle }) {
-    let content;
+    const { toggleOperationDeleteModal, operationList } = this.props;
+
+    let operationListItem;
 
     if (!this.isRowLoaded({ index })) {
-      content = (
-        <div key={key} className={style['operation-list-item']}>
-          <span className={style['operation-loading']}>
-            <FormattedMessage {...messages.loading} />
-          </span>
-        </div>
-      );
+      operationListItem = <OperationListItem />;
     } else {
-      const operation = this.props.operationList[index];
-
-      content = (
-        <div key={key} className={style['operation-list-item']}>
-          {this.getControls()}
-          {this.getColorMark(operation.type)}
-          {this.getDate(operation.created)}
-          <div className={style['operation-category']}>
-            <div>{operation.category.name}</div>
-          </div>
-          {this.getOperationDetails(operation)}
-        </div>
+      const operation = operationList[index];
+      operationListItem = (
+        <OperationListItem
+          operation={operation}
+          toggleOperationDeleteModal={toggleOperationDeleteModal}
+        />
       );
     }
 
-    return (<div key={key} style={positionStyle}>{content}</div>);
+    return (
+      <div key={key} style={positionStyle}>
+        {operationListItem}
+      </div>
+    );
   }
 
   isRowLoaded({ index }) {
@@ -308,4 +203,4 @@ const mapDispatchToProps = dispatch => ({
   loadNextPage: (...args) => dispatch(operationActions.list(...args)),
 });
 
-export default injectIntl(connect(selector, mapDispatchToProps)(OperationList));
+export default connect(selector, mapDispatchToProps)(OperationList);

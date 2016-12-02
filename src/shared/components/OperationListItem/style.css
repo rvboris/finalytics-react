@@ -1,4 +1,4 @@
-.operation-list-item {
+.operation-item {
   height: 68px;
   margin-bottom: 12px;
   padding: 10px 10px 10px 14px;
@@ -13,7 +13,8 @@
   box: vertical;
 }
 
-.operation-category {
+.operation-category,
+.operation-controls {
   margin-left: 12px;
   width: 30%;
   display: flex;
@@ -79,18 +80,4 @@
 
 .operation-loading {
   box-item: center;
-}
-
-.operation-controls {
-	position: absolute;
-	left: 15%;
-	top: 0;
-	bottom: 0;
-	width: 30%;
-	background: #fff;
-	display: flex;
-
-	& > div {
-		box-item: center;
-	}
 }

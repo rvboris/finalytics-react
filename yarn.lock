@@ -6131,8 +6131,8 @@ react@15.4.1:
     object-assign "^4.1.0"
 
 reactstrap@^3.9.2:
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/reactstrap/-/reactstrap-3.9.2.tgz#fec2a9a4fbcff117a58544bad8e59e199b7bb33b"
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/reactstrap/-/reactstrap-3.9.3.tgz#438384a46245bec60a004c244ab24bf75cdb5048"
   dependencies:
     classnames "^2.2.3"
     lodash.isfunction "^3.0.8"
