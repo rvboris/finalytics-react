@@ -29,6 +29,7 @@ class OperationListItem extends React.Component {
   static propTypes = {
     operation: React.PropTypes.object,
     toggleOperationDeleteModal: React.PropTypes.func,
+    editOperation: React.PropTypes.func,
   };
 
   constructor(...args) {
@@ -37,6 +38,7 @@ class OperationListItem extends React.Component {
     this.showControls = this.showControls.bind(this);
     this.hideControls = this.hideControls.bind(this);
     this.removeOperation = this.removeOperation.bind(this);
+    this.editOperation = this.editOperation.bind(this);
 
     this.state = {
       showControls: false,
@@ -92,7 +94,7 @@ class OperationListItem extends React.Component {
           <Button outline color="danger" size="sm" onClick={this.removeOperation}>
             <FormattedMessage {...messages.remove} />
           </Button>
-          <Button outline color="primary" size="sm">
+          <Button outline color="primary" size="sm" onClick={this.editOperation}>
             <FormattedMessage {...messages.edit} />
           </Button>
         </ButtonGroup>
@@ -145,6 +147,11 @@ class OperationListItem extends React.Component {
   removeOperation() {
     const { toggleOperationDeleteModal, operation } = this.props;
     toggleOperationDeleteModal(operation);
+  }
+
+  editOperation() {
+    const { editOperation, operation } = this.props;
+    editOperation(operation);
   }
 
   showControls() {

@@ -1,7 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { reduxForm, Field, formValueSelector, SubmissionError, change } from 'redux-form';
+import {
+  reduxForm,
+  Field,
+  formValueSelector,
+  SubmissionError,
+  change,
+} from 'redux-form';
 import { get, isUndefined, omitBy, mapValues } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -227,6 +233,7 @@ const formId = 'operationEdit';
 class OperationEditForm extends React.Component {
   static propTypes = {
     operationId: React.PropTypes.string,
+    operation: React.PropTypes.object,
     process: React.PropTypes.bool.isRequired,
     isNewOperation: React.PropTypes.bool.isRequired,
     form: React.PropTypes.object.isRequired,
@@ -257,7 +264,34 @@ class OperationEditForm extends React.Component {
       selectedType,
       selectedAccount,
       selectedTransferAccounts,
+      operation,
     } = nextProps;
+
+    const editOperation = operation && !this.props.operation;
+    const isNewEditOperation = this.props.operation && operation._id !== this.props.operation._id;
+
+    if (editOperation || isNewEditOperation) {
+      const editOperation = operation.asMutable();
+
+      editOperation.category = editOperation.category._id;
+
+      if (editOperation.transfer) {
+        editOperation.accountFrom = editOperation.account._id;
+        editOperation.accountTo = editOperation.transfer.account._id;
+
+        editOperation.amountFrom = editOperation.amount;
+        editOperation.amountTo = editOperation.transfer.amount;
+
+        delete editOperation.account;
+        delete editOperation.amount;
+      } else {
+        editOperation.account = editOperation.account._id;
+      }
+
+      nextProps.form.initialize(editOperation);
+
+      return;
+    }
 
     const categoryExist = availableCategoryList
       .some(category => category.value === selectedCategory);
@@ -617,9 +651,9 @@ const initialValuesSelector = createSelector(
   accountListSelector,
   selectedTypeSelector,
   (isNewOperation, operation, availableCategoryList, accountList, selectedType) => {
-    const newOperation = Object.assign({}, defaultValues);
-
     if (isNewOperation) {
+      const newOperation = Object.assign({}, defaultValues);
+
       if (selectedType === 'transfer') {
         newOperation.accountFrom = get(availableCategoryList, '0.value');
         newOperation.accountTo = get(accountList, '1.value');
@@ -631,7 +665,7 @@ const initialValuesSelector = createSelector(
       return newOperation;
     }
 
-    return operation;
+    return undefined;
   }
 );
 

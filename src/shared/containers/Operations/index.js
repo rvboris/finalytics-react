@@ -26,6 +26,36 @@ const messages = defineMessages({
     description: 'Account not found alert',
     defaultMessage: 'Accounts not found',
   },
+  removeOperationModalTitle: {
+    id: 'container.operations.removeOperationModalTitle',
+    description: 'Remove operation modal title',
+    defaultMessage: 'Remove operation',
+  },
+  removeOperationModalInfo: {
+    id: 'container.operations.removeOperationModalInfo',
+    description: 'Remove operation modal info',
+    defaultMessage: 'Are you sure you want to delete this operation?',
+  },
+  removeOperationModalError: {
+    id: 'container.operations.removeOperationModalError',
+    description: 'Remove operation modal error',
+    defaultMessage: 'When you delete an operation error occurred',
+  },
+  removeOperationModalCancelButton: {
+    id: 'container.operations.removeOperationModalCancelButton',
+    description: 'Label of remove operation modal cancel button',
+    defaultMessage: 'Cancel',
+  },
+  removeOperationModalConfirmButton: {
+    id: 'container.operations.removeOperationModalConfirmButton',
+    description: 'Label of remove operation modal confirm button',
+    defaultMessage: 'Remove',
+  },
+  removeOperationModalProcessButton: {
+    id: 'container.operations.removeOperationModalProcessButton',
+    description: 'Label of remove operation modal process button',
+    defaultMessage: 'Removing...',
+  },
 });
 
 class Operations extends React.Component {
@@ -41,6 +71,7 @@ class Operations extends React.Component {
 
     this.toggleOperationDeleteModal = this.toggleOperationDeleteModal.bind(this);
     this.removeOperation = this.removeOperation.bind(this);
+    this.editOperation = this.editOperation.bind(this);
 
     this.state = { operationDeleteModal: false };
   }
@@ -69,17 +100,26 @@ class Operations extends React.Component {
       });
   }
 
+  editOperation(operation) {
+    this.setState(Object.assign({}, this.state, {
+      operationToEdit: operation,
+    }));
+  }
+
   render() {
     const { accountsExist, operationProcess } = this.props;
-    const { operationDeleteModal, operationDeleteError } = this.state;
+    const { operationDeleteModal, operationDeleteError, operationToEdit } = this.state;
 
     return (
       <div className={style.operations}>
         <div className={style['operations-container']}>
-          { accountsExist && <OperationEditForm /> }
+          { accountsExist && <OperationEditForm operation={operationToEdit} /> }
 
           { accountsExist &&
-            <OperationList toggleOperationDeleteModal={this.toggleOperationDeleteModal} />
+            <OperationList
+              toggleOperationDeleteModal={this.toggleOperationDeleteModal}
+              editOperation={this.editOperation}
+            />
           }
 
           { !accountsExist &&
@@ -88,15 +128,15 @@ class Operations extends React.Component {
 
           <Modal isOpen={operationDeleteModal} toggle={this.toggleOperationDeleteModal}>
             <ModalHeader toggle={this.toggleOperationDeleteModal}>
-              Удаление операции
+              <FormattedMessage {...messages.removeOperationModalTitle} />
             </ModalHeader>
             <ModalBody>
-              <p>Вы уверены что хотите удалить операцию?</p>
+              <p><FormattedMessage {...messages.removeOperationModalInfo} /></p>
             </ModalBody>
             <ModalFooter>
               { operationDeleteError &&
                 <p className="text-danger">
-                  Ошибка удаления операции
+                  <FormattedMessage {...messages.removeOperationModalError} />
                 </p>
               }
 
@@ -106,11 +146,15 @@ class Operations extends React.Component {
                 color="danger"
                 className="mr-1"
               >
-                Удалить
+                {
+                  operationProcess
+                    ? <FormattedMessage {...messages.removeOperationModalProcessButton} />
+                    : <FormattedMessage {...messages.removeOperationModalConfirmButton} />
+                }
               </Button>
 
               <Button onClick={this.toggleOperationDeleteModal} disabled={operationProcess}>
-                Отмена
+                <FormattedMessage {...messages.removeOperationModalCancelButton} />
               </Button>
             </ModalFooter>
           </Modal>

@@ -243,4 +243,10 @@ export default {
   'container.categories.createCategory': 'Создать категорию',
 
   'container.operations.noAccounts': 'Для добавление операций необходимо создать счет',
+  'container.operations.removeOperationModalTitle': 'Удаление операции',
+  'container.operations.removeOperationModalInfo': 'Вы уверены что хотите удалить операцию?',
+  'container.operations.removeOperationModalError': 'Ошибка при удалении операции',
+  'container.operations.removeOperationModalCancelButton': 'Отмена',
+  'container.operations.removeOperationModalConfirmButton': 'Удалить',
+  'container.operations.removeOperationModalProcessButton': 'Удаление...',
 };

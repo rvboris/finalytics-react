@@ -244,4 +244,10 @@ export default {
   'container.categories.createCategory': 'Create new category',
 
   'container.operations.noAccounts': 'To add operations, you must create an account',
+  'container.operations.removeOperationModalTitle': 'Delete operation',
+  'container.operations.removeOperationModalInfo': 'Are you sure you want to delete this operation?',
+  'container.operations.removeOperationModalError': 'When you delete an operation error occurred',
+  'container.operations.removeOperationModalCancelButton': 'Cancel',
+  'container.operations.removeOperationModalConfirmButton': 'Delete',
+  'container.operations.removeOperationModalProcessButton': 'Deleting...',
 };
