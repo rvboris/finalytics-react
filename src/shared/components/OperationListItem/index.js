@@ -5,6 +5,7 @@ import { ButtonGroup, Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import style from './style.css';
+import eventEmitter from '../../utils/event-emitter';
 import MoneyFormat from '../MoneyFormat';
 
 const messages = defineMessages({
@@ -30,19 +31,28 @@ class OperationListItem extends React.Component {
     operation: React.PropTypes.object,
     toggleOperationDeleteModal: React.PropTypes.func,
     editOperation: React.PropTypes.func,
+    editOperationItem: React.PropTypes.object,
   };
 
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
 
     this.showControls = this.showControls.bind(this);
     this.hideControls = this.hideControls.bind(this);
     this.removeOperation = this.removeOperation.bind(this);
     this.editOperation = this.editOperation.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
 
     this.state = {
       showControls: false,
+      isEdit: this.isEditActive(props.editOperationItem),
     };
+
+    eventEmitter.on('operation.editOperationItem', this.toggleEdit);
+  }
+
+  componentWillUnmount() {
+    eventEmitter.off('operation.editOperationItem', this.toggleEdit);
   }
 
   getDate(date) {
@@ -162,9 +172,20 @@ class OperationListItem extends React.Component {
     this.setState(Object.assign({}, this.state, { showControls: false }));
   }
 
+  isEditActive(editOperationItem) {
+    const { operation } = this.props;
+    return editOperationItem && operation && editOperationItem._id === operation._id;
+  }
+
+  toggleEdit(editOperationItem) {
+    this.setState(Object.assign({}, this.state, {
+      isEdit: this.isEditActive(editOperationItem),
+    }));
+  }
+
   render() {
     const { operation } = this.props;
-    const { showControls } = this.state;
+    const { showControls, isEdit } = this.state;
 
     if (!operation) {
       return (
@@ -176,9 +197,14 @@ class OperationListItem extends React.Component {
       );
     }
 
+    const itemClassName = classnames(
+      style['operation-item'],
+      isEdit && style['operation-item-edit']
+    );
+
     return (
       <div
-        className={style['operation-item']}
+        className={itemClassName}
         onMouseOver={this.showControls}
         onMouseLeave={this.hideControls}
       >

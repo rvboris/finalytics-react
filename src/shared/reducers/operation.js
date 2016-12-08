@@ -21,6 +21,7 @@ const initialState = Immutable({
   total: 0,
   query: defaultQuery,
   needUpdate: false,
+  batch: false,
 });
 
 const queryIsEqual = (currentQuery, newQuery) => {
@@ -75,4 +76,6 @@ export default handleActions({
   OPERATION_ADD_TRANSFER_REJECTED: (state) => state.set('process', false),
 
   OPERATION_NEED_UPDATE: (state) => state.set('needUpdate', true),
+
+  OPERATION_MODE_BATCH: (state, { payload }) => state.set('batch', payload),
 }, initialState);

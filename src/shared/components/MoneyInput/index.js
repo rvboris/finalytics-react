@@ -80,3 +80,7 @@ MoneyInput.propTypes = {
 };
 
 export default MoneyInput;
+
+export const toPositive = (txt = '') => txt.toString().replace('-', '');
+
+export const toNegative = (txt = '') => txt ? `-${toPositive(txt)}` : '';

@@ -1,9 +1,15 @@
 import { takeLatest } from 'redux-saga';
-import { put } from 'redux-saga/effects';
+import { put, select } from 'redux-saga/effects';
 import { operationActions, accountActions } from '../actions';
 import { defaultQuery } from '../reducers/operation';
 
 function* onOperationListChange() {
+  const batchMode = yield select((state) => state.operation.batch);
+
+  if (batchMode) {
+    return;
+  }
+
   yield [put(operationActions.list(defaultQuery)), put(accountActions.load())];
   yield put(operationActions.needUpdate());
 }

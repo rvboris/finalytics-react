@@ -15,6 +15,7 @@ import {
 import { error } from '../../log';
 import { operationActions } from '../../actions';
 import { defaultQuery } from '../../reducers/operation';
+import eventEmitter from '../../utils/event-emitter';
 import AccountList from '../../components/AccountList';
 import OperationList from '../../components/OperationList';
 import OperationEditForm from '../../components/OperationEditForm';
@@ -93,6 +94,12 @@ class Operations extends React.Component {
 
     return removeOperation({ _id: operationToDelete._id })
       .then(() => {
+        const { operationToDelete, operationToEdit } = this.state;
+
+        if (operationToDelete._id === operationToEdit._id) {
+          this.editOperation();
+        }
+
         this.toggleOperationDeleteModal();
       }, (e) => {
         error(e);
@@ -104,6 +111,8 @@ class Operations extends React.Component {
     this.setState(Object.assign({}, this.state, {
       operationToEdit: operation,
     }));
+
+    eventEmitter.emit('operation.editOperationItem', operation);
   }
 
   render() {
@@ -113,12 +122,17 @@ class Operations extends React.Component {
     return (
       <div className={style.operations}>
         <div className={style['operations-container']}>
-          { accountsExist && <OperationEditForm operation={operationToEdit} /> }
+          { accountsExist &&
+            <OperationEditForm
+              operation={operationToEdit}
+              editOperation={this.editOperation}
+            /> }
 
           { accountsExist &&
             <OperationList
               toggleOperationDeleteModal={this.toggleOperationDeleteModal}
               editOperation={this.editOperation}
+              editOperationItem={operationToEdit}
             />
           }
 

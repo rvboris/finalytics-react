@@ -8,6 +8,10 @@
   position: relative;
 }
 
+.operation-item-edit {
+  border-color: rgba(0, 0, 0, 0.45);
+}
+
 .operation-date {
   width: 15%;
   box: vertical;

@@ -20,6 +20,7 @@ class OperationList extends React.Component {
     loadNextPage: React.PropTypes.func.isRequired,
     toggleOperationDeleteModal: React.PropTypes.func.isRequired,
     editOperation: React.PropTypes.func.isRequired,
+    editOperationItem: React.PropTypes.object,
   };
 
   constructor(...args) {
@@ -48,7 +49,12 @@ class OperationList extends React.Component {
   }
 
   rowRenderer({ index, key, style: positionStyle }) {
-    const { toggleOperationDeleteModal, operationList, editOperation } = this.props;
+    const {
+      toggleOperationDeleteModal,
+      operationList,
+      editOperation,
+      editOperationItem,
+    } = this.props;
 
     let operationListItem;
 
@@ -61,6 +67,7 @@ class OperationList extends React.Component {
           operation={operation}
           toggleOperationDeleteModal={toggleOperationDeleteModal}
           editOperation={editOperation}
+          editOperationItem={editOperationItem}
         />
       );
     }

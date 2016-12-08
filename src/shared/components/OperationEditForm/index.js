@@ -30,12 +30,11 @@ import {
 
 import config from '../../config';
 import validationHandler from '../../utils/validation-handler';
-import { toNegative, toPositive } from '../../utils/money-input';
 import { optionRenderer, valueRenderer } from '../../utils/category-select';
 import { operationActions } from '../../actions';
 import { error } from '../../log';
 import DatePicker from '../DatePicker';
-import MoneyInput from '../MoneyInput';
+import MoneyInput, { toNegative, toPositive } from '../MoneyInput';
 import SelectInput from '../SelectInput';
 import style from './style.css';
 
@@ -240,8 +239,10 @@ class OperationEditForm extends React.Component {
     intl: React.PropTypes.object.isRequired,
     addOperation: React.PropTypes.func.isRequired,
     addTransferOperation: React.PropTypes.func.isRequired,
+    updateTransferOperation: React.PropTypes.func.isRequired,
     updateOperation: React.PropTypes.func.isRequired,
     removeOperation: React.PropTypes.func.isRequired,
+    editOperation: React.PropTypes.func.isRequired,
     locale: React.PropTypes.string.isRequired,
     accountList: React.PropTypes.array.isRequired,
     availableAccountListFrom: React.PropTypes.array.isRequired,
@@ -254,6 +255,7 @@ class OperationEditForm extends React.Component {
     selectedAccount: React.PropTypes.string,
     selectedTransferAccounts: React.PropTypes.object,
     changeFieldValue: React.PropTypes.func.isRequired,
+    batchMode: React.PropTypes.func.isRequired,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -268,12 +270,15 @@ class OperationEditForm extends React.Component {
     } = nextProps;
 
     const editOperation = operation && !this.props.operation;
-    const isNewEditOperation = this.props.operation && operation._id !== this.props.operation._id;
+    const isNewEditOperation = editOperation
+      && this.props.operation
+      && operation._id !== this.props.operation._id;
 
     if (editOperation || isNewEditOperation) {
       const editOperation = operation.asMutable();
 
       editOperation.category = editOperation.category._id;
+      editOperation.created = moment(editOperation.created).format();
 
       if (editOperation.transfer) {
         editOperation.accountFrom = editOperation.account._id;
@@ -341,9 +346,14 @@ class OperationEditForm extends React.Component {
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
     const {
-      addTransferOperation,
+      batchMode,
       addOperation,
+      addTransferOperation,
+      removeOperation,
+      updateOperation,
+      updateTransferOperation,
       isNewOperation,
+      operation,
     } = this.props;
 
     const toValidate = omitBy(Object.assign({}, defaultValues, values), val => !val);
@@ -369,8 +379,6 @@ class OperationEditForm extends React.Component {
       seconds: nowTime.seconds(),
     }).format();
 
-    console.log(toValidate);
-
     let result;
 
     try {
@@ -380,8 +388,22 @@ class OperationEditForm extends React.Component {
         } else {
           result = await addOperation(toValidate);
         }
+      } else if (toValidate.type !== operation.type) {
+        batchMode(true);
+
+        await removeOperation(operation);
+
+        batchMode(false);
+
+        if (toValidate.type === 'transfer') {
+          result = await addTransferOperation(toValidate);
+        } else {
+          result = await addOperation(toValidate);
+        }
+      } else if (toValidate.type === 'transfer') {
+        result = await updateTransferOperation(toValidate);
       } else {
-        // Update, Remove
+        result = await updateOperation(toValidate);
       }
     } catch (err) {
       error(err);
@@ -395,15 +417,16 @@ class OperationEditForm extends React.Component {
       return;
     }
 
-    resolve(result);
-  }).then((operation) => {
-    const { changeFieldValue } = this.props;
+    resolve(result.data);
+  }).then(() => {
+    const { changeFieldValue, isNewOperation, editOperation } = this.props;
 
-    if (operation.type === 'transfer') {
-      changeFieldValue(formId, 'amountFrom', null);
-      changeFieldValue(formId, 'amountTo', null);
-    } else {
-      changeFieldValue(formId, 'amount', null);
+    changeFieldValue(formId, 'amountFrom', null);
+    changeFieldValue(formId, 'amountTo', null);
+    changeFieldValue(formId, 'amount', null);
+
+    if (!isNewOperation) {
+      editOperation();
     }
   });
 
@@ -537,10 +560,12 @@ let operationForm = reduxForm({
 })(OperationEditForm);
 
 const mapDispatchToProps = dispatch => ({
-  updateOperation: (...args) => dispatch(operationActions.update(...args)),
   addOperation: (...args) => dispatch(operationActions.add(...args)),
-  addTransferOperation: (...args) => dispatch(operationActions.addTransfer(...args)),
   removeOperation: (...args) => dispatch(operationActions.remove(...args)),
+  updateOperation: (...args) => dispatch(operationActions.update(...args)),
+  addTransferOperation: (...args) => dispatch(operationActions.addTransfer(...args)),
+  updateTransferOperation: (...args) => dispatch(operationActions.updateTransfer(...args)),
+  batchMode: (...args) => dispatch(operationActions.batchMode(...args)),
   changeFieldValue: (...args) => dispatch(change(...args)),
 });
 

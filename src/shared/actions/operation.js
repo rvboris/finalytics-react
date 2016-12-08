@@ -71,6 +71,7 @@ export const list = createAction('OPERATION_LIST',
 );
 
 export const needUpdate = createAction('OPERATION_NEED_UPDATE', undefined);
+export const batchMode = createAction('OPERATION_MODE_BATCH', (batch) => !!batch);
 
 export default {
   add,
@@ -80,4 +81,5 @@ export default {
   updateTransfer,
   list,
   needUpdate,
+  batchMode,
 };
