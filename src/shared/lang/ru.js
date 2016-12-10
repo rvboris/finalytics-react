@@ -219,7 +219,9 @@ export default {
   'component.operationEditForm.accountFrom.placeholder': 'Выбрать счет',
   'component.operationEditForm.accountTo.label': 'Счет поступления',
   'component.operationEditForm.accountTo.placeholder': 'Выбрать счет',
-  'component.operationEditForm.operationDate.label': 'Дата операции',
+  'component.operationEditForm.deleteButton': 'Удалить',
+  'component.operationEditForm.cancelButton': 'Отмена',
+  'component.operationEditForm.todayButton': 'Сегодня',
 
   'component.operationListItem.loading': 'Загрузка...',
   'component.operationListItem.remove': 'Удалить',

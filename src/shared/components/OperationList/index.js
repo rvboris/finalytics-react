@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 import { noop, memoize } from 'lodash';
 import TreeModel from 'tree-model';
 
+import './style.css';
 import InfiniteLoader from '../InfiniteLoader';
 import OperationListItem from '../OperationListItem';
 import { operationActions } from '../../actions';

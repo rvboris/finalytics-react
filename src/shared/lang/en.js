@@ -220,7 +220,9 @@ export default {
   'component.operationEditForm.accountFrom.placeholder': 'Select account',
   'component.operationEditForm.accountTo.label': 'Account of receipt',
   'component.operationEditForm.accountTo.placeholder': 'Select account',
-  'component.operationEditForm.operationDate.label': 'Date of operation',
+  'component.operationEditForm.deleteButton': 'Delete',
+  'component.operationEditForm.cancelButton': 'Cancel',
+  'component.operationEditForm.todayButton': 'Today',
 
   'component.operationListItem.loading': 'Loading...',
   'component.operationListItem.remove': 'Remove',

@@ -126,6 +126,7 @@ class Operations extends React.Component {
             <OperationEditForm
               operation={operationToEdit}
               editOperation={this.editOperation}
+              toggleOperationDeleteModal={this.toggleOperationDeleteModal}
             /> }
 
           { accountsExist &&

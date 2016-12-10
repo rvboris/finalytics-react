@@ -3,6 +3,8 @@ import DayPicker, { DateUtils } from 'react-day-picker';
 import LocaleUtils from 'react-day-picker/moment';
 import moment from 'moment';
 
+import './style.css';
+
 const DatePicker = (props) => {
   const { value } = props.input;
 

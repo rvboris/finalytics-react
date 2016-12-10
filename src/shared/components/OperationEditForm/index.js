@@ -29,6 +29,7 @@ import {
 } from 'reactstrap';
 
 import config from '../../config';
+import eventEmitter from '../../utils/event-emitter';
 import validationHandler from '../../utils/validation-handler';
 import { optionRenderer, valueRenderer } from '../../utils/category-select';
 import { operationActions } from '../../actions';
@@ -68,6 +69,21 @@ const messages = defineMessages({
     id: 'component.operationEditForm.saveButton',
     description: 'Label of save button',
     defaultMessage: 'Save',
+  },
+  deleteButton: {
+    id: 'component.operationEditForm.deleteButton',
+    description: 'Label of delete button',
+    defaultMessage: 'Delete',
+  },
+  cancelButton: {
+    id: 'component.operationEditForm.cancelButton',
+    description: 'Label of cancel button',
+    defaultMessage: 'Cancel',
+  },
+  todayButton: {
+    id: 'component.operationEditForm.todayButton',
+    description: 'Label of today button',
+    defaultMessage: 'Today',
   },
   addOperationHeader: {
     id: 'component.operationEditForm.addOperationHeader',
@@ -148,13 +164,6 @@ const messages = defineMessages({
       defaultMessage: 'Select account',
     },
   },
-  operationDate: {
-    label: {
-      id: 'component.operationEditForm.operationDate.label',
-      description: 'Label of datepicker',
-      defaultMessage: 'Date of operation',
-    },
-  },
 });
 
 const SelectFormField = field =>
@@ -185,18 +194,14 @@ const TypeFormField = field => {
     <ButtonGroup className="btn-group-justified mb-1">
       <Button
         onClick={() => input.onChange('expense')}
-        color="primary"
         type="button"
-        outline
         active={input.value === 'expense'}
       >
         <FormattedMessage {...messages.expense} />
       </Button>
       <Button
         onClick={() => input.onChange('transfer')}
-        color="primary"
         type="button"
-        outline
         active={input.value === 'transfer'}
         disabled={field.transferDisabled}
       >
@@ -204,9 +209,7 @@ const TypeFormField = field => {
       </Button>
       <Button
         onClick={() => input.onChange('income')}
-        color="primary"
         type="button"
-        outline
         active={input.value === 'income'}
       >
         <FormattedMessage {...messages.income} />
@@ -253,10 +256,22 @@ class OperationEditForm extends React.Component {
     selectedType: React.PropTypes.string,
     selectedCategory: React.PropTypes.string,
     selectedAccount: React.PropTypes.string,
+    selectedCreated: React.PropTypes.string,
     selectedTransferAccounts: React.PropTypes.object,
     changeFieldValue: React.PropTypes.func.isRequired,
     batchMode: React.PropTypes.func.isRequired,
+    toggleOperationDeleteModal: React.PropTypes.func.isRequired,
   };
+
+  constructor(...args) {
+    super(...args);
+
+    this.scrollMe = this.scrollMe.bind(this);
+  }
+
+  componentDidMount() {
+    eventEmitter.on('operation.editOperationItem', this.scrollMe);
+  }
 
   componentWillReceiveProps(nextProps) {
     const {
@@ -298,6 +313,10 @@ class OperationEditForm extends React.Component {
       return;
     }
 
+    if (this.props.operation && !operation) {
+      this.cleanFields();
+    }
+
     const categoryExist = availableCategoryList
       .some(category => category.value === selectedCategory);
 
@@ -326,6 +345,10 @@ class OperationEditForm extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    eventEmitter.off('operation.editOperationItem', this.scrollMe);
+  }
+
   getSubmitButton = () => {
     const { submitting } = this.props.form;
     const { process, isNewOperation } = this.props;
@@ -343,6 +366,72 @@ class OperationEditForm extends React.Component {
 
     return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
+
+  getDeleteButton = () => {
+    const { toggleOperationDeleteModal, operation } = this.props;
+
+    return (
+      <Button
+        type="button"
+        color="danger"
+        className="ml-1"
+        onClick={() => toggleOperationDeleteModal(operation)}
+      >
+        <FormattedMessage {...messages.deleteButton} />
+      </Button>
+    );
+  };
+
+  getCancelButton = () => {
+    const { editOperation } = this.props;
+
+    return (
+      <Button
+        type="button"
+        className="float-xs-right"
+        color="secondary"
+        onClick={() => editOperation()}
+      >
+        <FormattedMessage {...messages.cancelButton} />
+      </Button>
+    );
+  };
+
+  getTodayButton = () => {
+    const { selectedCreated } = this.props;
+
+    if (!selectedCreated) {
+      return null;
+    }
+
+    const selectedDate = moment(selectedCreated).startOf('d').utc();
+    const now = moment().startOf('d').utc();
+    const isSameDay = now.diff(selectedDate, 'd') === 0;
+
+    if (isSameDay) {
+      return null;
+    }
+
+    return (
+      <Button type="button" size="sm" className="mt-1" block onClick={this.setToday}>
+        <FormattedMessage {...messages.todayButton} />
+      </Button>
+    );
+  }
+
+  setToday = () => {
+    this.props.changeFieldValue(formId, 'created', moment.utc().format());
+  }
+
+  scrollMe() {
+    this.operationEditForm.scrollIntoView(true, { behavior: 'smooth' });
+  }
+
+  cleanFields() {
+    this.props.changeFieldValue(formId, 'amountFrom', null);
+    this.props.changeFieldValue(formId, 'amountTo', null);
+    this.props.changeFieldValue(formId, 'amount', null);
+  }
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
     const {
@@ -419,15 +508,13 @@ class OperationEditForm extends React.Component {
 
     resolve(result.data);
   }).then(() => {
-    const { changeFieldValue, isNewOperation, editOperation } = this.props;
-
-    changeFieldValue(formId, 'amountFrom', null);
-    changeFieldValue(formId, 'amountTo', null);
-    changeFieldValue(formId, 'amount', null);
+    const { isNewOperation, editOperation } = this.props;
 
     if (!isNewOperation) {
       editOperation();
     }
+
+    this.cleanFields();
   });
 
   render() {
@@ -447,109 +534,111 @@ class OperationEditForm extends React.Component {
     const { handleSubmit, error: formError } = this.props.form;
 
     return (
-      <Card>
-        <CardHeader>
-          { isNewOperation
-            ? <FormattedMessage {...messages.addOperationHeader} />
-            : <FormattedMessage {...messages.editOperationHeader} />
-          }
-        </CardHeader>
-        <CardBlock>
-          <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
-            <div className={style['datepicker-container']}>
-              <h6 className={classnames('text-xs-center', style['datepicker-label'])}>
-                <FormattedMessage {...messages.operationDate.label} />
-              </h6>
+      <div ref={node => { this.operationEditForm = node; }}>
+        <Card>
+          <CardHeader>
+            { isNewOperation
+              ? <FormattedMessage {...messages.addOperationHeader} />
+              : <FormattedMessage {...messages.editOperationHeader} />
+            }
+          </CardHeader>
+          <CardBlock>
+            <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style['content-container']}>
+              <div className={style['datepicker-container']}>
+                <Field
+                  name="created"
+                  locale={locale}
+                  component={DatePicker}
+                />
 
-              <Field
-                name="created"
-                locale={locale}
-                component={DatePicker}
-              />
-            </div>
-            <div className={classnames(style['form-container'], 'ml-1')}>
-              <Field
-                name="type"
-                component={TypeFormField}
-                transferDisabled={accountList.length <= 1}
-              />
-
-              {selectedType !== 'transfer' && [
-                <Field
-                  key="category"
-                  label={formatMessage(messages.category.label)}
-                  placeholder={formatMessage(messages.category.placeholder)}
-                  name="category"
-                  options={availableCategoryList}
-                  disabled={availableCategoryList.length === 1}
-                  component={SelectFormField}
-                  optionRenderer={optionRenderer()}
-                  valueRenderer={valueRenderer()}
-                  virtualized={false}
-                />,
-                <Field
-                  key="account"
-                  label={formatMessage(messages.account.label)}
-                  placeholder={formatMessage(messages.account.placeholder)}
-                  name="account"
-                  options={accountList}
-                  component={SelectFormField}
-                  disabled={accountList.length === 1}
-                />,
-                <Field
-                  key="amount"
-                  name="amount"
-                  label={formatMessage(messages.amount.label)}
-                  component={NumberFormField}
-                  currency={selectedAccountCurrency}
-                  type="number"
-                />,
-              ]}
-
-              {selectedType === 'transfer' && [
-                <Field
-                  key="accountFrom"
-                  label={formatMessage(messages.accountFrom.label)}
-                  placeholder={formatMessage(messages.accountFrom.placeholder)}
-                  name="accountFrom"
-                  options={availableAccountListFrom}
-                  component={SelectFormField}
-                />,
-                <Field
-                  key="accountTo"
-                  label={formatMessage(messages.accountTo.label)}
-                  placeholder={formatMessage(messages.accountTo.placeholder)}
-                  name="accountTo"
-                  options={availableAccountListTo}
-                  component={SelectFormField}
-                />,
-                <Field
-                  key="amountFrom"
-                  name="amountFrom"
-                  label={formatMessage(messages.amountFrom.label)}
-                  component={NumberFormField}
-                  currency={selectedTransferAccountsCurrency.accountFrom}
-                  type="number"
-                />,
-                <Field
-                  key="amountTo"
-                  name="amountTo"
-                  label={formatMessage(messages.amountTo.label)}
-                  component={NumberFormField}
-                  currency={selectedTransferAccountsCurrency.accountTo}
-                  type="number"
-                />,
-              ]}
-
-              { formError && <Alert color="danger">{formError}</Alert> }
-
-              <div>
-                { this.getSubmitButton() }
+                { this.getTodayButton() }
               </div>
-            </div>
-          </Form>
-        </CardBlock>
-      </Card>
+              <div className={classnames(style['form-container'], 'ml-1')}>
+                <Field
+                  name="type"
+                  component={TypeFormField}
+                  transferDisabled={accountList.length <= 1}
+                />
+
+                {selectedType !== 'transfer' && [
+                  <Field
+                    key="category"
+                    label={formatMessage(messages.category.label)}
+                    placeholder={formatMessage(messages.category.placeholder)}
+                    name="category"
+                    options={availableCategoryList}
+                    disabled={availableCategoryList.length === 1}
+                    component={SelectFormField}
+                    optionRenderer={optionRenderer()}
+                    valueRenderer={valueRenderer()}
+                    virtualized={false}
+                  />,
+                  <Field
+                    key="account"
+                    label={formatMessage(messages.account.label)}
+                    placeholder={formatMessage(messages.account.placeholder)}
+                    name="account"
+                    options={accountList}
+                    component={SelectFormField}
+                    disabled={accountList.length === 1}
+                  />,
+                  <Field
+                    key="amount"
+                    name="amount"
+                    label={formatMessage(messages.amount.label)}
+                    component={NumberFormField}
+                    currency={selectedAccountCurrency}
+                    type="number"
+                  />,
+                ]}
+
+                {selectedType === 'transfer' && [
+                  <Field
+                    key="accountFrom"
+                    label={formatMessage(messages.accountFrom.label)}
+                    placeholder={formatMessage(messages.accountFrom.placeholder)}
+                    name="accountFrom"
+                    options={availableAccountListFrom}
+                    component={SelectFormField}
+                  />,
+                  <Field
+                    key="accountTo"
+                    label={formatMessage(messages.accountTo.label)}
+                    placeholder={formatMessage(messages.accountTo.placeholder)}
+                    name="accountTo"
+                    options={availableAccountListTo}
+                    component={SelectFormField}
+                  />,
+                  <Field
+                    key="amountFrom"
+                    name="amountFrom"
+                    label={formatMessage(messages.amountFrom.label)}
+                    component={NumberFormField}
+                    currency={selectedTransferAccountsCurrency.accountFrom}
+                    type="number"
+                  />,
+                  <Field
+                    key="amountTo"
+                    name="amountTo"
+                    label={formatMessage(messages.amountTo.label)}
+                    component={NumberFormField}
+                    currency={selectedTransferAccountsCurrency.accountTo}
+                    type="number"
+                  />,
+                ]}
+
+                { formError && <Alert color="danger">{formError}</Alert> }
+
+                <div>
+                  { this.getSubmitButton() }
+                  { !isNewOperation && this.getDeleteButton() }
+                  { !isNewOperation && this.getCancelButton() }
+                </div>
+              </div>
+            </Form>
+          </CardBlock>
+        </Card>
+      </div>
     );
   }
 }
@@ -614,6 +703,11 @@ const categoryListSelector = createSelector(
 const selectedTypeSelector = createSelector(
   state => formFieldSelector(state, 'type'),
   currentType => currentType
+);
+
+const selectedCreatedSelector = createSelector(
+  state => formFieldSelector(state, 'created'),
+  currentDate => currentDate
 );
 
 const selectedCategorySelector = createSelector(
@@ -757,6 +851,7 @@ const selector = createSelector(
   selectedTypeSelector,
   selectedCategorySelector,
   selectedAccountSelector,
+  selectedCreatedSelector,
   selectedTransferAccountsSelector,
   availableAccountListFromSelector,
   availableAccountListToSelector,
@@ -772,6 +867,7 @@ const selector = createSelector(
     selectedType,
     selectedCategory,
     selectedAccount,
+    selectedCreated,
     selectedTransferAccounts,
     availableAccountListFrom,
     availableAccountListTo
@@ -787,6 +883,7 @@ const selector = createSelector(
     selectedType,
     selectedCategory,
     selectedAccount,
+    selectedCreated,
     selectedTransferAccounts,
     availableAccountListFrom,
     availableAccountListTo,
@@ -795,4 +892,4 @@ const selector = createSelector(
 
 operationForm = connect(selector, mapDispatchToProps)(operationForm);
 
-export default injectIntl(operationForm);
+export default injectIntl(operationForm, { withRef: true });
