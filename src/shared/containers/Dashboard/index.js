@@ -32,17 +32,18 @@ class Dashboard extends React.Component {
     locale: React.PropTypes.string.isRequired,
   }
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+
     moment.locale(props.locale);
   }
 
   render() {
-    const { isReady } = this.props;
+    const { isReady, children } = this.props;
 
     if (!isReady) {
       return (
-        <div className={style['spinner-container']}>
+        <div className={style.spinner}>
           <Spinner />
           <h4 className="mt-1"><FormattedMessage {...messages.loading} /></h4>
         </div>
@@ -52,7 +53,7 @@ class Dashboard extends React.Component {
     return (
       <div className="pt-1">
         <div className="container"><AppBar /></div>
-        <div className="container mt-1">{ this.props.children }</div>
+        <div className="container mt-1">{ children }</div>
       </div>
     );
   }
@@ -64,7 +65,7 @@ const localeSelector = createSelector(
 );
 
 const isReadySelector = createSelector(
-  state => state.dashboard.ready,
+  state => get(state, 'dashboard.ready', false),
   ready => ready,
 );
 

@@ -1,19 +1,22 @@
+import { isFSA } from 'flux-standard-action';
 import { get } from 'lodash';
 import axios from 'axios';
 
 export default store => next => action => {
+  if (!isFSA(action)) {
+    return next(action);
+  }
+
   const newAction = Object.assign({}, action);
 
   if (get(newAction, 'meta.request')) {
     const state = store.getState();
     const token = get(state, 'auth.token');
+    const axiosConfig = {
+      headers: { Authorization: `JWT ${token}` },
+    };
 
-    let req = axios;
-
-    if (token) {
-      req = axios.create({ headers: { Authorization: `JWT ${token}` } });
-    }
-
+    const req = token ? axios.create(axiosConfig) : axios;
     const method = get(newAction, 'meta.request.method');
     const url = get(newAction, 'meta.request.url');
     const values = get(newAction, 'meta.request.values');

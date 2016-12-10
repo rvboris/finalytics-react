@@ -19,7 +19,7 @@ const ConnectedIntlProvider = connect(intlSelector)(IntlProvider);
 
 const App = (props) => (
   <ConnectedIntlProvider>
-    <div id="app" className={styles.app}>{props.children}</div>
+    <div className={styles.app}>{props.children}</div>
   </ConnectedIntlProvider>
 );
 

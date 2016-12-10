@@ -25,8 +25,8 @@ const storeEnchancers = [
   applyMiddleware(...sagaStoreEnhancer),
 ];
 
-if (process.env.NODE_ENV === 'development') {
-  storeEnchancers.push(window.devToolsExtension ? window.devToolsExtension() : f => f);
+if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
+  storeEnchancers.push(window.devToolsExtension());
 }
 
 const store = createStore(reducer, initialState, compose(...storeEnchancers));

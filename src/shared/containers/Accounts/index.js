@@ -31,18 +31,22 @@ const Accounts = (props) => {
       <h4><FormattedMessage {...messages.manageAccounts} /></h4>
       <hr />
       <div className={style.accounts}>
-        <div className={style['account-list-container']}>
+        <div className={style.list}>
           <Button
             block
             color="primary"
             className="mb-1"
-            onClick={props.newAccount}
+            onClick={props.onNewAccount}
           >
             <FormattedMessage {...messages.createAccount} />
           </Button>
-          <LinkedAccountList onSelect={props.selectAccount} selectedAccountId={selectedAccountId} />
+
+          <LinkedAccountList
+            onSelect={props.onSelectAccount}
+            selectedAccountId={selectedAccountId}
+          />
         </div>
-        <div className={classnames(style['account-details-container'], 'ml-2')}>
+        <div className={classnames(style.details, 'ml-2')}>
           <AccountEditForm accountId={selectedAccountId} />
         </div>
       </div>
@@ -51,13 +55,13 @@ const Accounts = (props) => {
 };
 
 Accounts.propTypes = {
-  selectAccount: React.PropTypes.func.isRequired,
-  newAccount: React.PropTypes.func.isRequired,
+  onSelectAccount: React.PropTypes.func.isRequired,
+  onNewAccount: React.PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  selectAccount: (accountId) => dispatch(push(`/dashboard/accounts/${accountId}`)),
-  newAccount: () => dispatch(push('/dashboard/accounts/new')),
+  onSelectAccount: (accountId) => dispatch(push(`/dashboard/accounts/${accountId}`)),
+  onNewAccount: () => dispatch(push('/dashboard/accounts/new')),
 });
 
 export default injectIntl(connect(null, mapDispatchToProps)(Accounts));

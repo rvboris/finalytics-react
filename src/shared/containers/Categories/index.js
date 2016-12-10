@@ -31,19 +31,22 @@ const Categories = (props) => {
       <h4><FormattedMessage {...messages.manageCategories} /></h4>
       <hr />
       <div className={style.categories}>
-        <div className={style['categories-tree-container']}>
+        <div className={style.tree}>
           <Button
             block
             color="primary"
             className="mb-1"
-            onClick={props.newCategory}
+            onClick={props.onNewCategory}
           >
             <FormattedMessage {...messages.createCategory} />
           </Button>
 
-          <CategoriesTree onSelect={props.selectCategory} selectedCategoryId={selectedCategoryId} />
+          <CategoriesTree
+            onSelect={props.onSelectCategory}
+            selectedCategoryId={selectedCategoryId}
+          />
         </div>
-        <div className={classnames(style['category-details-container'], 'ml-2')}>
+        <div className={classnames(style.details, 'ml-2')}>
           <CategoryEditForm categoryId={selectedCategoryId} />
         </div>
       </div>
@@ -52,13 +55,13 @@ const Categories = (props) => {
 };
 
 Categories.propTypes = {
-  selectCategory: React.PropTypes.func.isRequired,
-  newCategory: React.PropTypes.func.isRequired,
+  onSelectCategory: React.PropTypes.func.isRequired,
+  onNewCategory: React.PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  selectCategory: (categoryId) => dispatch(push(`/dashboard/categories/${categoryId}`)),
-  newCategory: () => dispatch(push('/dashboard/categories/new')),
+  onSelectCategory: (categoryId) => dispatch(push(`/dashboard/categories/${categoryId}`)),
+  onNewCategory: () => dispatch(push('/dashboard/categories/new')),
 });
 
 export default injectIntl(connect(null, mapDispatchToProps)(Categories));

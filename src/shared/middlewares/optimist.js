@@ -2,23 +2,13 @@ import { isFSA } from 'flux-standard-action';
 import { isBoolean } from 'lodash';
 import uuid from 'uuid';
 
-function isPromise(val) {
-  return val && typeof val.then === 'function';
-}
-
-const [RESOLVED_NAME, REJECTED_NAME] = ['_RESOLVED', '_REJECTED'];
-
 const BEGIN = 'BEGIN';
 const COMMIT = 'COMMIT';
 const REVERT = 'REVERT';
 
-function resolve(actionName) {
-  return actionName + RESOLVED_NAME;
-}
-
-function reject(actionName) {
-  return actionName + REJECTED_NAME;
-}
+const isPromise = (val) => val && typeof val.then === 'function';
+const resolveAction = (actionName) => `${actionName}_RESOLVED`;
+const rejectAction = (actionName) => `${actionName}_REJECTED`;
 
 export default ({ dispatch }) => (next) => (action) => {
   if (!isFSA(action) || !action.meta || !isPromise(action.meta.promise)) {
@@ -69,7 +59,7 @@ export default ({ dispatch }) => (next) => (action) => {
 
   return action.meta.promise.then((result) => {
     const actionToDispatch = {
-      type: resolve(action.type),
+      type: resolveAction(action.type),
       payload: result,
       ...nextActionBase,
     };
@@ -83,7 +73,7 @@ export default ({ dispatch }) => (next) => (action) => {
     return result;
   }).catch((error) => {
     const actionToDispatch = {
-      type: reject(action.type),
+      type: rejectAction(action.type),
       payload: error,
       ...nextActionBase,
     };

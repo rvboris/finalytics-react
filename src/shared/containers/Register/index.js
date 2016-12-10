@@ -5,8 +5,8 @@ import { push } from 'react-router-redux';
 import { authActions } from '../../actions';
 import RegisterForm from '../../components/RegisterForm';
 
-const Register = (props) =>
-  (<RegisterForm register={props.register} onSuccess={props.onSuccess} />);
+const Register = ({ register, onSuccess }) =>
+  <RegisterForm register={register} onSuccess={onSuccess} />;
 
 Register.propTypes = {
   register: React.PropTypes.func.isRequired,

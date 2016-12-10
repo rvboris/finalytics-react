@@ -10,7 +10,11 @@ function* onOperationListChange() {
     return;
   }
 
-  yield [put(operationActions.list(defaultQuery)), put(accountActions.load())];
+  yield [
+    put(operationActions.list(defaultQuery)),
+    put(accountActions.load()),
+  ];
+
   yield put(operationActions.needUpdate());
 }
 

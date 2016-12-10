@@ -2,10 +2,10 @@
   box: horizontal;
 }
 
-.categories-tree-container {
+.tree {
   width: 350px;
 }
 
-.category-details-container {
+.details {
   width: 450px;
 }

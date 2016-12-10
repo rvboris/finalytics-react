@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import Immutable from 'seamless-immutable';
 import { handleActions } from 'redux-actions';
 
@@ -11,7 +12,7 @@ const preReducer = (state) => state.set('process', true);
 const reducer = (state, action) =>
   state
     .set('process', false)
-    .set('data', action.payload.data.data);
+    .set('data', get(action, 'payload.data.data'));
 
 const postReducer = () => initialState;
 

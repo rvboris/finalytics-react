@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
+import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { authActions } from '../../actions';
@@ -29,16 +30,18 @@ class Logout extends React.Component {
   };
 
   componentDidMount() {
-    this.props.logout().finally(Promise.delay(2000).then(this.props.goToLogin));
+    const { logout, goToLogin } = this.props;
+    logout().finally(Promise.delay(2000).then(goToLogin));
   }
 
   render() {
-    return (
-      <div className={styles.container}>
-        <Spinner />
+    const { process } = this.props;
 
+    return (
+      <div className={styles.logout}>
+        <Spinner />
         {
-          this.props.process
+          process
             ? <h4 className="mt-1"><FormattedMessage {...messages.process} /></h4>
             : <h4 className="mt-1"><FormattedMessage {...messages.done} /></h4>
         }
@@ -53,7 +56,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const selector = createSelector(
-  state => state.auth.process,
+  state => get(state, 'auth.process', false),
   process => ({ process }),
 );
 
