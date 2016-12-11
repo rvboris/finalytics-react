@@ -48,8 +48,8 @@ const checkValue = (event, currentValue) => {
   }
 };
 
-const MoneyInput = (props) => {
-  const onKeyPress = (event) => checkValue(event, props.input.value.toString());
+const MoneyInput = ({ input, className }) => {
+  const onKeyPress = (event) => checkValue(event, input.value.toString());
 
   const onChange = (event) => {
     const parseValue = parseFloat(event.target.value);
@@ -58,16 +58,16 @@ const MoneyInput = (props) => {
       event.preventDefault();
     }
 
-    if (props.input.onChange) {
-      props.input.onChange(event.target.value);
+    if (input.onChange) {
+      input.onChange(event.target.value);
     }
   };
 
   return (
     <input
-      {...props.input}
+      {...input}
       type="text"
-      className={props.className}
+      className={className}
       onKeyPress={onKeyPress}
       onChange={onChange}
     />

@@ -14,30 +14,31 @@ const messages = defineMessages({
 });
 
 const SelectInput = (props) => {
-  const formatMessage = props.intl.formatMessage;
+  const { intl, input, virtualized, options, name } = props;
+  const formatMessage = intl.formatMessage;
 
   const onChange = (event) => {
-    if (props.input.onChange && event) {
-      props.input.onChange(event.value);
+    if (input.onChange && event) {
+      input.onChange(event.value);
     }
   };
 
   const onBlur = () => {
-    if (props.input.onBlur) {
-      props.input.onBlur(props.input.value);
+    if (input.onBlur) {
+      input.onBlur(input.value);
     }
   };
 
-  if (props.virtualized) {
+  if (virtualized) {
     return (
       <VirtualizedSelect
         {...props}
-        value={props.input.value || ''}
+        value={input.value || ''}
         onBlur={onBlur}
         onChange={onChange}
-        options={props.options}
+        options={options}
         noResultsText={formatMessage(messages.notFoud)}
-        instanceId={props.name}
+        instanceId={name}
         maxHeight={300}
       />
     );
@@ -46,12 +47,12 @@ const SelectInput = (props) => {
   return (
     <Select
       {...props}
-      value={props.input.value || ''}
+      value={input.value || ''}
       onBlur={onBlur}
       onChange={onChange}
-      options={props.options}
+      options={options}
       noResultsText={formatMessage(messages.notFoud)}
-      instanceId={props.name}
+      instanceId={name}
     />
   );
 };

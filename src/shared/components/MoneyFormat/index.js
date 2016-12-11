@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { memoize } from 'lodash';
+import { memoize, get } from 'lodash';
 import accounting from 'accounting';
 
 export const format = (num, currency) => {
@@ -14,7 +14,7 @@ export const format = (num, currency) => {
   return accounting.formatMoney(num, formatOptions);
 };
 
-const MoneyFormat = (props) => (<span>{format(props.sum, props.currency)}</span>);
+const MoneyFormat = ({ sum, currency }) => (<span>{format(sum, currency)}</span>);
 
 MoneyFormat.propTypes = {
   sum: React.PropTypes.number.isRequired,
@@ -30,9 +30,9 @@ const getMemoizeCurrencyFind = (currencyList) => memoize(
 let memoizeCurrencyFind;
 
 const currencySelector = createSelector(
-  state => state.currency.currencyList,
-  (_, props) => props.currencyId,
-  (currencyList = [], currencyId) => {
+  state => get(state, 'currency.currencyList', []),
+  (_, { currencyId }) => currencyId,
+  (currencyList, currencyId) => {
     if (!currencyList.length) {
       return undefined;
     }
@@ -46,7 +46,7 @@ const currencySelector = createSelector(
 );
 
 const processSelector = createSelector(
-  state => state.currency.process,
+  state => get(state, 'currency.process', false),
   process => process
 );
 

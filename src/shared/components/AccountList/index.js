@@ -1,4 +1,5 @@
 import React from 'react';
+import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
@@ -45,12 +46,9 @@ AccountList.propTypes = {
 };
 
 const selector = createSelector(
-  state => state.account.accounts,
-  state => state.account.process,
-  (accounts, process) => ({
-    accounts: accounts || [],
-    process,
-  }),
+  state => get(state, 'account.accounts', []),
+  state => get(state, 'account.process', false),
+  (accounts, process) => ({ accounts, process })
 );
 
 export default injectIntl(connect(selector)(AccountList));

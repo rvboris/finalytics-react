@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Link } from 'react-router';
+import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import {
   Navbar,
@@ -78,14 +79,12 @@ class AppBar extends React.Component {
   constructor(...args) {
     super(...args);
 
-    this.menuToggle = this.menuToggle.bind(this);
-
     this.state = {
       menuOpen: false,
     };
   }
 
-  menuToggle() {
+  menuToggle = () => {
     this.setState(Object.assign({}, this.state, { menuOpen: !this.state.menuOpen }));
   }
 
@@ -142,7 +141,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const userLoginSelector = createSelector(
-  state => state.auth.profile.email,
+  state => get(state, 'auth.profile.email'),
   userLogin => ({ userLogin }),
 );
 

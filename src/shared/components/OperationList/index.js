@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { List, AutoSizer, WindowScroller } from 'react-virtualized';
 import { createSelector } from 'reselect';
-import { noop, memoize } from 'lodash';
+import { noop, memoize, get } from 'lodash';
 import TreeModel from 'tree-model';
 
 import './style.css';
@@ -24,32 +24,25 @@ class OperationList extends React.Component {
     editOperationItem: React.PropTypes.object,
   };
 
-  constructor(...args) {
-    super(...args);
-
-    this.rowRenderer = this.rowRenderer.bind(this);
-    this.loadQuery = this.loadQuery.bind(this);
-    this.isRowLoaded = this.isRowLoaded.bind(this);
-  }
-
   componentWillReceiveProps({ needUpdate }) {
     if (!needUpdate) {
       return;
     }
 
     const { skip, limit } = defaultQuery;
+
     this.loader.clearCache();
     this.loadQuery({ startIndex: skip, stopIndex: limit });
   }
 
-  loadQuery({ startIndex, stopIndex }) {
+  loadQuery = ({ startIndex, stopIndex }) => {
     const query = { limit: stopIndex, skip: startIndex };
     const fullQuery = this.props.operationListQuery.merge(query);
 
     return this.props.loadNextPage(fullQuery.asMutable());
   }
 
-  rowRenderer({ index, key, style: positionStyle }) {
+  rowRenderer = ({ index, key, style: positionStyle }) => {
     const {
       toggleOperationDeleteModal,
       operationList,
@@ -80,9 +73,7 @@ class OperationList extends React.Component {
     );
   }
 
-  isRowLoaded({ index }) {
-    return !!this.props.operationList[index];
-  }
+  isRowLoaded = ({ index }) => !!this.props.operationList[index];
 
   render() {
     const { process, operationList, operationListTotal } = this.props;
@@ -124,17 +115,17 @@ class OperationList extends React.Component {
 }
 
 const processSelector = createSelector(
-  state => state.operation.process,
+  state => get(state, 'operation.process', false),
   process => process,
 );
 
 const operationListQuerySelector = createSelector(
-  state => state.operation.query,
+  state => get(state, 'operation.query'),
   (query) => query,
 );
 
 const categoryTreeSelector = createSelector(
-  state => state.category.data,
+  state => get(state, 'category.data'),
   categoryData => {
     const tree = new TreeModel();
     const rootNode = tree.parse(categoryData);
@@ -149,8 +140,8 @@ const categoryListSelector = createSelector(
 );
 
 const operationListSelector = createSelector(
-  state => state.operation.list,
-  state => state.account.accounts,
+  state => get(state, 'operation.list', []),
+  state => get(state, 'account.accounts', []),
   categoryListSelector,
   (operations, accountList, categoryList) => {
     const accountFindMemoize = memoize(
@@ -179,13 +170,13 @@ const operationListSelector = createSelector(
 );
 
 const operationListTotalSelector = createSelector(
-  state => state.operation.total,
-  (total) => total,
+  state => get(state, 'operation.total', 0),
+  total => total,
 );
 
 const operationNeedUpdateSelector = createSelector(
-  state => state.operation.needUpdate,
-  (needUpdate) => needUpdate,
+  state => get(state, 'operation.needUpdate', false),
+  needUpdate => needUpdate,
 );
 
 const selector = createSelector(

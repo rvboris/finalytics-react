@@ -21,6 +21,7 @@ import {
   InputGroupAddon,
 } from 'reactstrap';
 
+import config from '../../config';
 import { error } from '../../log';
 import { accountActions } from '../../actions';
 import validationHandler from '../../utils/validation-handler';
@@ -184,17 +185,17 @@ const accountTypeMap = {
 
 class AccountEditForm extends React.Component {
   static propTypes = {
-    accountId: React.PropTypes.string,
-    process: React.PropTypes.bool.isRequired,
     form: React.PropTypes.object.isRequired,
     intl: React.PropTypes.object.isRequired,
+    isNewAccount: React.PropTypes.bool.isRequired,
+    accountId: React.PropTypes.string,
+    process: React.PropTypes.bool.isRequired,
     createAccount: React.PropTypes.func.isRequired,
     saveAccount: React.PropTypes.func.isRequired,
     removeAccount: React.PropTypes.func.isRequired,
     selectAccount: React.PropTypes.func.isRequired,
     currencyList: React.PropTypes.array.isRequired,
     selectedCurrency: React.PropTypes.object.isRequired,
-    isNewAccount: React.PropTypes.bool.isRequired,
   };
 
   constructor(...args) {
@@ -207,12 +208,13 @@ class AccountEditForm extends React.Component {
   }
 
   getSubmitButton = () => {
+    const { process } = this.props;
     const { pristine, submitting } = this.props.form;
     const disabled = pristine || submitting || this.props.process;
 
     let label;
 
-    if (submitting || this.props.process) {
+    if (submitting || process) {
       label = <FormattedMessage {...messages.saveProcessButton} />;
     } else if (this.props.isNewAccount) {
       label = <FormattedMessage {...messages.createButton} />;
@@ -236,29 +238,30 @@ class AccountEditForm extends React.Component {
   };
 
   submitHandler = (values) => {
+    const { isNewAccount, accountId, createAccount, saveAccount, selectAccount, intl } = this.props;
     const toValidate = Object.assign({}, defaultValues, values);
 
     toValidate.type = invert(accountTypeMap)[toValidate.type];
 
-    if (!this.props.isNewAccount) {
-      toValidate._id = this.props.accountId;
+    if (!isNewAccount) {
+      toValidate._id = accountId;
     }
 
     return new Promise(async (resolve, reject) => {
       let result;
 
       try {
-        if (this.props.isNewAccount) {
-          result = await this.props.createAccount(toValidate);
+        if (isNewAccount) {
+          result = await createAccount(toValidate);
         } else {
-          result = await this.props.saveAccount(toValidate);
+          result = await saveAccount(toValidate);
         }
       } catch (err) {
         const validationResult =
-          mapValues(validationHandler(toValidate, err),
-            val => this.props.intl.formatMessage({ id: val }));
+          mapValues(validationHandler(toValidate, err), val => intl.formatMessage({ id: val }));
 
         reject(new SubmissionError(validationResult));
+
         return;
       }
 
@@ -267,11 +270,11 @@ class AccountEditForm extends React.Component {
 
       resolve(account);
     }).then((account) => {
-      if (!this.props.isNewAccount) {
+      if (!isNewAccount) {
         return;
       }
 
-      this.props.selectAccount(account._id);
+      selectAccount(account._id);
     });
   };
 
@@ -279,17 +282,21 @@ class AccountEditForm extends React.Component {
     this.setState({ accountDeleteModal: !this.state.accountDeleteModal });
   };
 
-  removeAccount = () =>
-    this.props.removeAccount({ _id: this.props.accountId })
+  removeAccount = () => {
+    const { removeAccount, selectAccount, accountId } = this.props;
+
+    return removeAccount({ _id: accountId })
       .then(() => {
         this.toggleModal();
-        this.props.selectAccount('');
+        selectAccount('');
       }, (e) => {
         error(e);
         this.setState(Object.assign(this.state, { accountDeleteError: true }));
       });
+  }
 
   render() {
+    const { accountId, isNewAccount, currencyList, selectedCurrency, process } = this.props;
     const { formatMessage } = this.props.intl;
     const { handleSubmit, error: formError, initialValues } = this.props.form;
     const deleteConfirmMessage =
@@ -301,7 +308,7 @@ class AccountEditForm extends React.Component {
         }
       />);
 
-    if (!this.props.accountId) {
+    if (!accountId) {
       return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
@@ -319,16 +326,16 @@ class AccountEditForm extends React.Component {
           <Field
             label={formatMessage(messages.currencyId.label)}
             name="currency"
-            options={this.props.currencyList}
+            options={currencyList}
             component={SelectFormField}
-            disabled={!this.props.isNewAccount}
+            disabled={!isNewAccount}
           />
 
           <Field
             label={formatMessage(messages.type.label)}
             name="type"
             component={ToggleFormField}
-            disabled={!this.props.isNewAccount}
+            disabled={!isNewAccount}
           />
 
           <Field
@@ -336,7 +343,7 @@ class AccountEditForm extends React.Component {
             label={formatMessage(messages.startBalance.label)}
             placeholder={formatMessage(messages.startBalance.placeholder)}
             component={NumberFormField}
-            currency={this.props.selectedCurrency}
+            currency={selectedCurrency}
             type="number"
           />
 
@@ -365,8 +372,9 @@ class AccountEditForm extends React.Component {
             }
 
             <Button
+              type="button"
               onClick={this.removeAccount}
-              disabled={this.props.process}
+              disabled={process}
               color="danger"
               className="mr-1"
             >
@@ -377,7 +385,7 @@ class AccountEditForm extends React.Component {
               }
             </Button>
 
-            <Button onClick={this.toggleModal} disabled={this.props.process}>
+            <Button type="button" onClick={this.toggleModal} disabled={process}>
               <FormattedMessage {...messages.cancelButton} />
             </Button>
           </ModalFooter>
@@ -396,12 +404,12 @@ let accountForm = reduxForm({
 const formFieldSelector = formValueSelector('accountEdit');
 
 const processSelector = createSelector(
-  state => state.account.process,
+  state => get(state, 'account.process', false),
   process => process,
 );
 
 const currencyListSelector = createSelector(
-  state => state.currency.currencyList,
+  state => get(state, 'currency.currencyList', []),
   currencyList => currencyList.map(currency => ({
     value: currency._id,
     label: `${currency.translatedName} (${currency.code})`,
@@ -409,9 +417,9 @@ const currencyListSelector = createSelector(
 );
 
 const accountSelector = createSelector(
-  state => state.account.accounts,
+  state => get(state, 'account.accounts', []),
   (_, props) => props.accountId,
-  (accountList, accountId) => accountList.find(account => account._id === accountId),
+  (accountList, accountId) => accountList.find(({ _id }) => _id === accountId),
 );
 
 const isNewAccountSelector = createSelector(
@@ -421,8 +429,8 @@ const isNewAccountSelector = createSelector(
 
 const accountDefaultsSelector = createSelector(
   accountSelector,
-  state => state.currency.currencyList,
-  state => state.auth.profile.settings.locale,
+  state => get(state, 'currency.currencyList', []),
+  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
   (accountToEdit, currencyList, locale) => {
     let result = defaultValues;
 
@@ -432,7 +440,7 @@ const accountDefaultsSelector = createSelector(
 
     if (!result.currency) {
       const currencyCode = locale === 'ru' ? 'RUB' : 'USD';
-      const defaultCurrency = currencyList.find(currency => currency.code === currencyCode);
+      const defaultCurrency = currencyList.find(({ code }) => code === currencyCode);
 
       result.currency = defaultCurrency._id;
     }
@@ -450,10 +458,10 @@ const accountDefaultsSelector = createSelector(
 const selectedCurrencySelector = createSelector(
   accountDefaultsSelector,
   state => formFieldSelector(state, ...fieldsToEdit),
-  state => state.currency.currencyList,
+  state => get(state, 'currency.currencyList'),
   (initialValues, currentValues, currencyList) => {
     const values = Object.assign({}, initialValues, currentValues);
-    const selectedCurrency = currencyList.find(currency => currency._id === values.currency);
+    const selectedCurrency = currencyList.find(({ _id }) => _id === values.currency);
 
     return selectedCurrency;
   },

@@ -1,6 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import {
@@ -62,33 +63,33 @@ const messages = defineMessages({
 class Operations extends React.Component {
   static propTypes = {
     accountsExist: React.PropTypes.bool.isRequired,
-    listOperations: React.PropTypes.func.isRequired,
     operationProcess: React.PropTypes.bool.isRequired,
+    listOperations: React.PropTypes.func.isRequired,
     removeOperation: React.PropTypes.func.isRequired,
   }
 
   constructor(...args) {
     super(...args);
 
-    this.toggleOperationDeleteModal = this.toggleOperationDeleteModal.bind(this);
-    this.removeOperation = this.removeOperation.bind(this);
-    this.editOperation = this.editOperation.bind(this);
-
-    this.state = { operationDeleteModal: false };
+    this.state = {
+      operationDeleteModal: false,
+      operationToDelete: undefined,
+      operationToEdit: undefined,
+    };
   }
 
   componentDidMount() {
     this.props.listOperations(defaultQuery);
   }
 
-  toggleOperationDeleteModal(operation) {
+  toggleOperationDeleteModal = (operation) => {
     this.setState(Object.assign({}, this.state, {
       operationDeleteModal: !this.state.operationDeleteModal,
       operationToDelete: operation,
     }));
   }
 
-  removeOperation() {
+  removeOperation = () => {
     const { removeOperation } = this.props;
     const { operationToDelete } = this.state;
 
@@ -107,7 +108,7 @@ class Operations extends React.Component {
       });
   }
 
-  editOperation(operation) {
+  editOperation = (operation) => {
     this.setState(Object.assign({}, this.state, {
       operationToEdit: operation,
     }));
@@ -120,27 +121,24 @@ class Operations extends React.Component {
     const { operationDeleteModal, operationDeleteError, operationToEdit } = this.state;
 
     return (
-      <div className={style.operations}>
-        <div className={style['operations-container']}>
+      <div className={style.container}>
+        <div className={style.operations}>
           { accountsExist &&
             <OperationEditForm
               operation={operationToEdit}
               editOperation={this.editOperation}
               toggleOperationDeleteModal={this.toggleOperationDeleteModal}
             /> }
-
           { accountsExist &&
             <OperationList
-              toggleOperationDeleteModal={this.toggleOperationDeleteModal}
               editOperation={this.editOperation}
               editOperationItem={operationToEdit}
+              toggleOperationDeleteModal={this.toggleOperationDeleteModal}
             />
           }
-
           { !accountsExist &&
             <Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>
           }
-
           <Modal isOpen={operationDeleteModal} toggle={this.toggleOperationDeleteModal}>
             <ModalHeader toggle={this.toggleOperationDeleteModal}>
               <FormattedMessage {...messages.removeOperationModalTitle} />
@@ -154,8 +152,8 @@ class Operations extends React.Component {
                   <FormattedMessage {...messages.removeOperationModalError} />
                 </p>
               }
-
               <Button
+                type="button"
                 onClick={this.removeOperation}
                 disabled={operationProcess}
                 color="danger"
@@ -168,13 +166,17 @@ class Operations extends React.Component {
                 }
               </Button>
 
-              <Button onClick={this.toggleOperationDeleteModal} disabled={operationProcess}>
+              <Button
+                type="button"
+                onClick={this.toggleOperationDeleteModal}
+                disabled={operationProcess}
+              >
                 <FormattedMessage {...messages.removeOperationModalCancelButton} />
               </Button>
             </ModalFooter>
           </Modal>
         </div>
-        <div className={classnames(style['balance-container'], 'ml-2')}>
+        <div className={classnames(style.balance, 'ml-2')}>
           <AccountList />
         </div>
       </div>
@@ -183,13 +185,13 @@ class Operations extends React.Component {
 }
 
 const operationProcessSelector = createSelector(
-  state => state.operation.process,
+  state => get(state, 'operation.process', false),
   process => process
 );
 
 const accountsExistSelector = createSelector(
-  state => state.account.accounts || [],
-  (accountList = []) => accountList.length > 0
+  state => get(state, 'account.accounts', []),
+  accountList => accountList.length > 0
 );
 
 const selector = createSelector(

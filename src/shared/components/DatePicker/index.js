@@ -5,12 +5,12 @@ import moment from 'moment';
 
 import './style.css';
 
-const DatePicker = (props) => {
-  const { value } = props.input;
+const DatePicker = ({ locale, input }) => {
+  const { value } = input;
 
   const onChange = (event, date) => {
-    if (props.input.onChange && event) {
-      props.input.onChange(moment(date).utc().format());
+    if (input.onChange && event) {
+      input.onChange(moment(date).utc().format());
     }
   };
 
@@ -19,7 +19,7 @@ const DatePicker = (props) => {
   return (
     <DayPicker
       localeUtils={LocaleUtils}
-      locale={props.locale}
+      locale={locale}
       onDayClick={onChange}
       selectedDays={selectedDays}
       initialMonth={moment(value).utc().toDate()}

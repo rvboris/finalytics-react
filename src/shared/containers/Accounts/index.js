@@ -33,6 +33,7 @@ const Accounts = (props) => {
       <div className={style.accounts}>
         <div className={style.list}>
           <Button
+            type="button"
             block
             color="primary"
             className="mb-1"

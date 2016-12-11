@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
-import { mapValues } from 'lodash';
+import { mapValues, get } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import FaFacebookIcon from 'react-icons/lib/fa/facebook';
 import FaGoogleIcon from 'react-icons/lib/fa/google';
@@ -125,12 +125,12 @@ let LoginForm = (props) => {
         return;
       }
 
-      resolve(result.data.token);
+      resolve(get(result, 'data.token'));
     }).then(onSuccess, onError);
 
   return (
     <div className={style.container}>
-      <Card className={style['login-form']}>
+      <Card className={style.form}>
         <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
 
         <CardBlock>
@@ -153,7 +153,7 @@ let LoginForm = (props) => {
 
             { error && <Alert color="danger">{error}</Alert> }
 
-            <div className={style['action-buttons']}>
+            <div className={style.buttons}>
               <Button
                 type="button"
                 disabled={process}
@@ -201,7 +201,10 @@ LoginForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => state.auth.process, process => ({ process }));
+const selector = createSelector(
+  state => get(state, 'auth.process', false),
+  process => ({ process })
+);
 
 LoginForm = reduxForm({ form: 'login', propNamespace: 'form' })(LoginForm);
 LoginForm = connect(selector)(LoginForm);

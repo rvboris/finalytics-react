@@ -3,18 +3,18 @@ import Toggle from 'react-toggle';
 
 import './style.css';
 
-const ToggleInput = (props) => {
+const ToggleInput = ({ input, disabled }) => {
   const onChange = (event) => {
-    if (props.input.onChange && event) {
-      props.input.onChange(event.target.checked);
+    if (input.onChange && event) {
+      input.onChange(event.target.checked);
     }
   };
 
   return (
     <Toggle
-      disabled={props.disabled}
+      disabled={disabled}
       onChange={onChange}
-      checked={props.input.value}
+      checked={input.value}
     />
   );
 };

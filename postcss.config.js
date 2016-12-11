@@ -1,5 +1,6 @@
 module.exports = () => ({
   plugins: [
+    require('stylelint')(),
     require('postcss-flexbox')(),
     require('rucksack-css'),
     require('postcss-cssnext'),

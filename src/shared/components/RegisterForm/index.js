@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
-import { mapValues } from 'lodash';
+import { mapValues, get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import FaFacebookIcon from 'react-icons/lib/fa/facebook';
 import FaGoogleIcon from 'react-icons/lib/fa/google';
@@ -138,7 +138,7 @@ let RegisterForm = (props) => {
 
   return (
     <div className={style.container}>
-      <Card className={style['register-form']}>
+      <Card className={style.form}>
         <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
         <CardBlock>
           <Form onSubmit={handleSubmit(submitHandler)} noValidate>
@@ -172,7 +172,7 @@ let RegisterForm = (props) => {
               type="submit"
               color="primary"
               disabled={pristine || submitting || process}
-              className={style['submit-button']}
+              className={style.submit}
               block
             >{process
               ? <FormattedMessage {...messages.processButton} />
@@ -208,7 +208,10 @@ RegisterForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => state.auth.process, process => ({ process }));
+const selector = createSelector(
+  state => get(state, 'auth.process', false),
+  process => ({ process })
+);
 
 RegisterForm = reduxForm({ form: 'register', propNamespace: 'form' })(RegisterForm);
 RegisterForm = connect(selector)(RegisterForm);

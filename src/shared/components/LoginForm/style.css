@@ -3,12 +3,12 @@
   min-height: 100vh;
 }
 
-.login-form {
+.form {
   display: inline-block;
   width: 320px;
 }
 
-.action-buttons {
+.buttons {
   box: horizontal space-between;
   margin-bottom: 40px;
 }

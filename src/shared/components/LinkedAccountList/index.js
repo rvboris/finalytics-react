@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { Alert } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 const messages = defineMessages({
@@ -13,15 +14,15 @@ const messages = defineMessages({
   },
 });
 
-const LinkedAccountList = (props) => {
-  if (props.accounts.length) {
+const LinkedAccountList = ({ accounts, selectedAccountId, onSelect }) => {
+  if (accounts.length) {
     return (
       <div className="list-group">
-        {props.accounts.map((account) => {
-          const onSelect = () => props.onSelect(account._id);
+        {accounts.map((account) => {
+          const accountSelect = () => onSelect(account._id);
           const btnClassess = ['list-group-item', 'list-group-item-action'];
 
-          if (account._id === props.selectedAccountId) {
+          if (account._id === selectedAccountId) {
             btnClassess.push('active');
           }
 
@@ -30,7 +31,7 @@ const LinkedAccountList = (props) => {
               key={account._id}
               type="button"
               className={classnames(...btnClassess)}
-              onClick={onSelect}
+              onClick={accountSelect}
             >
               {account.name}
             </button>
@@ -40,7 +41,7 @@ const LinkedAccountList = (props) => {
     );
   }
 
-  return (<Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>);
+  return <Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>;
 };
 
 LinkedAccountList.propTypes = {
@@ -50,12 +51,9 @@ LinkedAccountList.propTypes = {
 };
 
 const selector = createSelector(
-  state => state.account.accounts,
-  state => state.account.process,
-  (accounts, process) => ({
-    accounts: accounts || [],
-    process,
-  }),
+  state => get(state, 'account.accounts', []),
+  state => get(state, 'account.process', false),
+  (accounts, process) => ({ accounts, process })
 );
 
 export default injectIntl(connect(selector)(LinkedAccountList));

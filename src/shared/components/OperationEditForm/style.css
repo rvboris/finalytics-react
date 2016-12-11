@@ -1,11 +1,11 @@
-.content-container {
+.content {
   box: horizontal;
 }
 
-.datepicker-container {
+.datepicker {
   width: 250px;
 }
 
-.form-container {
+.form {
   box-item: flex-1;
 }

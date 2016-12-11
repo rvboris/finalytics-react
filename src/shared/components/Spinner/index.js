@@ -2,10 +2,7 @@ import React from 'react';
 
 import style from './style.css';
 
-const Spinner = (props) => {
-  const color = props.color || '#000';
-  const size = props.size || 50;
-
+const Spinner = ({ color = '#000', size = 50 }) => {
   const styleSize = {
     width: `${size}px`,
     height: `${size}px`,

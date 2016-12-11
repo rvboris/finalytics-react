@@ -33,6 +33,7 @@ const Categories = (props) => {
       <div className={style.categories}>
         <div className={style.tree}>
           <Button
+            type="button"
             block
             color="primary"
             className="mb-1"
