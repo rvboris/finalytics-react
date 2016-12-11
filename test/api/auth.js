@@ -54,8 +54,7 @@ test.serial('login', async (t) => {
     password: '12345678',
   });
 
-  t.is(res.status, 302);
-  t.is(res.headers.location, '/dashboard');
+  t.is(res.status, 200);
   t.is(res.headers['set-cookie'].length, 2);
   t.true(res.headers['set-cookie'][0].startsWith('koa.sid'));
   t.true(res.headers['set-cookie'][1].startsWith('koa.sid.sig'));
@@ -67,8 +66,7 @@ test.serial('login authorized', async (t) => {
     password: '12345678',
   });
 
-  t.is(res.status, 302);
-  t.is(res.headers.location, '/dashboard');
+  t.is(res.status, 200);
 });
 
 test.serial('register local strategy exist', async (t) => {
@@ -101,8 +99,7 @@ test.serial('login again authorized', async (t) => {
     password: '12345678',
   });
 
-  t.is(res.status, 302);
-  t.is(res.headers.location, '/dashboard');
+  t.is(res.status, 200);
 });
 
 test('register local strategy require email', async (t) => {
