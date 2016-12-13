@@ -27,20 +27,25 @@ export default class TreeView extends React.Component {
   }
 
   getCollapseButton = () => {
-    if (!this.props.children) {
+    const { children, arrowClassName } = this.props;
+    const { collapsed } = this.state;
+
+    if (!children) {
       return null;
     }
 
     return (
-      <button className={this.props.arrowClassName} onClick={this.handleCollapse}>
-        { this.state.collapsed ? <FaAngleDown /> : <FaAngleUp /> }
+      <button type="button" className={arrowClassName} onClick={this.handleCollapse}>
+        { collapsed ? <FaAngleDown /> : <FaAngleUp /> }
       </button>
     );
   }
 
   handleSelect = () => {
-    if (this.props.onSelect) {
-      this.props.onSelect(this.props.itemId);
+    const { onSelect, itemId } = this.props;
+
+    if (onSelect) {
+      onSelect(itemId);
     }
   }
 
@@ -49,29 +54,34 @@ export default class TreeView extends React.Component {
   }
 
   render() {
-    const { selected, label, children } = this.props;
+    const {
+      selected,
+      label,
+      children,
+      itemClassName,
+      itemNoChildrenClassName,
+      labelClassName,
+      labelSelectedClassName,
+      chidlrenContainerClassName,
+    } = this.props;
+
     const { collapsed } = this.state;
 
     return (
       <div>
-        <div
-          className={classnames(
-            this.props.itemClassName,
-            !children && this.props.itemNoChildrenClassName
-          )}
-        >
+        <div className={classnames(itemClassName, !children && itemNoChildrenClassName)}>
           { this.getCollapseButton() }
+
           <button
+            type="button"
             onClick={this.handleSelect}
-            className={classnames(
-              this.props.labelClassName,
-              selected && this.props.labelSelectedClassName
-            )}
+            className={classnames(labelClassName, selected && labelSelectedClassName)}
           >
             {label}
           </button>
         </div>
-        <div className={this.props.chidlrenContainerClassName}>{collapsed ? null : children}</div>
+
+        <div className={chidlrenContainerClassName}>{collapsed ? null : children}</div>
       </div>
     );
   }

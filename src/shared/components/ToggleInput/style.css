@@ -1,0 +1,19 @@
+:global .react-toggle {
+  display: block;
+  width: 50px;
+}
+
+:global .react-toggle-thumb {
+  border: 0;
+  border-radius: 0.25rem;
+}
+
+:global .react-toggle-track {
+  border-radius: 0.25rem;
+}
+
+:global .react-toggle--focus .react-toggle-thumb,
+:global .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb,
+:global .react-toggle:active .react-toggle-thumb {
+  box-shadow: none;
+}

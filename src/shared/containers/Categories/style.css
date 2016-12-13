@@ -2,15 +2,10 @@
   box: horizontal;
 }
 
-.categories-tree-container {
+.tree {
   width: 350px;
 }
 
-.category-details-container {
+.details {
   width: 450px;
-  margin-left: 20px;
-}
-
-.category-create {
-  margin-bottom: 20px;
 }

@@ -3,11 +3,11 @@
   min-height: 100vh;
 }
 
-.register-form {
+.form {
   display: inline-block;
   width: 320px;
 }
 
-.submit-button {
+.submit {
   margin-bottom: 40px;
 }

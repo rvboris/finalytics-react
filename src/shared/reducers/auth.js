@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import Immutable from 'seamless-immutable';
 import { handleActions } from 'redux-actions';
 
@@ -28,7 +29,10 @@ export default handleActions({
   AUTH_LOGOUT: (state) => state.set('process', true),
 
   AUTH_LOGOUT_RESOLVED: (state) =>
-    initialState.setIn(['profile', 'settings', 'locale'], state.profile.settings.locale),
+    initialState.setIn(
+      ['profile', 'settings', 'locale'],
+      get(state, 'profile.settings.locale', config.defaultLang)
+    ),
 
   AUTH_LOGOUT_REJECTED: (state) => state.set('process', false),
 
@@ -46,7 +50,9 @@ export default handleActions({
   AUTH_GET_PROFILE_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .merge({ profile: action.payload.data }),
+      .merge({
+        profile: get(action, 'payload.data'),
+      }),
 
   AUTH_GET_PROFILE_REJECTED: (state) => state.set('process', false),
 
@@ -55,7 +61,9 @@ export default handleActions({
   AUTH_SET_SETTINGS_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .merge({ profile: { settings: action.payload.data } }, { deep: true }),
+      .merge({
+        profile: { settings: get(action, 'payload.data') },
+      }, { deep: true }),
 
   AUTH_SET_SETTINGS_REJECTED: (state) => state.set('process', false),
 
@@ -64,16 +72,16 @@ export default handleActions({
   AUTH_SET_STATUS_RESOLVED: (state, action) =>
     state
       .set('process', false)
-      .setIn(['profile', 'status'], action.payload.data.status),
+      .setIn(['profile', 'status'], get(action, 'payload.data.status')),
 
   AUTH_SET_STATUS_REJECTED: (state) => state.set('process', false),
 
   AUTH_SET_TOKEN: (state, action) =>
     state
       .set('isAuthenticated', true)
-      .set('token', action.payload.token),
+      .set('token', get(action, 'payload.token')),
 
   AUTH_SET_USER_AGENT: (state, action) =>
     state
-      .set('userAgent', action.payload.userAgent),
+      .set('userAgent', get(action, 'payload.userAgent')),
 }, initialState);

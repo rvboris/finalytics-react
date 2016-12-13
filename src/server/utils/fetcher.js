@@ -1,9 +1,9 @@
-import { isFunction } from 'lodash';
+import { isFunction, get } from 'lodash';
 
 export default (dispatch, components, params) => {
   const needs = components.reduce((prev, current) => {
     if (current) {
-      return (current.needs || []).concat(prev);
+      return (current.needs || get(current, 'WrappedComponent.needs', [])).concat(prev);
     }
 
     return prev;

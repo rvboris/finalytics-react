@@ -45,7 +45,12 @@ const oauthHandler = (provider, options) => async (ctx, next) => {
     const token = getToken(user);
 
     ctx.session.token = token;
-    ctx.redirect('/dashboard');
+
+    if (provider !== 'local') {
+      ctx.redirect('/dashboard');
+    } else {
+      ctx.status = 200;
+    }
   })(ctx, next);
 };
 

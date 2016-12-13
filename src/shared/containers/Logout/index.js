@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { createSelector } from 'reselect';
+import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { authActions } from '../../actions';
@@ -12,7 +13,7 @@ const messages = defineMessages({
   done: {
     id: 'container.logout.done',
     description: 'Logout exit message',
-    defaultMessage: 'The logout is complete, return to the main page',
+    defaultMessage: 'The logout is complete',
   },
   process: {
     id: 'container.logout.process',
@@ -24,27 +25,25 @@ const messages = defineMessages({
 class Logout extends React.Component {
   static propTypes = {
     logout: React.PropTypes.func.isRequired,
-    goMain: React.PropTypes.func.isRequired,
+    goToLogin: React.PropTypes.func.isRequired,
     process: React.PropTypes.bool.isRequired,
   };
 
-  constructor(...args) {
-    super(...args);
-
-    if (IS_CLIENT) {
-      this.props.logout().finally(Promise.delay(2000).then(this.props.goMain));
-    }
+  componentDidMount() {
+    const { logout, goToLogin } = this.props;
+    logout().finally(Promise.delay(2000).then(goToLogin));
   }
 
   render() {
-    return (
-      <div className={styles.container}>
-        <Spinner />
+    const { process } = this.props;
 
+    return (
+      <div className={styles.logout}>
+        <Spinner />
         {
-          this.props.process
-            ? <h4><FormattedMessage {...messages.process} /></h4>
-            : <h4><FormattedMessage {...messages.done} /></h4>
+          process
+            ? <h4 className="mt-1"><FormattedMessage {...messages.process} /></h4>
+            : <h4 className="mt-1"><FormattedMessage {...messages.done} /></h4>
         }
       </div>
     );
@@ -53,11 +52,11 @@ class Logout extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(authActions.logout()),
-  goMain: () => dispatch(push('/')),
+  goToLogin: () => dispatch(push('/login')),
 });
 
 const selector = createSelector(
-  state => state.auth.process,
+  state => get(state, 'auth.process', false),
   process => ({ process }),
 );
 

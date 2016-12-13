@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Alert, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Alert } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   noAccounts: {
@@ -12,28 +14,34 @@ const messages = defineMessages({
   },
 });
 
-const LinkedAccountList = (props) => {
-  if (props.accounts.length) {
+const LinkedAccountList = ({ accounts, selectedAccountId, onSelect }) => {
+  if (accounts.length) {
     return (
-      <ListGroup>
-        {props.accounts.map((account) => {
-          const onSelect = () => props.onSelect(account._id);
+      <div className="list-group">
+        {accounts.map((account) => {
+          const accountSelect = () => onSelect(account._id);
+          const btnClassess = ['list-group-item', 'list-group-item-action'];
+
+          if (account._id === selectedAccountId) {
+            btnClassess.push('active');
+          }
 
           return (
-            <ListGroupItem
-              onClick={onSelect}
-              active={account._id === props.selectedAccountId}
+            <button
               key={account._id}
+              type="button"
+              className={classnames(...btnClassess)}
+              onClick={accountSelect}
             >
               {account.name}
-            </ListGroupItem>
+            </button>
           );
         })}
-      </ListGroup>
+      </div>
     );
   }
 
-  return (<Alert><FormattedMessage {...messages.noAccounts} /></Alert>);
+  return <Alert color="info"><FormattedMessage {...messages.noAccounts} /></Alert>;
 };
 
 LinkedAccountList.propTypes = {
@@ -43,12 +51,9 @@ LinkedAccountList.propTypes = {
 };
 
 const selector = createSelector(
-  state => state.account.accounts,
-  state => state.account.process,
-  (accounts, process) => ({
-    accounts: accounts || [],
-    process,
-  }),
+  state => get(state, 'account.accounts', []),
+  state => get(state, 'account.process', false),
+  (accounts, process) => ({ accounts, process })
 );
 
 export default injectIntl(connect(selector)(LinkedAccountList));

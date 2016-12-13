@@ -7,22 +7,27 @@ import { mapValues, pick, invert, get, isUndefined } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import {
   Button,
-  FormControl,
+  Form,
   FormGroup,
-  ControlLabel,
-  HelpBlock,
-  InputGroup,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
   Modal,
-} from 'react-bootstrap';
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  InputGroup,
+  InputGroupAddon,
+} from 'reactstrap';
 
+import config from '../../config';
 import { error } from '../../log';
 import { accountActions } from '../../actions';
 import validationHandler from '../../utils/validation-handler';
 import SelectInput from '../SelectInput';
 import ToggleInput from '../ToggleInput';
 import MoneyInput from '../MoneyInput';
-import style from './style.css';
 
 const messages = defineMessages({
   infoAlert: {
@@ -126,48 +131,42 @@ const messages = defineMessages({
 });
 
 const TextFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type="text"
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const NumberFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <InputGroup>
       <MoneyInput {...field} className="form-control" />
-      <InputGroup.Addon>{field.currency.code}</InputGroup.Addon>
+      <InputGroupAddon>{field.currency.code}</InputGroupAddon>
     </InputGroup>
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const SelectFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <SelectInput
       {...field}
       options={field.options}
       clearable={false}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const ToggleFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>
-      <span className={style['toggle-label']}>{field.label}</span>
-      <ToggleInput {...field} />
-    </ControlLabel>
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <ToggleInput {...field} />
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const defaultValues = {
@@ -186,17 +185,17 @@ const accountTypeMap = {
 
 class AccountEditForm extends React.Component {
   static propTypes = {
-    accountId: React.PropTypes.string,
-    process: React.PropTypes.bool.isRequired,
     form: React.PropTypes.object.isRequired,
     intl: React.PropTypes.object.isRequired,
+    isNewAccount: React.PropTypes.bool.isRequired,
+    accountId: React.PropTypes.string,
+    process: React.PropTypes.bool.isRequired,
     createAccount: React.PropTypes.func.isRequired,
     saveAccount: React.PropTypes.func.isRequired,
     removeAccount: React.PropTypes.func.isRequired,
     selectAccount: React.PropTypes.func.isRequired,
     currencyList: React.PropTypes.array.isRequired,
     selectedCurrency: React.PropTypes.object.isRequired,
-    isNewAccount: React.PropTypes.bool.isRequired,
   };
 
   constructor(...args) {
@@ -209,12 +208,13 @@ class AccountEditForm extends React.Component {
   }
 
   getSubmitButton = () => {
+    const { process } = this.props;
     const { pristine, submitting } = this.props.form;
     const disabled = pristine || submitting || this.props.process;
 
     let label;
 
-    if (submitting || this.props.process) {
+    if (submitting || process) {
       label = <FormattedMessage {...messages.saveProcessButton} />;
     } else if (this.props.isNewAccount) {
       label = <FormattedMessage {...messages.createButton} />;
@@ -222,7 +222,7 @@ class AccountEditForm extends React.Component {
       label = <FormattedMessage {...messages.saveButton} />;
     }
 
-    return (<Button type="submit" bsStyle="primary" disabled={disabled}>{label}</Button>);
+    return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
   getDeleteButton = () => {
@@ -231,36 +231,37 @@ class AccountEditForm extends React.Component {
     }
 
     return (
-      <Button className="pull-right" bsStyle="danger" onClick={this.toggleModal}>
+      <Button className="float-xs-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
   };
 
   submitHandler = (values) => {
+    const { isNewAccount, accountId, createAccount, saveAccount, selectAccount, intl } = this.props;
     const toValidate = Object.assign({}, defaultValues, values);
 
     toValidate.type = invert(accountTypeMap)[toValidate.type];
 
-    if (!this.props.isNewAccount) {
-      toValidate._id = this.props.accountId;
+    if (!isNewAccount) {
+      toValidate._id = accountId;
     }
 
     return new Promise(async (resolve, reject) => {
       let result;
 
       try {
-        if (this.props.isNewAccount) {
-          result = await this.props.createAccount(toValidate);
+        if (isNewAccount) {
+          result = await createAccount(toValidate);
         } else {
-          result = await this.props.saveAccount(toValidate);
+          result = await saveAccount(toValidate);
         }
       } catch (err) {
         const validationResult =
-          mapValues(validationHandler(toValidate, err),
-            val => this.props.intl.formatMessage({ id: val }));
+          mapValues(validationHandler(toValidate, err), val => intl.formatMessage({ id: val }));
 
         reject(new SubmissionError(validationResult));
+
         return;
       }
 
@@ -269,11 +270,11 @@ class AccountEditForm extends React.Component {
 
       resolve(account);
     }).then((account) => {
-      if (!this.props.isNewAccount) {
+      if (!isNewAccount) {
         return;
       }
 
-      this.props.selectAccount(account._id);
+      selectAccount(account._id);
     });
   };
 
@@ -281,19 +282,23 @@ class AccountEditForm extends React.Component {
     this.setState({ accountDeleteModal: !this.state.accountDeleteModal });
   };
 
-  removeAccount = () =>
-    this.props.removeAccount({ _id: this.props.accountId })
+  removeAccount = () => {
+    const { removeAccount, selectAccount, accountId } = this.props;
+
+    return removeAccount({ _id: accountId })
       .then(() => {
         this.toggleModal();
-        this.props.selectAccount('');
+        selectAccount('');
       }, (e) => {
         error(e);
         this.setState(Object.assign(this.state, { accountDeleteError: true }));
       });
+  }
 
   render() {
+    const { accountId, isNewAccount, currencyList, selectedCurrency, process } = this.props;
     const { formatMessage } = this.props.intl;
-    const { handleSubmit, error, initialValues } = this.props.form;
+    const { handleSubmit, error: formError, initialValues } = this.props.form;
     const deleteConfirmMessage =
       (<FormattedMessage
         {
@@ -303,13 +308,13 @@ class AccountEditForm extends React.Component {
         }
       />);
 
-    if (!this.props.accountId) {
-      return (<Alert><FormattedMessage {...messages.infoAlert} /></Alert>);
+    if (!accountId) {
+      return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
     return (
       <div>
-        <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
+        <Form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
             name="name"
             label={formatMessage(messages.name.label)}
@@ -321,14 +326,16 @@ class AccountEditForm extends React.Component {
           <Field
             label={formatMessage(messages.currencyId.label)}
             name="currency"
-            options={this.props.currencyList}
+            options={currencyList}
             component={SelectFormField}
+            disabled={!isNewAccount}
           />
 
           <Field
             label={formatMessage(messages.type.label)}
             name="type"
             component={ToggleFormField}
+            disabled={!isNewAccount}
           />
 
           <Field
@@ -336,43 +343,52 @@ class AccountEditForm extends React.Component {
             label={formatMessage(messages.startBalance.label)}
             placeholder={formatMessage(messages.startBalance.placeholder)}
             component={NumberFormField}
-            currency={this.props.selectedCurrency}
+            currency={selectedCurrency}
             type="number"
           />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+          { formError && <Alert color="danger">{formError}</Alert> }
 
-          <div className={style['action-buttons']}>
+          <div>
             { this.getSubmitButton() }
             { this.getDeleteButton() }
           </div>
-        </form>
+        </Form>
 
-        <Modal show={this.state.accountDeleteModal}>
-          <Modal.Header>
-            <Modal.Title><FormattedMessage {...messages.deleteModalTitle} /></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+        <Modal isOpen={this.state.accountDeleteModal} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>
+            <FormattedMessage {...messages.deleteModalTitle} />
+          </ModalHeader>
+          <ModalBody>
             <p>{deleteConfirmMessage}</p>
-            <Alert bsStyle="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
-            <Alert bsStyle="info"><FormattedMessage {...messages.deleteModalNotice} /></Alert>
-          </Modal.Body>
-          <Modal.Footer>
+            <Alert color="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
+            <Alert color="info"><FormattedMessage {...messages.deleteModalNotice} /></Alert>
+          </ModalBody>
+          <ModalFooter>
             { this.state.accountDeleteError &&
-              <p className="text-danger pull-left"><FormattedMessage {...messages.deleteModalError} /></p>
+              <p className="text-danger">
+                <FormattedMessage {...messages.deleteModalError} />
+              </p>
             }
 
-            <Button onClick={this.removeAccount} disabled={this.props.process} bsStyle="danger">
+            <Button
+              type="button"
+              onClick={this.removeAccount}
+              disabled={process}
+              color="danger"
+              className="mr-1"
+            >
               {
                 this.props.process
                   ? <FormattedMessage {...messages.deleteProcessButton} />
                   : <FormattedMessage {...messages.deleteButton} />
               }
             </Button>
-            <Button onClick={this.toggleModal} disabled={this.props.process}>
+
+            <Button type="button" onClick={this.toggleModal} disabled={process}>
               <FormattedMessage {...messages.cancelButton} />
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
       </div>
     );
@@ -388,12 +404,12 @@ let accountForm = reduxForm({
 const formFieldSelector = formValueSelector('accountEdit');
 
 const processSelector = createSelector(
-  state => state.account.process,
+  state => get(state, 'account.process', false),
   process => process,
 );
 
 const currencyListSelector = createSelector(
-  state => state.currency.currencyList,
+  state => get(state, 'currency.currencyList', []),
   currencyList => currencyList.map(currency => ({
     value: currency._id,
     label: `${currency.translatedName} (${currency.code})`,
@@ -401,9 +417,9 @@ const currencyListSelector = createSelector(
 );
 
 const accountSelector = createSelector(
-  state => state.account.accounts,
+  state => get(state, 'account.accounts', []),
   (_, props) => props.accountId,
-  (accountList, accountId) => accountList.find(account => account._id === accountId),
+  (accountList, accountId) => accountList.find(({ _id }) => _id === accountId),
 );
 
 const isNewAccountSelector = createSelector(
@@ -413,8 +429,8 @@ const isNewAccountSelector = createSelector(
 
 const accountDefaultsSelector = createSelector(
   accountSelector,
-  state => state.currency.currencyList,
-  state => state.auth.profile.settings.locale,
+  state => get(state, 'currency.currencyList', []),
+  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
   (accountToEdit, currencyList, locale) => {
     let result = defaultValues;
 
@@ -424,7 +440,7 @@ const accountDefaultsSelector = createSelector(
 
     if (!result.currency) {
       const currencyCode = locale === 'ru' ? 'RUB' : 'USD';
-      const defaultCurrency = currencyList.find(currency => currency.code === currencyCode);
+      const defaultCurrency = currencyList.find(({ code }) => code === currencyCode);
 
       result.currency = defaultCurrency._id;
     }
@@ -442,10 +458,10 @@ const accountDefaultsSelector = createSelector(
 const selectedCurrencySelector = createSelector(
   accountDefaultsSelector,
   state => formFieldSelector(state, ...fieldsToEdit),
-  state => state.currency.currencyList,
+  state => get(state, 'currency.currencyList'),
   (initialValues, currentValues, currencyList) => {
     const values = Object.assign({}, initialValues, currentValues);
-    const selectedCurrency = currencyList.find(currency => currency._id === values.currency);
+    const selectedCurrency = currencyList.find(({ _id }) => _id === values.currency);
 
     return selectedCurrency;
   },

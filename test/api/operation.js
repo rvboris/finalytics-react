@@ -37,12 +37,16 @@ test.serial('list', async (t) => {
 
   for (let i = 50; i >= 1; i--) {
     const amount = chance.integer({ min: 1, max: 100 });
+    const created = moment();
+
+    if (i <= 25) {
+      created.add(chance.integer({ min: 0, max: 365 }), 'd');
+    } else {
+      created.subtract(chance.integer({ min: 0, max: 365 }), 'd');
+    }
 
     res = await request.post('/api/operation/add').send({
-      created: moment()
-        .startOf('year')
-        .add(chance.integer({ min: 1, max: 300 }), 'd')
-        .utc(),
+      created: created.utc(),
       account: sample(accounts)._id,
       category: sample(incomeCategoryList).model._id,
       amount,
@@ -52,11 +56,16 @@ test.serial('list', async (t) => {
   }
 
   for (let i = 50; i >= 1; i--) {
+    const created = moment();
+
+    if (i <= 25) {
+      created.add(chance.integer({ min: 0, max: 365 }), 'd');
+    } else {
+      created.subtract(chance.integer({ min: 0, max: 365 }), 'd');
+    }
+
     res = await request.post('/api/operation/addTransfer').send({
-      created: moment()
-        .startOf('year')
-        .add(chance.integer({ min: 1, max: 300 }), 'd')
-        .utc(),
+      created: created.utc(),
       accountFrom: accounts[0]._id,
       accountTo: accounts[1]._id,
       amountFrom: chance.integer({ min: 1, max: 100 }),
@@ -70,12 +79,16 @@ test.serial('list', async (t) => {
 
   for (let i = 50; i >= 1; i--) {
     const amount = chance.integer({ min: -100, max: -1 });
+    const created = moment();
+
+    if (i <= 25) {
+      created.add(chance.integer({ min: 0, max: 365 }), 'd');
+    } else {
+      created.subtract(chance.integer({ min: 0, max: 365 }), 'd');
+    }
 
     res = await request.post('/api/operation/add').send({
-      created: moment()
-        .startOf('year')
-        .add(chance.integer({ min: 1, max: 300 }), 'd')
-        .utc(),
+      created: created.utc(),
       account: sample(accounts)._id,
       category: sample(expenseCategoryList).model._id,
       amount,

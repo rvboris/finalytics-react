@@ -1,49 +1,50 @@
-.tree-item {
+.item {
   box: horizontal;
 }
 
-.tree-item-no-children {
-  margin-left: 26px;
-}
-
-.tree-children-container {
+.children {
   margin-left: 10px;
 }
 
-.tree-item-label {
+.noChildren {
+  margin-left: 26px;
+}
+
+.label {
   line-height: 30px;
   display: block;
   box-item: flex-1;
   text-align: left;
 }
 
-.tree-arrow,
-.tree-item-label {
+.arrow,
+.label {
   border: 0;
   outline: 0;
   background: transparent;
+  cursor: pointer;
 }
 
-.tree-type-label-any,
-.tree-type-label-expense,
-.tree-type-label-income {
-  font-size: 11px;
+.any,
+.expense,
+.income {
+  font-size: 0.9rem;
   text-transform: lowercase;
 }
 
-.tree-type-label-any {
+.any {
   color: gray;
 }
 
-.tree-type-label-expense {
+.expense {
   color: red;
 }
 
-.tree-type-label-income {
+.income {
   color: green;
 }
 
-.tree-item-label:hover .tree-text-label,
-.tree-item-label-selected .tree-text-label {
+.label:hover .textLabel,
+.selected .textLabel {
   font-weight: bold;
 }

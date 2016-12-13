@@ -1,0 +1,31 @@
+@import '~bootstrap/scss/bootstrap.scss';
+
+.btn {
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      outline: 0;
+      outline-offset: 0;
+    }
+  }
+}
+
+.btn-group-justified {
+  display: flex;
+  width: 100%;
+
+  .btn,
+  .btn-group {
+    flex: 1;
+
+    .btn {
+      width: 100%;
+    }
+
+    .dropdown-menu {
+      left: auto;
+    }
+  }
+}

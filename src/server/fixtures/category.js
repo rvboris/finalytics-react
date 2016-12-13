@@ -1,6 +1,6 @@
 export default {
   ru: {
-    name: '/',
+    name: 'Корневой элемент',
     type: 'any',
     system: true,
     children: [

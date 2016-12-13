@@ -5,13 +5,13 @@ import { connect } from 'react-redux';
 import { authActions } from '../../actions';
 import LoginForm from '../../components/LoginForm';
 
-const Login = (props) =>
-  (<LoginForm login={props.login} go={props.go} onSuccess={props.onSuccess} />);
+const Login = ({ login, go, onSuccess }) =>
+  <LoginForm login={login} go={go} onSuccess={onSuccess} />;
 
 Login.propTypes = {
   login: React.PropTypes.func.isRequired,
   go: React.PropTypes.func.isRequired,
-  onSuccess: React.PropTypes.any.isRequired,
+  onSuccess: React.PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

@@ -2,8 +2,9 @@ import React from 'react';
 import { push } from 'react-router-redux';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 
 import CategoriesTree from '../../components/CategoriesTree';
 import CategoryEditForm from '../../components/CategoryEditForm';
@@ -27,22 +28,26 @@ const Categories = (props) => {
 
   return (
     <div>
-      <h3><FormattedMessage {...messages.manageCategories} /></h3>
+      <h4><FormattedMessage {...messages.manageCategories} /></h4>
       <hr />
       <div className={style.categories}>
-        <div className={style['categories-tree-container']}>
+        <div className={style.tree}>
           <Button
+            type="button"
             block
-            bsStyle="primary"
-            className={style['category-create']}
-            onClick={props.newCategory}
+            color="primary"
+            className="mb-1"
+            onClick={props.onNewCategory}
           >
             <FormattedMessage {...messages.createCategory} />
           </Button>
 
-          <CategoriesTree onSelect={props.selectCategory} selectedCategoryId={selectedCategoryId} />
+          <CategoriesTree
+            onSelect={props.onSelectCategory}
+            selectedCategoryId={selectedCategoryId}
+          />
         </div>
-        <div className={style['category-details-container']}>
+        <div className={classnames(style.details, 'ml-2')}>
           <CategoryEditForm categoryId={selectedCategoryId} />
         </div>
       </div>
@@ -51,13 +56,13 @@ const Categories = (props) => {
 };
 
 Categories.propTypes = {
-  selectCategory: React.PropTypes.func.isRequired,
-  newCategory: React.PropTypes.func.isRequired,
+  onSelectCategory: React.PropTypes.func.isRequired,
+  onNewCategory: React.PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  selectCategory: (categoryId) => dispatch(push(`/dashboard/categories/${categoryId}`)),
-  newCategory: () => dispatch(push('/dashboard/categories/new')),
+  onSelectCategory: (categoryId) => dispatch(push(`/dashboard/categories/${categoryId}`)),
+  onNewCategory: () => dispatch(push('/dashboard/categories/new')),
 });
 
 export default injectIntl(connect(null, mapDispatchToProps)(Categories));

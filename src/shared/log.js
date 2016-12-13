@@ -1,17 +1,15 @@
 import logger from 'debug';
 
 export const createLogger = (wildcard = '') => {
-  if (wildcard) {
-    wildcard = `:${wildcard}`;
-  }
+  const namespace = wildcard ? `:${wildcard}` : '';
 
   return {
-    info: logger(`app:info${wildcard}`),
-    error: logger(`app:error${wildcard}`),
-    debug: logger(`app:debug${wildcard}`),
-    request: logger(`app:request${wildcard}`),
-    task: logger(`app:task${wildcard}`),
-    db: logger(`app:db${wildcard}`),
+    info: logger(`app:info${namespace}`),
+    error: logger(`app:error${namespace}`),
+    debug: logger(`app:debug${namespace}`),
+    request: logger(`app:request${namespace}`),
+    task: logger(`app:task${namespace}`),
+    db: logger(`app:db${namespace}`),
   };
 };
 

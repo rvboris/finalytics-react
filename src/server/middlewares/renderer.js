@@ -2,16 +2,16 @@ import { renderToString } from 'react-dom/server';
 import { RouterContext, match } from 'react-router';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
-import { pick, values } from 'lodash';
+import { pick } from 'lodash';
 import passport from 'koa-passport';
 import React from 'react';
 
-import * as sagas from '../../shared/sagas';
+import sagas from '../../shared/sagas';
 import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
 import ServerLayout from '../components/ServerLayout';
-import { authActions } from '../../shared/actions';
+import { authActions, dashboardActions } from '../../shared/actions';
 
 import ClientBundleAssets from '../../../build/client/assets.json';
 
@@ -31,7 +31,7 @@ const runRouter = (location, routes) =>
   new Promise((resolve) =>
     match({ routes, location }, (...args) => resolve(args)));
 
-export default async(ctx, next) => {
+export default async (ctx, next) => {
   if (ctx.request.url.startsWith('/api')) {
     await next();
     return;
@@ -58,6 +58,7 @@ export default async(ctx, next) => {
     if (token && user) {
       store.dispatch(authActions.setToken(token));
       store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings', 'status'])));
+      store.dispatch(dashboardActions.ready());
     } else {
       store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
     }
@@ -100,23 +101,27 @@ export default async(ctx, next) => {
       </Provider>
     );
 
-    await store.runSaga(...values(sagas));
-    store.dispatch(push(ctx.request.url));
-    await fetcher(store.dispatch, renderProps.components, renderProps.params);
+    try {
+      await store.runSaga(sagas);
+      store.dispatch(push(ctx.request.url));
+      await fetcher(store.dispatch, renderProps.components, renderProps.params);
 
-    const state = store.getState();
+      const layoutProps = {
+        initialState: store.getState(),
+        body: renderToString(initialView),
+        locale: ctx.language,
+        title: 'koa-universal-react-redux',
+        description: 'koa-universal-react-redux',
+        assets,
+      };
 
-    const layoutProps = {
-      initialState: state,
-      body: renderToString(initialView),
-      locale: ctx.language,
-      title: 'koa-universal-react-redux',
-      description: 'koa-universal-react-redux',
-      assets,
-    };
+      ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
+    } catch (err) {
+      ctx.log.error(err);
 
-    ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
-
-    store.close();
+      ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
+      ctx.status = 500;
+      store.close();
+    }
   })(ctx, next);
 };

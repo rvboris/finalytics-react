@@ -1,6 +1,9 @@
 import React from 'react';
+import VirtualizedSelect from 'react-virtualized-select';
 import Select from 'react-select';
 import { defineMessages, injectIntl } from 'react-intl';
+
+import './style.css';
 
 const messages = defineMessages({
   notFoud: {
@@ -11,28 +14,45 @@ const messages = defineMessages({
 });
 
 const SelectInput = (props) => {
-  const formatMessage = props.intl.formatMessage;
+  const { intl, input, virtualized, options, name } = props;
+  const formatMessage = intl.formatMessage;
 
   const onChange = (event) => {
-    if (props.input.onChange && event) {
-      props.input.onChange(event.value);
+    if (input.onChange && event) {
+      input.onChange(event.value);
     }
   };
 
   const onBlur = () => {
-    if (props.input.onBlur) {
-      props.input.onBlur(props.input.value);
+    if (input.onBlur) {
+      input.onBlur(input.value);
     }
   };
+
+  if (virtualized) {
+    return (
+      <VirtualizedSelect
+        {...props}
+        value={input.value || ''}
+        onBlur={onBlur}
+        onChange={onChange}
+        options={options}
+        noResultsText={formatMessage(messages.notFoud)}
+        instanceId={name}
+        maxHeight={300}
+      />
+    );
+  }
 
   return (
     <Select
       {...props}
-      value={props.input.value || ''}
+      value={input.value || ''}
       onBlur={onBlur}
       onChange={onChange}
-      options={props.options}
+      options={options}
       noResultsText={formatMessage(messages.notFoud)}
+      instanceId={name}
     />
   );
 };
@@ -41,6 +61,12 @@ SelectInput.propTypes = {
   intl: React.PropTypes.object.isRequired,
   input: React.PropTypes.object.isRequired,
   options: React.PropTypes.array.isRequired,
+  name: React.PropTypes.string.isRequired,
+  virtualized: React.PropTypes.bool,
+};
+
+SelectInput.defaultProps = {
+  virtualized: true,
 };
 
 export default injectIntl(SelectInput);

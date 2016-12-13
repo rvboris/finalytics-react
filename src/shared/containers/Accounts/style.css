@@ -2,15 +2,10 @@
   box: horizontal;
 }
 
-.account-list-container {
+.list {
   width: 350px;
 }
 
-.account-details-container {
+.details {
   width: 450px;
-  margin-left: 20px;
-}
-
-.account-create {
-  margin-bottom: 20px;
 }

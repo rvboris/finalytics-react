@@ -5,15 +5,9 @@ const AssetsPlugin = require('assets-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const log = require('debug')('webpack');
-const cssnext = require('postcss-cssnext');
-const flexbox = require('postcss-flexbox');
 const Visualizer = require('webpack-visualizer-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const stylelint = require('stylelint');
-const rucksack = require('rucksack-css');
-const mqpacker = require('css-mqpacker');
-const postcssReporter = require('postcss-reporter');
 const Writable = require('stream').Writable;
 const configs = require('../config');
 
@@ -53,6 +47,7 @@ module.exports = ({ target, options }) => {
     'facebook',
     'twitter',
     'openexchangerates',
+    'tokenKeyFile',
   ]);
 
   const reloadPath = `http://localhost:${config.devPort}/__webpack_hmr`;
@@ -83,14 +78,13 @@ module.exports = ({ target, options }) => {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
           ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
-          ifClient('react-select/dist/react-select.css'),
-          ifClient('react-toggle/style.css'),
-          ifClient('./src/client/globals-css/semantic.css'),
-          ifClient('./src/client/globals-css/bootstrap.css'),
-          ifClient('./src/client/globals-css/select.css'),
-          ifClient('./src/client/globals-css/toggle.css'),
-          ifClient('./src/client/globals-css/app.css'),
+
           ifClient('webfontloader'),
+          ifClient('react-toggle/style.css'),
+          ifClient('react-select/dist/react-select.css'),
+          ifClient('react-virtualized-select/styles.css'),
+          ifClient('react-day-picker/lib/style.css'),
+
           ifServer(
             path.resolve(__dirname, `../src/${target}/bootstrap.js`),
             path.resolve(__dirname, `../src/${target}/app.js`)
@@ -114,22 +108,12 @@ module.exports = ({ target, options }) => {
     resolve: {
       extensions: ['.js', '.json'],
       alias: {
-        react: ifElse(isDev)('react', 'react-lite'),
         'react/lib/ReactDOM': 'react-dom', // redbox-react fix
-        'react-dom': ifElse(isDev)('react-dom', 'react-lite'),
       },
     },
     plugins: _.compact([
       new webpack.LoaderOptionsPlugin({
         options: {
-          postcss: () => _.compact([
-            stylelint(),
-            rucksack(),
-            flexbox(),
-            cssnext(),
-            mqpacker(),
-            postcssReporter({ clearMessages: true }),
-          ]),
           eslint: {
             configFile: '.eslintrc',
           },
@@ -140,7 +124,7 @@ module.exports = ({ target, options }) => {
         collections: true,
         paths: true,
       })),
-      new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en|ru)$/),
+      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /^\.\/(en|ru)$/),
       new webpack.DefinePlugin({
         CONFIG: JSON.stringify(ifServer(config, configForClient)),
         IS_CLIENT: isClient,
@@ -188,6 +172,12 @@ module.exports = ({ target, options }) => {
           allChunks: true,
         })
       ),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          context: __dirname,
+          output: { path: './' },
+        },
+      }),
     ]),
     module: {
       rules: _.compact([
@@ -196,11 +186,6 @@ module.exports = ({ target, options }) => {
           test: /\.js$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
           loader: 'eslint',
-        },
-        {
-          test: /\.pem$/,
-          exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: 'raw-loader',
         },
         {
           test: /\.(jpg|png|svg)$/,
@@ -234,38 +219,51 @@ module.exports = ({ target, options }) => {
                 },
               },
               plugins: [
-                'lodash',
                 'transform-promise-to-bluebird',
-                [
-                  'transform-runtime',
-                  {
-                    polyfill: true,
-                    regenerator: true,
-                  },
-                ],
+                'transform-runtime',
+                'lodash',
               ],
             },
-            ifServer({ presets: ['react', 'es2016', 'es2017', 'stage-1'] }),
+            ifServer({ presets: ['react', 'es2017', 'stage-1'] }),
             ifClient({ presets: ['react', 'latest', 'stage-1'] })
           ),
         },
         _.merge(
-          { test: /(globals-css|react-select|react-toggle|rc-tree).+\.css$/ },
-          ifClient({
+          { test: /.scss$/ },
+          ifProdClient({
+            loader: ExtractTextPlugin.extract({
+              fallbackLoader: 'style-loader',
+              loader: 'css-loader!postcss-loader!sass-loader',
+            }),
+          }),
+          ifDevClient({ loaders: ['style-loader', 'css-loader', 'sass-loader'] })
+        ),
+        _.merge(
+          { test: /node_modules.+\.css$/ },
+          ifServer({ loader: 'css-loader/locals' }),
+          ifProdClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader',
             }),
-          })
+          }),
+          ifDevClient({ loaders: ['style-loader', 'css-loader'] })
         ),
         _.merge(
-          { test: /shared.+\.css$/ },
-          ifServer({ loader: ['css-loader/locals?modules', 'postcss-loader'] }),
-          ifClient({
+          { test: /(shared|client).+\.css$/ },
+          ifServer({ loaders: ['css-loader/locals?modules', 'postcss-loader'] }),
+          ifProdClient({
             loader: ExtractTextPlugin.extract({
               fallbackLoader: 'style-loader',
               loader: 'css-loader?modules!postcss-loader',
             }),
+          }),
+          ifDevClient({
+            loaders: [
+              'style-loader',
+              'css-loader?modules',
+              'postcss-loader',
+            ],
           })
         ),
       ]),

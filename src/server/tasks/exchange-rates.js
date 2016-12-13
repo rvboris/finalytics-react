@@ -9,8 +9,7 @@ import config from '../../shared/config';
 import { ExchangeRateModel } from '../models';
 import ratesFixture from '../fixtures/rates';
 
-const rule = new schedule.RecurrenceRule();
-rule.hour = new schedule.Range(0, 24, 3);
+const rule = '0 */3 * * *';
 
 const getFixture = () => {
   const fixture = ratesFixture;

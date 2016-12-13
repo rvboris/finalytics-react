@@ -54,10 +54,10 @@ model.pre('save', function preSave(next) {
   next();
 });
 
-model.post('save', async function postSave(account, next) {
-  const wasNew = account.wasNew;
+model.post('save', async function postSave(accountModel, next) {
+  const wasNew = accountModel.wasNew;
 
-  account = account.toObject({ depopulate: false, version: false });
+  const account = accountModel.toObject({ depopulate: false, version: false });
 
   if (!wasNew && this._original.startBalance !== account.startBalance) {
     try {

@@ -1,0 +1,87 @@
+.operation {
+  height: 68px;
+  margin-bottom: 12px;
+  padding: 10px 10px 10px 14px;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  box: horizontal left;
+  position: relative;
+}
+
+.edit {
+  border-color: rgba(0, 0, 0, 0.45);
+}
+
+.date {
+  width: 15%;
+  box: vertical;
+}
+
+.category,
+.controls {
+  margin-left: 12px;
+  width: 30%;
+  display: flex;
+
+  & div {
+    box-item: center;
+  }
+}
+
+.details {
+  width: 55%;
+  box: horizontal;
+  margin-left: 12px;
+}
+
+.transferAaccount,
+.transferAmount {
+  box: vertical;
+  width: 50%;
+
+  & div {
+    box-item: flex-auto;
+    text-align: right;
+  }
+}
+
+.account,
+.amount {
+  display: flex;
+  text-align: right;
+  width: 50%;
+
+  & div {
+    box-item: flex-auto center;
+  }
+}
+
+.transferAmount,
+.amount {
+  margin-left: 12px;
+}
+
+.mark {
+  width: 10px;
+  height: 10px;
+  top: -6px;
+  left: -6px;
+  position: absolute;
+  border-radius: 10px;
+}
+
+.expense {
+  background: #d9534f;
+}
+
+.income {
+  background: #5cb85c;
+}
+
+.transfer {
+  background: #31b0d5;
+}
+
+.loading {
+  box-item: center;
+}

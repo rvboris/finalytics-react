@@ -2,24 +2,42 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import classnames from 'classnames';
+import { get } from 'lodash';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import TreeView from '../TreeView';
 import style from './style.css';
 
-const categoryTypeMap = {
-  expense: 'Расход',
-  income: 'Доход',
-  any: 'Любые',
-};
+const messages = defineMessages({
+  expense: {
+    id: 'component.categoriesTree.expense',
+    description: 'Expense type label',
+    defaultMessage: 'expense',
+  },
+  income: {
+    id: 'component.categoriesTree.income',
+    description: 'Income type label',
+    defaultMessage: 'income',
+  },
+  any: {
+    id: 'component.categoriesTree.any',
+    description: 'Any type label',
+    defaultMessage: 'any',
+  },
+});
 
-const CategoriesTree = (props) => {
-  const { categories, onSelect, selectedCategoryId } = props;
-
+const CategoriesTree = ({ categories, onSelect, selectedCategoryId }) => {
   const loopNodes = data => data.map((item) => {
+    if (item.transfer) {
+      return null;
+    }
+
     const label = (
       <span>
-        <span className={style['tree-text-label']}>{item.name}</span>
-        <span className={classnames('pull-right', style[`tree-type-label-${item.type}`])}>{categoryTypeMap[item.type]}</span>
+        <span className={style.textLabel}>{item.name}</span>
+        <span className={classnames('float-xs-right', style[item.type])}>
+          <FormattedMessage {...messages[item.type]} />
+        </span>
       </span>
     );
 
@@ -30,21 +48,19 @@ const CategoriesTree = (props) => {
         key={item._id}
         label={label}
         selected={item._id === selectedCategoryId}
-        itemClassName={style['tree-item']}
-        itemNoChildrenClassName={style['tree-item-no-children']}
-        chidlrenContainerClassName={style['tree-children-container']}
-        labelClassName={style['tree-item-label']}
-        labelSelectedClassName={style['tree-item-label-selected']}
-        arrowClassName={style['tree-arrow']}
+        itemClassName={style.item}
+        itemNoChildrenClassName={style.noChildren}
+        chidlrenContainerClassName={style.children}
+        labelClassName={style.label}
+        labelSelectedClassName={style.selected}
+        arrowClassName={style.arrow}
       >
         {item.children && item.children.length ? loopNodes(item.children) : null}
       </TreeView>
     );
   });
 
-  return (
-    <div>{loopNodes(categories.children)}</div>
-  );
+  return <div>{loopNodes(categories.children)}</div>;
 };
 
 CategoriesTree.propTypes = {
@@ -54,12 +70,9 @@ CategoriesTree.propTypes = {
 };
 
 const selector = createSelector(
-  state => state.category.data,
-  state => state.category.process,
-  (categories, process) => ({
-    categories,
-    process,
-  }),
+  state => get(state, 'category.data'),
+  state => get(state, 'category.process', false),
+  (categories, process) => ({ categories, process })
 );
 
-export default connect(selector)(CategoriesTree);
+export default injectIntl(connect(selector)(CategoriesTree));

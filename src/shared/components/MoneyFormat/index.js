@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { memoize, get } from 'lodash';
 import accounting from 'accounting';
 
 export const format = (num, currency) => {
@@ -13,7 +14,7 @@ export const format = (num, currency) => {
   return accounting.formatMoney(num, formatOptions);
 };
 
-const MoneyFormat = (props) => (<span>{format(props.sum, props.currency)}</span>);
+const MoneyFormat = ({ sum, currency }) => (<span>{format(sum, currency)}</span>);
 
 MoneyFormat.propTypes = {
   sum: React.PropTypes.number.isRequired,
@@ -21,12 +22,39 @@ MoneyFormat.propTypes = {
   currencyId: React.PropTypes.string.isRequired,
 };
 
+const getMemoizeCurrencyFind = (currencyList) => memoize(
+  currencyId => currencyList.find(({ _id }) => currencyId === _id),
+  currencyId => currencyId,
+);
+
+let memoizeCurrencyFind;
+
+const currencySelector = createSelector(
+  state => get(state, 'currency.currencyList', []),
+  (_, { currencyId }) => currencyId,
+  (currencyList, currencyId) => {
+    if (!currencyList.length) {
+      return undefined;
+    }
+
+    if (!memoizeCurrencyFind) {
+      memoizeCurrencyFind = getMemoizeCurrencyFind(currencyList);
+    }
+
+    return memoizeCurrencyFind(currencyId);
+  }
+);
+
+const processSelector = createSelector(
+  state => get(state, 'currency.process', false),
+  process => process
+);
+
 const selector = createSelector(
-  state => state.currency.currencyList,
-  (_, props) => props.currencyId,
-  state => state.currency.process,
-  (currencyList, currencyId, process) => ({
-    currency: (currencyList || []).find((currency) => currency._id === currencyId),
+  currencySelector,
+  processSelector,
+  (currency, process) => ({
+    currency,
     process,
   }),
 );

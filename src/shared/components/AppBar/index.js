@@ -1,7 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import { Link } from 'react-router';
-import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { get } from 'lodash';
+import { push } from 'react-router-redux';
+import {
+  Navbar,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 const messages = defineMessages({
@@ -20,48 +32,117 @@ const messages = defineMessages({
     description: 'AppBar reports link',
     defaultMessage: 'Reports',
   },
-  settings: {
-    id: 'component.appBar.settings',
-    description: 'AppBar settings link',
-    defaultMessage: 'Settings',
+  profile: {
+    id: 'component.appBar.profile',
+    description: 'AppBar profile link',
+    defaultMessage: 'Profile',
   },
   exit: {
     id: 'component.appBar.exit',
     description: 'AppBar exit link',
     defaultMessage: 'Logout',
   },
+  manageAccounts: {
+    id: 'component.appBar.manageAccounts',
+    description: 'AppBar manage accounts button',
+    defaultMessage: 'Manage accounts',
+  },
+  manageCategories: {
+    id: 'component.appBar.manageCategories',
+    description: 'AppBar manage categories button',
+    defaultMessage: 'Manage categories',
+  },
+  more: {
+    id: 'component.appBar.more',
+    description: 'AppBar more button',
+    defaultMessage: 'More',
+  },
 });
 
-const AppBar = () => (
-  <Navbar staticTop>
-    <Navbar.Header>
-      <Navbar.Brand>
-        <Link to="/dashboard/operations">Finalytics</Link>
-      </Navbar.Brand>
-      <Navbar.Toggle />
-    </Navbar.Header>
-    <Navbar.Collapse>
-      <Nav>
-        <IndexLinkContainer to="/dashboard/operations">
-          <NavItem eventKey={1}><FormattedMessage {...messages.operations} /></NavItem>
-        </IndexLinkContainer>
-        <LinkContainer to="/dashboard/budget">
-          <NavItem eventKey={2}><FormattedMessage {...messages.budget} /></NavItem>
-        </LinkContainer>
-        <LinkContainer to="/dashboard/reports">
-          <NavItem eventKey={3}><FormattedMessage {...messages.reports} /></NavItem>
-        </LinkContainer>
-      </Nav>
-      <Nav pullRight>
-        <LinkContainer to="/settings">
-          <NavItem eventKey={4}><FormattedMessage {...messages.settings} /></NavItem>
-        </LinkContainer>
-        <LinkContainer to="/logout">
-          <NavItem eventKey={5}><FormattedMessage {...messages.exit} /></NavItem>
-        </LinkContainer>
-      </Nav>
-    </Navbar.Collapse>
-  </Navbar>
+const NavLink = (props) => (
+  <Link {...props} className="nav-link" activeClassName="active">
+    {props.children}
+  </Link>
 );
 
-export default injectIntl(AppBar);
+NavLink.propTypes = {
+  children: React.PropTypes.any,
+};
+
+class AppBar extends React.Component {
+  static propTypes = {
+    userLogin: React.PropTypes.string,
+    manageAccounts: React.PropTypes.func.isRequired,
+    manageCategories: React.PropTypes.func.isRequired,
+  };
+
+  constructor(...args) {
+    super(...args);
+
+    this.state = {
+      menuOpen: false,
+    };
+  }
+
+  menuToggle = () => {
+    this.setState(Object.assign({}, this.state, { menuOpen: !this.state.menuOpen }));
+  }
+
+  render() {
+    const { userLogin, manageAccounts, manageCategories } = this.props;
+    const { menuOpen } = this.state;
+
+    return (
+      <Navbar color="primary" dark>
+        <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
+        <Nav navbar>
+          <NavItem>
+            <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink to="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink to="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
+          </NavItem>
+          <NavDropdown isOpen={menuOpen} toggle={this.menuToggle}>
+            <DropdownToggle color="primary" nav caret>
+              <FormattedMessage {...messages.more} />
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem onClick={manageAccounts}>
+                <FormattedMessage {...messages.manageAccounts} />
+              </DropdownItem>
+              <DropdownItem onClick={manageCategories}>
+                <FormattedMessage {...messages.manageCategories} />
+              </DropdownItem>
+            </DropdownMenu>
+          </NavDropdown>
+        </Nav>
+
+        <Nav className="float-xs-right" navbar>
+          <NavItem>
+            <NavLink to="/dashboard/profile">
+              <FormattedMessage {...messages.profile} /> {userLogin && `(${userLogin})`}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+          </NavItem>
+        </Nav>
+      </Navbar>
+    );
+  }
+}
+
+const mapDispatchToProps = (dispatch) => ({
+  manageAccounts: () => dispatch(push('/dashboard/accounts')),
+  manageCategories: () => dispatch(push('/dashboard/categories')),
+});
+
+const userLoginSelector = createSelector(
+  state => get(state, 'auth.profile.email'),
+  userLogin => ({ userLogin }),
+);
+
+export default injectIntl(connect(userLoginSelector, mapDispatchToProps)(AppBar));

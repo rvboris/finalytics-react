@@ -2,21 +2,24 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
-import { mapValues } from 'lodash';
+import { mapValues, get } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import TiSocialFacebook from 'react-icons/lib/ti/social-facebook';
-import TiSocialGooglePlus from 'react-icons/lib/ti/social-google-plus';
-import TiSocialTwitter from 'react-icons/lib/ti/social-twitter';
+import FaFacebookIcon from 'react-icons/lib/fa/facebook';
+import FaGoogleIcon from 'react-icons/lib/fa/google';
+import FaTwitterIcon from 'react-icons/lib/fa/twitter';
 import {
   Button,
-  FormControl,
-  FormGroup,
-  ControlLabel,
-  Panel,
   ButtonGroup,
-  HelpBlock,
+  Form,
+  FormGroup,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
-} from 'react-bootstrap';
+  Card,
+  CardHeader,
+  CardBlock,
+} from 'reactstrap';
 
 import validationHandler from '../../utils/validation-handler';
 import style from './style.css';
@@ -81,15 +84,14 @@ const onTwitter = () => {
 };
 
 const FormField = (field) =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type={field.type}
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 let LoginForm = (props) => {
@@ -123,70 +125,68 @@ let LoginForm = (props) => {
         return;
       }
 
-      resolve(result.data.token);
+      resolve(get(result, 'data.token'));
     }).then(onSuccess, onError);
 
   return (
     <div className={style.container}>
-      <Panel header={formatMessage(messages.title)} className={style['login-form']}>
-        <form onSubmit={handleSubmit(submitHandler)} noValidate>
-          <Field
-            name="email"
-            label={formatMessage(messages.email.label)}
-            placeholder={formatMessage(messages.email.placeholder)}
-            component={FormField}
-            type="email"
-          />
+      <Card className={style.form}>
+        <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
 
-          <Field
-            name="password"
-            label={formatMessage(messages.password.label)}
-            placeholder={formatMessage(messages.password.placeholder)}
-            component={FormField}
-            type="password"
-          />
+        <CardBlock>
+          <Form onSubmit={handleSubmit(submitHandler)} noValidate>
+            <Field
+              name="email"
+              label={formatMessage(messages.email.label)}
+              placeholder={formatMessage(messages.email.placeholder)}
+              component={FormField}
+              type="email"
+            />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+            <Field
+              name="password"
+              label={formatMessage(messages.password.label)}
+              placeholder={formatMessage(messages.password.placeholder)}
+              component={FormField}
+              type="password"
+            />
 
-          <div className={style['action-buttons']}>
-            <Button
-              type="button"
-              disabled={process}
-              onClick={onRegister}
-            >
-              <FormattedMessage {...messages.registerButton} />
-            </Button>
-            <Button
-              type="submit"
-              bsStyle="primary"
-              disabled={pristine || submitting || process}
-            >{process
-              ? <FormattedMessage {...messages.processButton} />
-              : <FormattedMessage {...messages.button} />
-            }</Button>
-          </div>
-        </form>
+            { error && <Alert color="danger">{error}</Alert> }
 
-        <ButtonGroup justified>
-          <ButtonGroup>
+            <div className={style.buttons}>
+              <Button
+                type="button"
+                disabled={process}
+                onClick={onRegister}
+              >
+                <FormattedMessage {...messages.registerButton} />
+              </Button>
+              <Button
+                type="submit"
+                color="primary"
+                disabled={pristine || submitting || process}
+              >{process
+                ? <FormattedMessage {...messages.processButton} />
+                : <FormattedMessage {...messages.button} />
+              }</Button>
+            </div>
+          </Form>
+
+          <ButtonGroup className="btn-group-justified">
             <Button type="button" onClick={onGoogle}>
-              <TiSocialGooglePlus size={30} />
+              <FaGoogleIcon size={30} />
             </Button>
-          </ButtonGroup>
 
-          <ButtonGroup>
             <Button type="button" onClick={onFacebook}>
-              <TiSocialFacebook size={30} />
+              <FaFacebookIcon size={30} />
             </Button>
-          </ButtonGroup>
 
-          <ButtonGroup>
             <Button type="button" onClick={onTwitter}>
-              <TiSocialTwitter size={30} />
+              <FaTwitterIcon size={30} />
             </Button>
           </ButtonGroup>
-        </ButtonGroup>
-      </Panel>
+        </CardBlock>
+      </Card>
     </div>
   );
 };
@@ -201,7 +201,10 @@ LoginForm.propTypes = {
   onError: React.PropTypes.func,
 };
 
-const selector = createSelector(state => state.auth.process, process => ({ process }));
+const selector = createSelector(
+  state => get(state, 'auth.process', false),
+  process => ({ process })
+);
 
 LoginForm = reduxForm({ form: 'login', propNamespace: 'form' })(LoginForm);
 LoginForm = connect(selector)(LoginForm);

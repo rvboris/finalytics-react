@@ -2,8 +2,9 @@ import React from 'react';
 import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import classnames from 'classnames';
 
 import style from './style.css';
 import LinkedAccountList from '../../components/LinkedAccountList';
@@ -27,21 +28,26 @@ const Accounts = (props) => {
 
   return (
     <div>
-      <h3><FormattedMessage {...messages.manageAccounts} /></h3>
+      <h4><FormattedMessage {...messages.manageAccounts} /></h4>
       <hr />
       <div className={style.accounts}>
-        <div className={style['account-list-container']}>
+        <div className={style.list}>
           <Button
+            type="button"
             block
-            bsStyle="primary"
-            className={style['account-create']}
-            onClick={props.newAccount}
+            color="primary"
+            className="mb-1"
+            onClick={props.onNewAccount}
           >
             <FormattedMessage {...messages.createAccount} />
           </Button>
-          <LinkedAccountList onSelect={props.selectAccount} selectedAccountId={selectedAccountId} />
+
+          <LinkedAccountList
+            onSelect={props.onSelectAccount}
+            selectedAccountId={selectedAccountId}
+          />
         </div>
-        <div className={style['account-details-container']}>
+        <div className={classnames(style.details, 'ml-2')}>
           <AccountEditForm accountId={selectedAccountId} />
         </div>
       </div>
@@ -50,13 +56,13 @@ const Accounts = (props) => {
 };
 
 Accounts.propTypes = {
-  selectAccount: React.PropTypes.func.isRequired,
-  newAccount: React.PropTypes.func.isRequired,
+  onSelectAccount: React.PropTypes.func.isRequired,
+  onNewAccount: React.PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  selectAccount: (accountId) => dispatch(push(`/dashboard/accounts/${accountId}`)),
-  newAccount: () => dispatch(push('/dashboard/accounts/new')),
+  onSelectAccount: (accountId) => dispatch(push(`/dashboard/accounts/${accountId}`)),
+  onNewAccount: () => dispatch(push('/dashboard/accounts/new')),
 });
 
 export default injectIntl(connect(null, mapDispatchToProps)(Accounts));

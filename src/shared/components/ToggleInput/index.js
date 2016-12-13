@@ -1,23 +1,27 @@
 import React from 'react';
 import Toggle from 'react-toggle';
 
-const ToggleInput = (props) => {
+import './style.css';
+
+const ToggleInput = ({ input, disabled }) => {
   const onChange = (event) => {
-    if (props.input.onChange && event) {
-      props.input.onChange(event.target.checked);
+    if (input.onChange && event) {
+      input.onChange(event.target.checked);
     }
   };
 
   return (
     <Toggle
+      disabled={disabled}
       onChange={onChange}
-      checked={props.input.value}
+      checked={input.value}
     />
   );
 };
 
 ToggleInput.propTypes = {
   input: React.PropTypes.object.isRequired,
+  disabled: React.PropTypes.bool,
 };
 
 export default ToggleInput;

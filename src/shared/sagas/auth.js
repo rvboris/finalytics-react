@@ -7,40 +7,45 @@ import {
   categoryActions,
   accountActions,
   currencyActions,
+  dashboardActions,
 } from '../actions';
 
-const userTimezoneLocale = function* userTimezoneLocale() {
+function* prepareDashboard() {
+  const dashboardRequiredData = [
+    'CATEGORY_LOAD_RESOLVED',
+    'ACCOUNT_LOAD_RESOLVED',
+    'CURRENCY_LOAD_RESOLVED',
+  ];
+
   if (IS_CLIENT) {
-    yield put(authActions.setSettings({
-      timezone: new Date().getTimezoneOffset(),
-      locale: 'auto',
-    }));
+    yield [
+      put(categoryActions.load()),
+      put(accountActions.load()),
+      put(currencyActions.load()),
+    ];
+
+    while (true) {
+      yield take(dashboardRequiredData);
+      yield take(dashboardRequiredData);
+      yield take(dashboardRequiredData);
+      break;
+    }
+
+    while (true) {
+      const auth = yield select((state) => state.auth);
+
+      if (get(auth, 'profile.status') === 'ready') {
+        break;
+      }
+
+      yield take('AUTH_SET_STATUS_RESOLVED');
+    }
+
+    yield put(dashboardActions.ready());
   }
-};
+}
 
-const prepareUserData = function* prepareUser() {
-  if (IS_CLIENT) {
-    const category = yield select((state) => state.category);
-
-    if (!category.data) {
-      yield put(categoryActions.load());
-    }
-
-    const accounts = yield select((state) => get(state, 'account.accounts'));
-
-    if (!accounts) {
-      yield put(accountActions.load());
-    }
-
-    const currencyList = yield select((state) => get(state, 'currency.currencyList'));
-
-    if (!currencyList) {
-      yield put(currencyActions.load());
-    }
-  }
-};
-
-const onUserReady = function* userReady() {
+function* onUserReady() {
   const initUserActions = [
     'AUTH_SET_SETTINGS_RESOLVED',
     'CATEGORY_LOAD_RESOLVED',
@@ -51,14 +56,34 @@ const onUserReady = function* userReady() {
     yield take(initUserActions);
     yield take(initUserActions);
     yield take(initUserActions);
-    yield put(authActions.setStatus('ready'));
     break;
   }
-};
 
-const onAuth = function* onAuth(action) {
+  yield put(authActions.setStatus('ready'));
+}
+
+function* userTimezoneLocale() {
+  if (IS_CLIENT) {
+    yield put(authActions.setSettings({
+      timezone: new Date().getTimezoneOffset(),
+      locale: 'auto',
+    }));
+  }
+}
+
+function* onProfile(action) {
+  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
+}
+
+function* onSettings(action) {
+  yield put(localeActions.load(get(action, 'payload.data.locale')));
+}
+
+function* onAuth(action) {
   yield put(authActions.setToken(get(action, 'payload.data.token')));
   yield put(authActions.getProfile());
+
+  yield take('AUTH_GET_PROFILE_RESOLVED');
 
   const auth = yield select((state) => state.auth);
 
@@ -66,16 +91,8 @@ const onAuth = function* onAuth(action) {
     yield fork(userTimezoneLocale);
   }
 
-  yield fork(prepareUserData);
-};
-
-const onProfile = function* onProfile(action) {
-  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
-};
-
-const onSettings = function* onSettings(action) {
-  yield put(localeActions.load(get(action, 'payload.data.locale')));
-};
+  yield fork(prepareDashboard);
+}
 
 export default function* () {
   yield fork(onUserReady);

@@ -8,19 +8,23 @@ import TreeModel from 'tree-model';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import {
   Button,
-  FormControl,
+  Form,
   FormGroup,
-  ControlLabel,
-  HelpBlock,
+  FormFeedback,
+  Label,
+  Input,
   Alert,
   Modal,
-} from 'react-bootstrap';
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from 'reactstrap';
 
+import { virtualizedOptionRenderer, valueRenderer } from '../../utils/category-select';
 import { categoryActions } from '../../actions';
 import { error } from '../../log';
 import SelectInput from '../SelectInput';
 import validationHandler from '../../utils/validation-handler';
-import style from './style.css';
 
 const messages = defineMessages({
   infoAlert: {
@@ -109,30 +113,43 @@ const messages = defineMessages({
     description: 'Label of cancel button',
     defaultMessage: 'Cancel',
   },
+  expense: {
+    id: 'component.categoryEditForm.expense',
+    description: 'Expense type option',
+    defaultMessage: 'Expense',
+  },
+  income: {
+    id: 'component.categoryEditForm.income',
+    description: 'Income type option',
+    defaultMessage: 'Income',
+  },
+  any: {
+    id: 'component.categoryEditForm.any',
+    description: 'Any type option',
+    defaultMessage: 'Any',
+  },
 });
 
 const TextFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
-    <FormControl
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
+    <Input
       type="text"
       placeholder={field.placeholder}
       {...field.input}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const SelectFormField = field =>
-  <FormGroup controlId={field.name} validationState={field.meta.error ? 'error' : null}>
-    <ControlLabel>{field.label}</ControlLabel>
+  <FormGroup color={field.meta.error ? 'danger' : null}>
+    <Label>{field.label}</Label>
     <SelectInput
       {...field}
       clearable={false}
       options={field.options}
     />
-    <FormControl.Feedback />
-    {field.meta.touched && field.meta.error && <HelpBlock>{field.meta.error}</HelpBlock>}
+    {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
   </FormGroup>;
 
 const defaultValues = {
@@ -143,19 +160,8 @@ const defaultValues = {
 };
 
 const fieldsToEdit = Object.keys(defaultValues);
-
 const availableTypesList = ['expense', 'income', 'any'];
 const availableTypesListLabeled = availableTypesList.map(type => ({ value: type, label: type }));
-
-const getParentNode = (node) => {
-  if (node.isRoot()) {
-    return node;
-  }
-
-  const nodePath = node.getPath();
-
-  return nodePath[nodePath.length - 2];
-};
 
 class CategoryEditForm extends React.Component {
   static propTypes = {
@@ -176,6 +182,16 @@ class CategoryEditForm extends React.Component {
     categoryNode: React.PropTypes.object,
   };
 
+  static getParentNode = (node) => {
+    if (node.isRoot()) {
+      return node;
+    }
+
+    const nodePath = node.getPath();
+
+    return nodePath[nodePath.length - 2];
+  };
+
   constructor(...args) {
     super(...args);
 
@@ -186,12 +202,13 @@ class CategoryEditForm extends React.Component {
   }
 
   getSubmitButton = () => {
+    const { process } = this.props;
     const { submitting } = this.props.form;
-    const disabled = submitting || this.props.process;
+    const disabled = submitting || process;
 
     let label;
 
-    if (submitting || this.props.process) {
+    if (submitting || process) {
       label = <FormattedMessage {...messages.saveProcessButton} />;
     } else if (this.props.isNewCategory) {
       label = <FormattedMessage {...messages.createButton} />;
@@ -199,7 +216,7 @@ class CategoryEditForm extends React.Component {
       label = <FormattedMessage {...messages.saveButton} />;
     }
 
-    return (<Button type="submit" bsStyle="primary" disabled={disabled}>{label}</Button>);
+    return (<Button type="submit" color="primary" disabled={disabled}>{label}</Button>);
   };
 
   getDeleteButton = () => {
@@ -208,32 +225,33 @@ class CategoryEditForm extends React.Component {
     }
 
     return (
-      <Button className="pull-right" bsStyle="danger" onClick={this.toggleModal}>
+      <Button type="button" className="float-xs-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
   };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
+    const { isNewCategory, categoryNode, addCategory, categoryId, intl } = this.props;
     let result;
 
     try {
-      if (this.props.isNewCategory) {
-        result = await this.props.addCategory({
+      if (isNewCategory) {
+        result = await addCategory({
           _id: values.parent,
           newNode: pick(values, ['name', 'type']),
         });
       } else {
-        if (this.props.categoryNode) {
-          const currentParentId = getParentNode(this.props.categoryNode).model._id;
+        if (categoryNode) {
+          const currentParentId = CategoryEditForm.getParentNode(categoryNode).model._id;
 
           if (currentParentId !== values.parent) {
-            await this.props.moveCategory({ _id: this.props.categoryId, to: values.parent });
+            await this.props.moveCategory({ _id: categoryId, to: values.parent });
           }
         }
 
         result = await this.props.updateCategory({
-          _id: this.props.categoryId,
+          _id: categoryId,
           name: values.name,
         });
       }
@@ -241,14 +259,14 @@ class CategoryEditForm extends React.Component {
       error(err);
 
       const validationResult = validationHandler({
-        _id: this.props.categoryId,
+        _id: categoryId,
         name: values.name,
         type: values.type,
         to: values.parent,
       }, err);
 
-      const validationResultErrors = mapValues(validationResult,
-        val => this.props.intl.formatMessage({ id: val }));
+      const validationResultErrors =
+        mapValues(validationResult, val => intl.formatMessage({ id: val }));
 
       reject(new SubmissionError(validationResultErrors));
 
@@ -257,30 +275,46 @@ class CategoryEditForm extends React.Component {
 
     resolve(get(result, 'data.newId'));
   }).then((newId) => {
-    if (!this.props.isNewCategory) {
+    const { isNewCategory, selectCategory } = this.props;
+
+    if (!isNewCategory) {
       return;
     }
 
-    this.props.selectCategory(newId);
+    selectCategory(newId);
   });
 
   toggleModal = () => {
     this.setState({ categoryDeleteModal: !this.state.categoryDeleteModal });
   };
 
-  removeCategory = () =>
-    this.props.removeCategory({ _id: this.props.categoryId })
+  removeCategory = () => {
+    const { removeCategory: remove, selectCategory, categoryId } = this.props;
+
+    return remove({ _id: categoryId })
       .then(() => {
         this.toggleModal();
-        this.props.selectCategory('');
+        selectCategory('');
       }, (e) => {
         error(e);
         this.setState(Object.assign(this.state, { categoryDeleteError: true }));
       });
+  }
 
   render() {
+    const {
+      categoryId,
+      isSystemCategory,
+      availableParentsList,
+      availableTypesList,
+      canChangeType,
+      process,
+    } = this.props;
+
     const { formatMessage } = this.props.intl;
-    const { handleSubmit, error, initialValues } = this.props.form;
+    const { handleSubmit, error: formError, initialValues } = this.props.form;
+    const { categoryDeleteModal } = this.state;
+
     const deleteConfirmMessage =
       (<FormattedMessage
         {
@@ -290,30 +324,32 @@ class CategoryEditForm extends React.Component {
         }
       />);
 
-    if (!this.props.categoryId) {
-      return (<Alert><FormattedMessage {...messages.infoAlert} /></Alert>);
+    if (!categoryId) {
+      return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
     }
 
-    if (this.props.isSystemCategory) {
-      return (<Alert><FormattedMessage {...messages.isSystemAlert} /></Alert>);
+    if (isSystemCategory) {
+      return (<Alert color="info"><FormattedMessage {...messages.isSystemAlert} /></Alert>);
     }
 
     return (
       <div>
-        <form onSubmit={handleSubmit(this.submitHandler)} noValidate>
+        <Form onSubmit={handleSubmit(this.submitHandler)} noValidate>
           <Field
             label={formatMessage(messages.parent.label)}
             name="parent"
-            options={this.props.availableParentsList}
+            options={availableParentsList}
             component={SelectFormField}
+            optionRenderer={virtualizedOptionRenderer(true)}
+            valueRenderer={valueRenderer(true)}
           />
 
           <Field
             label={formatMessage(messages.type.label)}
             name="type"
-            options={this.props.availableTypesList}
+            options={availableTypesList}
             component={SelectFormField}
-            disabled={!this.props.canChangeType}
+            disabled={!canChangeType}
           />
 
           <Field
@@ -324,38 +360,43 @@ class CategoryEditForm extends React.Component {
             type="text"
           />
 
-          { error && <Alert bsStyle="danger">{error}</Alert> }
+          { formError && <Alert color="danger">{formError}</Alert> }
 
-          <div className={style['action-buttons']}>
+          <div>
             { this.getSubmitButton() }
             { this.getDeleteButton() }
           </div>
-        </form>
+        </Form>
 
-        <Modal show={this.state.categoryDeleteModal}>
-          <Modal.Header>
-            <Modal.Title><FormattedMessage {...messages.deleteModalTitle} /></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+        <Modal isOpen={categoryDeleteModal} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>
+            <FormattedMessage {...messages.deleteModalTitle} />
+          </ModalHeader>
+          <ModalBody>
             <p>{deleteConfirmMessage}</p>
-            <Alert bsStyle="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
-          </Modal.Body>
-          <Modal.Footer>
+            <Alert color="danger"><FormattedMessage {...messages.deleteModalWarning} /></Alert>
+          </ModalBody>
+          <ModalFooter>
             { this.state.accountDeleteError &&
-              <p className="text-danger pull-left"><FormattedMessage {...messages.deleteModalError} /></p>
+              <p className="text-danger"><FormattedMessage {...messages.deleteModalError} /></p>
             }
-
-            <Button onClick={this.removeCategory} disabled={this.props.process} bsStyle="danger">
+            <Button
+              type="button"
+              onClick={this.removeCategory}
+              disabled={process}
+              color="danger"
+              className="mr-1"
+            >
               {
                 this.props.process
                   ? <FormattedMessage {...messages.deleteProcessButton} />
                   : <FormattedMessage {...messages.deleteButton} />
               }
             </Button>
-            <Button onClick={this.toggleModal} disabled={this.props.process}>
+            <Button type="button" onClick={this.toggleModal} disabled={process}>
               <FormattedMessage {...messages.cancelButton} />
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
       </div>
     );
@@ -371,12 +412,12 @@ let categoryForm = reduxForm({
 const formFieldSelector = formValueSelector('categoryEdit');
 
 const processSelector = createSelector(
-  state => state.category.process,
+  state => get(state, 'category.process', false),
   process => process,
 );
 
 const categoryTreeSelector = createSelector(
-  state => state.category.data,
+  state => get(state, 'category.data'),
   categoryData => {
     const tree = new TreeModel();
     const rootNode = tree.parse(categoryData);
@@ -420,7 +461,7 @@ const isSystemCategorySelector = createSelector(
 );
 
 const categoryDefaultsSelector = createSelector(
-  state => state.category.data,
+  state => get(state, 'category.data'),
   categoryNodeSelector,
   (categoryData, categoryNode) => {
     let result = Object.assign({}, defaultValues);
@@ -429,7 +470,7 @@ const categoryDefaultsSelector = createSelector(
 
     if (categoryNode) {
       result = pick(categoryNode.model, fieldsToEdit);
-      result.parent = getParentNode(categoryNode).model._id;
+      result.parent = CategoryEditForm.getParentNode(categoryNode).model._id;
     } else {
       result._id = 'new';
     }
@@ -457,7 +498,7 @@ const initialValuesSelector = createSelector(
       values = Object.assign({}, initialValues, { _id: categoryId });
     }
 
-    const selectedParent = categoryTree.first(node => node.model._id === values.parent);
+    const selectedParent = categoryTree.first(({ model }) => model._id === values.parent);
 
     if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
       values.type = selectedParent.model.type;
@@ -467,8 +508,6 @@ const initialValuesSelector = createSelector(
   }
 );
 
-const getNodeLabel = node => `${'- - '.repeat(node.getPath().length - 1)} ${node.model.name}`;
-
 const availableParentsListSelector = createSelector(
   initialValuesSelector,
   categoryListSelector,
@@ -477,27 +516,35 @@ const availableParentsListSelector = createSelector(
     const values = Object.assign({}, initialValues);
     const filteredList = isNewCategory
       ? categoryList
-      : categoryList.filter(node =>
-        (node.model.type === 'any' || node.model.type === values.type)
-        && node.model._id !== values._id
-      );
+      : categoryList.filter(({ model }) =>
+        (model.type === 'any' || model.type === values.type) && model._id !== values._id);
 
-    return filteredList.map(node => ({ value: node.model._id, label: getNodeLabel(node) }));
+    return filteredList.map(node => ({
+      value: node.model._id,
+      label: node.model.name,
+      node,
+    }));
   }
 );
 
 const availableTypesListSelector = createSelector(
   initialValuesSelector,
   categoryTreeSelector,
-  (initialValues, categoryTree) => {
+  (_, { intl }) => intl.formatMessage,
+  (initialValues, categoryTree, formatMessage) => {
     const values = Object.assign({}, initialValues);
-    const selectedParent = categoryTree.first(node => node.model._id === values.parent);
+    const selectedParent = categoryTree.first(({ model }) => model._id === values.parent);
 
     if (selectedParent && !selectedParent.isRoot() && selectedParent.model.type !== 'any') {
-      return [{ label: selectedParent.model.type, value: selectedParent.model.type }];
+      return [{
+        label: formatMessage(messages[selectedParent.model.type]),
+        value: selectedParent.model.type,
+      }];
     }
 
-    return availableTypesListLabeled;
+    return availableTypesListLabeled.map(type =>
+      Object.assign({}, type, { label: formatMessage(messages[type.label]) })
+    );
   }
 );
 
