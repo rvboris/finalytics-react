@@ -31,11 +31,17 @@ function* prepareDashboard() {
       break;
     }
 
-    const auth = yield select((state) => state.auth);
+    while (true) {
+      const auth = yield select((state) => state.auth);
 
-    if (get(auth, 'profile.status') === 'ready') {
-      yield put(dashboardActions.ready());
+      if (get(auth, 'profile.status') === 'ready') {
+        break;
+      }
+
+      yield take('AUTH_SET_STATUS_RESOLVED');
     }
+
+    yield put(dashboardActions.ready());
   }
 }
 
