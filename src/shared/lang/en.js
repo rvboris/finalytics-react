@@ -224,6 +224,8 @@ export default {
   'component.operationEditForm.cancelButton': 'Cancel',
   'component.operationEditForm.todayButton': 'Today',
 
+  'components.operationList.noOperations': 'You have not added any operation',
+
   'component.operationListItem.loading': 'Loading...',
   'component.operationListItem.remove': 'Remove',
   'component.operationListItem.edit': 'Edit',

@@ -223,6 +223,8 @@ export default {
   'component.operationEditForm.cancelButton': 'Отмена',
   'component.operationEditForm.todayButton': 'Сегодня',
 
+  'components.operationList.noOperations': 'Вы еще не добавили ни одной операции',
+
   'component.operationListItem.loading': 'Загрузка...',
   'component.operationListItem.remove': 'Удалить',
   'component.operationListItem.edit': 'Редактировать',

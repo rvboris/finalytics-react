@@ -4,12 +4,22 @@ import { List, AutoSizer, WindowScroller } from 'react-virtualized';
 import { createSelector } from 'reselect';
 import { noop, memoize, get } from 'lodash';
 import TreeModel from 'tree-model';
+import { Alert } from 'reactstrap';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import './style.css';
 import InfiniteLoader from '../InfiniteLoader';
 import OperationListItem from '../OperationListItem';
 import { operationActions } from '../../actions';
 import { defaultQuery } from '../../reducers/operation';
+
+const messages = defineMessages({
+  noOperations: {
+    id: 'components.operationList.noOperations',
+    description: 'No operations info message',
+    defaultMessage: 'You have not added any operation',
+  },
+});
 
 class OperationList extends React.Component {
   static propTypes = {
@@ -78,6 +88,14 @@ class OperationList extends React.Component {
   render() {
     const { process, operationList, operationListTotal } = this.props;
     const loadMoreRows = process ? noop : this.loadQuery;
+
+    if (!operationListTotal) {
+      return (
+        <Alert color="info">
+          <FormattedMessage {...messages.noOperations} />
+        </Alert>
+      );
+    }
 
     return (
       <InfiniteLoader
@@ -204,4 +222,4 @@ const mapDispatchToProps = dispatch => ({
   loadNextPage: (...args) => dispatch(operationActions.list(...args)),
 });
 
-export default connect(selector, mapDispatchToProps)(OperationList);
+export default injectIntl(connect(selector, mapDispatchToProps)(OperationList));

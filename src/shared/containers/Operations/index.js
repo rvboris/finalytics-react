@@ -83,6 +83,7 @@ class Operations extends React.Component {
   }
 
   toggleOperationDeleteModal = (operation) => {
+    console.log(this.state.operationDeleteModal);
     this.setState(Object.assign({}, this.state, {
       operationDeleteModal: !this.state.operationDeleteModal,
       operationToDelete: operation,
@@ -91,13 +92,11 @@ class Operations extends React.Component {
 
   removeOperation = () => {
     const { removeOperation } = this.props;
-    const { operationToDelete } = this.state;
+    const { operationToDelete, operationToEdit } = this.state;
 
     return removeOperation({ _id: operationToDelete._id })
       .then(() => {
-        const { operationToDelete, operationToEdit } = this.state;
-
-        if (operationToDelete._id === operationToEdit._id) {
+        if (operationToEdit && operationToDelete._id === operationToEdit._id) {
           this.editOperation();
         }
 
