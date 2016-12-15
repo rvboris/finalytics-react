@@ -99,12 +99,6 @@ class AppBar extends React.Component {
           <NavItem>
             <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink to="/dashboard/budget"><FormattedMessage {...messages.budget} /></NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink to="/dashboard/reports"><FormattedMessage {...messages.reports} /></NavLink>
-          </NavItem>
           <NavDropdown isOpen={menuOpen} toggle={this.menuToggle}>
             <DropdownToggle color="primary" nav caret>
               <FormattedMessage {...messages.more} />
