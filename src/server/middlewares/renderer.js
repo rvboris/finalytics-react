@@ -5,12 +5,13 @@ import { push } from 'react-router-redux';
 import { pick } from 'lodash';
 import passport from 'koa-passport';
 import React from 'react';
+import Helmet from 'react-helmet';
 
 import sagas from '../../shared/sagas';
 import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
-import ServerLayout from '../components/ServerLayout';
+import HtmlPage from '../components/HtmlPage';
 import { authActions, dashboardActions } from '../../shared/actions';
 
 import ClientBundleAssets from '../../../build/client/assets.json';
@@ -109,13 +110,14 @@ export default async (ctx, next) => {
       const layoutProps = {
         initialState: store.getState(),
         body: renderToString(initialView),
+        head: Helmet.rewind(),
         locale: ctx.language,
-        title: 'koa-universal-react-redux',
-        description: 'koa-universal-react-redux',
         assets,
       };
 
-      ctx.body = `<!DOCTYPE html>${renderToString(<ServerLayout {...layoutProps} />)}`;
+      ctx.body = `<!DOCTYPE html>${renderToString(<HtmlPage {...layoutProps} />)}`;
+
+      Helmet.rewind();
     } catch (err) {
       ctx.log.error(err);
 
