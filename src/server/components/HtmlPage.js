@@ -12,14 +12,14 @@ const HtmlPage = ({ initialState, body, assets, locale, head }) => {
         {head.meta.toComponent()}
         {head.link.toComponent()}
 
-        {assets.css.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
+        {assets.css.map(({ path, key }) => <link key={key} rel="stylesheet" href={path} />)}
 
         <script dangerouslySetInnerHTML={{ __html: inlineScript }} />
       </head>
 
       <body>
         <div dangerouslySetInnerHTML={{ __html: body }} />
-        {assets.javascript.map((src, idx) => <script key={idx} src={src} />)}
+        {assets.javascript.map(({ path, key }) => <script key={key} src={path} />)}
       </body>
     </html>
   );
