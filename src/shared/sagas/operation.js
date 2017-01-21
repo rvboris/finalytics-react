@@ -1,5 +1,4 @@
-import { takeLatest } from 'redux-saga';
-import { put, select } from 'redux-saga/effects';
+import { put, select, takeLatest } from 'redux-saga/effects';
 import { operationActions, accountActions } from '../actions';
 import { defaultQuery } from '../reducers/operation';
 

@@ -79,6 +79,10 @@ MoneyInput.propTypes = {
   className: React.PropTypes.string,
 };
 
+MoneyInput.defaultProps = {
+  className: null,
+};
+
 export default MoneyInput;
 
 export const toPositive = (txt = '') => txt.toString().replace('-', '');

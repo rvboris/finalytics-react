@@ -1,5 +1,4 @@
-import { takeLatest } from 'redux-saga';
-import { select, fork, put, take } from 'redux-saga/effects';
+import { select, fork, put, take, takeLatest } from 'redux-saga/effects';
 import { get } from 'lodash';
 import {
   authActions,

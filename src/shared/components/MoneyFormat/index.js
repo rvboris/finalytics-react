@@ -22,6 +22,10 @@ MoneyFormat.propTypes = {
   currencyId: React.PropTypes.string.isRequired,
 };
 
+MoneyFormat.defaultProps = {
+  currency: null,
+};
+
 const getMemoizeCurrencyFind = (currencyList) => memoize(
   currencyId => currencyList.find(({ _id }) => currencyId === _id),
   currencyId => currencyId,

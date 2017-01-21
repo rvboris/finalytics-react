@@ -1,10 +1,16 @@
 import convert from 'koa-convert';
 import staticCache from 'koa-static-cache';
-import clientConfigBuilder from '../../../webpack/client-config';
+import config from '../../shared/config';
 
-const webpackClientConfig = clientConfigBuilder({ mode: process.env.NODE_ENV });
+const getStaticPrefix = (isDev) =>
+  isDev ? `http://${config.hostname}:${config.devPort}/assets/` : '/assets/';
 
-export default convert(staticCache(webpackClientConfig.output.path, {
+const clientStatic = {
+  path: '../client',
+  prefix: getStaticPrefix(process.env.NODE_ENV === 'development'),
+};
+
+export default convert(staticCache(clientStatic.path, {
   maxAge: 365 * 24 * 60 * 60,
-  prefix: webpackClientConfig.output.publicPath,
+  prefix: clientStatic.prefix,
 }));

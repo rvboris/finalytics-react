@@ -24,4 +24,8 @@ ToggleInput.propTypes = {
   disabled: React.PropTypes.bool,
 };
 
+ToggleInput.defaultProps = {
+  disabled: false,
+};
+
 export default ToggleInput;

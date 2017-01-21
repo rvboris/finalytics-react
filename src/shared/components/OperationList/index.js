@@ -34,6 +34,10 @@ class OperationList extends React.Component {
     editOperationItem: React.PropTypes.object,
   };
 
+  static defaultProps = {
+    editOperationItem: null,
+  };
+
   componentWillReceiveProps({ needUpdate }) {
     if (!needUpdate) {
       return;
