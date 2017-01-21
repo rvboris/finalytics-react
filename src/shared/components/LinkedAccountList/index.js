@@ -50,6 +50,10 @@ LinkedAccountList.propTypes = {
   selectedAccountId: React.PropTypes.string,
 };
 
+LinkedAccountList.defaultProps = {
+  selectedAccountId: null,
+};
+
 const selector = createSelector(
   state => get(state, 'account.accounts', []),
   state => get(state, 'account.process', false),

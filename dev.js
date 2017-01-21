@@ -12,6 +12,7 @@ const Koa = require('koa');
 const middleware = require('koa-webpack');
 const log = require('debug')('dev');
 const config = require('./config/development');
+const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
 class ListenerManager {
   constructor(listener) {
@@ -65,7 +66,7 @@ class HotServer {
         this.instance = null;
       });
 
-      const url = `http://localhost:${config.port}`;
+      const url = `http://${config.hostname}:${config.port}`;
 
       log(`running on ${url}`);
     } catch (err) {
@@ -132,9 +133,16 @@ class HotServers {
 
       const clientConfig = require('./webpack/client-config')(params);
       const serverConfig = require('./webpack/server-config')(params);
+      const clientCompilerCtx =
+        new ProgressPlugin(this._progressLogger('client'));
+      const serverCompilerCtx =
+          new ProgressPlugin(this._progressLogger('server'));
 
       this.clientCompiler = webpack(clientConfig);
+      this.clientCompiler.apply(clientCompilerCtx);
+
       this.serverCompiler = webpack(serverConfig);
+      this.serverCompiler.apply(serverCompilerCtx);
     } catch (err) {
       log(err);
       return;
@@ -157,6 +165,12 @@ class HotServers {
       this.serverBundle ? this.serverBundle.dispose() : undefined,
       this.clientBundle ? this.clientBundle.dispose() : undefined,
     ]).then(clearWebpackConfigsCache).then(this.start, err => log(err));
+  }
+
+  _progressLogger(target) {
+    return (percentage, msg) => {
+      log(`${target} ${(percentage * 100).toFixed()}%`, msg);
+    };
   }
 
   _configureHotClient() {

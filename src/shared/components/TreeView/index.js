@@ -1,4 +1,5 @@
 import React from 'react';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import FaAngleDown from 'react-icons/lib/fa/angle-down';
 import FaAngleUp from 'react-icons/lib/fa/angle-up';
@@ -16,6 +17,17 @@ export default class TreeView extends React.Component {
     labelClassName: React.PropTypes.string,
     labelSelectedClassName: React.PropTypes.string,
     arrowClassName: React.PropTypes.string,
+  };
+
+  static defaultProps = {
+    onSelect: noop,
+    children: null,
+    itemClassName: null,
+    itemNoChildrenClassName: null,
+    chidlrenContainerClassName: null,
+    labelClassName: null,
+    labelSelectedClassName: null,
+    arrowClassName: null,
   };
 
   constructor(...args) {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import style from './style.css';
 
-const Spinner = ({ color = '#000', size = 50 }) => {
+const Spinner = ({ color, size }) => {
   const styleSize = {
     width: `${size}px`,
     height: `${size}px`,
@@ -24,6 +24,11 @@ const Spinner = ({ color = '#000', size = 50 }) => {
 Spinner.propTypes = {
   color: React.PropTypes.string,
   size: React.PropTypes.number,
+};
+
+Spinner.defaultProps = {
+  color: '#000',
+  size: 50,
 };
 
 export default Spinner;

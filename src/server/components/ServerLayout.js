@@ -13,7 +13,7 @@ export default function ServerLayout({ initialState, body, assets, locale, title
         <meta charSet="utf-8" />
         <link rel="icon" type="image/ico" href="/favicon.ico" />
 
-        {assets.css.map((href, idx) => <link key={idx} rel="stylesheet" href={href} />)}
+        {assets.css.map(({ path, key }) => <link key={key} rel="stylesheet" href={path} />)}
 
         <script dangerouslySetInnerHTML={{ __html: inlineScript.join(';') }} />
       </head>
@@ -21,7 +21,7 @@ export default function ServerLayout({ initialState, body, assets, locale, title
       <body>
         <div dangerouslySetInnerHTML={{ __html: body }} />
 
-        {assets.javascript.map((src, idx) => <script key={idx} src={src} />)}
+        {assets.javascript.map(({ path, key }) => <script key={key} src={path} />)}
       </body>
     </html>
   );

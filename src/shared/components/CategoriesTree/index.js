@@ -69,6 +69,10 @@ CategoriesTree.propTypes = {
   selectedCategoryId: React.PropTypes.string,
 };
 
+CategoriesTree.defaultProps = {
+  selectedCategoryId: null,
+};
+
 const selector = createSelector(
   state => get(state, 'category.data'),
   state => get(state, 'category.process', false),

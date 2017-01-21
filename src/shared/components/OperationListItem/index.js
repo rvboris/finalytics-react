@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import { ButtonGroup, Button } from 'reactstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
@@ -33,6 +34,13 @@ class OperationListItem extends React.Component {
     editOperationItem: React.PropTypes.object,
     toggleOperationDeleteModal: React.PropTypes.func,
   };
+
+  static defaultProps = {
+    operation: null,
+    editOperation: noop,
+    editOperationItem: null,
+    toggleOperationDeleteModal: noop,
+  }
 
   static getDate(date) {
     const now = moment().utc();

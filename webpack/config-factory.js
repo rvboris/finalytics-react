@@ -7,7 +7,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const log = require('debug')('webpack');
 const Visualizer = require('webpack-visualizer-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const Writable = require('stream').Writable;
 const configs = require('../config');
 
@@ -31,13 +30,11 @@ module.exports = ({ target, options }) => {
   const isServer = target === 'server';
 
   const ifDev = ifElse(isDev);
-  const ifProd = ifElse(isProd);
   const ifClient = ifElse(isClient);
   const ifServer = ifElse(isServer);
   const ifDevClient = ifElse(isDev && isClient);
   const ifDevServer = ifElse(isDev && isServer);
   const ifProdClient = ifElse(isProd && isClient);
-  const ifCI = ifElse(process.env.CI);
 
   const config = configs[options.mode];
   const configForClient = _.omit(config, [
@@ -50,7 +47,7 @@ module.exports = ({ target, options }) => {
     'tokenKeyFile',
   ]);
 
-  const reloadPath = `http://localhost:${config.devPort}/__webpack_hmr`;
+  const reloadPath = `http://${config.hostname}:${config.devPort}/__webpack_hmr`;
 
   return {
     target: ifServer('node', 'web'),
@@ -99,7 +96,7 @@ module.exports = ({ target, options }) => {
         '[name].js'
       ),
       publicPath: ifDev(
-        `http://localhost:${config.devPort}/assets/`,
+        `http://${config.hostname}:${config.devPort}/assets/`,
         '/assets/'
       ),
       chunkFilename: '[name]-[chunkhash].js',
@@ -119,7 +116,6 @@ module.exports = ({ target, options }) => {
           },
         },
       }),
-      ifCI(undefined, new ProgressBarPlugin({ stream: logStream })),
       ifClient(new LodashModuleReplacementPlugin({
         collections: true,
         paths: true,
@@ -147,7 +143,7 @@ module.exports = ({ target, options }) => {
       })),
       ifClient(new Visualizer({ filename: '../client-stats.html' })),
       ifServer(new Visualizer({ filename: '../server-stats.html' })),
-      ifDev(new webpack.NoErrorsPlugin()),
+      ifDev(new webpack.NoEmitOnErrorsPlugin()),
       ifDevClient(new webpack.HotModuleReplacementPlugin()),
       ifDevServer(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })),
       ifProdClient(
@@ -164,7 +160,6 @@ module.exports = ({ target, options }) => {
           },
         })
       ),
-      ifProd(new webpack.optimize.DedupePlugin()),
       ifClient(
         new ExtractTextPlugin({
           filename: '[name]-[chunkhash].css',
@@ -179,18 +174,19 @@ module.exports = ({ target, options }) => {
         },
       }),
     ]),
+    stats: 'minimal',
     module: {
       rules: _.compact([
         {
           enforce: 'pre',
           test: /\.js$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: 'eslint',
+          loader: 'eslint-loader',
         },
         {
           test: /\.(jpg|png|svg)$/,
           exclude: [/node_modules/, path.resolve(__dirname, '../build')],
-          loader: 'url?limit=100000',
+          loader: 'url-loader?limit=100000',
         },
         {
           test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,

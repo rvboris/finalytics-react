@@ -69,11 +69,19 @@ NavLink.propTypes = {
   children: React.PropTypes.any,
 };
 
+NavLink.defaultProps = {
+  children: null,
+};
+
 class AppBar extends React.Component {
   static propTypes = {
     userLogin: React.PropTypes.string,
     manageAccounts: React.PropTypes.func.isRequired,
     manageCategories: React.PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    userLogin: '',
   };
 
   constructor(...args) {
@@ -93,7 +101,7 @@ class AppBar extends React.Component {
     const { menuOpen } = this.state;
 
     return (
-      <Navbar color="primary" dark>
+      <Navbar color="primary" inverse>
         <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
         <Nav navbar>
           <NavItem>
