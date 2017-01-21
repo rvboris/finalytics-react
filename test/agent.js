@@ -1,5 +1,5 @@
 import http from 'http';
-import { agent } from 'supertest-as-promised';
+import { agent } from 'supertest';
 import { app } from '../build/server/main';
 
 export default async () => {
