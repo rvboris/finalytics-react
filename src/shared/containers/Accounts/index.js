@@ -36,7 +36,7 @@ const Accounts = (props) => {
             type="button"
             block
             color="primary"
-            className="mb-1"
+            className="mb-3"
             onClick={props.onNewAccount}
           >
             <FormattedMessage {...messages.createAccount} />
@@ -47,7 +47,7 @@ const Accounts = (props) => {
             selectedAccountId={selectedAccountId}
           />
         </div>
-        <div className={classnames(style.details, 'ml-2')}>
+        <div className={classnames(style.details, 'ml-3')}>
           <AccountEditForm accountId={selectedAccountId} />
         </div>
       </div>

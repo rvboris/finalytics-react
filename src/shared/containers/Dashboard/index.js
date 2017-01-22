@@ -45,15 +45,15 @@ class Dashboard extends React.Component {
       return (
         <div className={style.spinner}>
           <Spinner />
-          <h4 className="mt-1"><FormattedMessage {...messages.loading} /></h4>
+          <h4 className="mt-3"><FormattedMessage {...messages.loading} /></h4>
         </div>
       );
     }
 
     return (
-      <div className="pt-1">
+      <div className="pt-3">
         <div className="container"><AppBar /></div>
-        <div className="container mt-1">{ children }</div>
+        <div className="container mt-3">{ children }</div>
       </div>
     );
   }

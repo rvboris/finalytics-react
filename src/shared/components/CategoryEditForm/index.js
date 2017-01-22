@@ -385,7 +385,7 @@ class CategoryEditForm extends React.Component {
               onClick={this.removeCategory}
               disabled={process}
               color="danger"
-              className="mr-1"
+              className="mr-3"
             >
               {
                 this.props.process

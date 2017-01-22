@@ -36,7 +36,7 @@ const Categories = (props) => {
             type="button"
             block
             color="primary"
-            className="mb-1"
+            className="mb-3"
             onClick={props.onNewCategory}
           >
             <FormattedMessage {...messages.createCategory} />
@@ -47,7 +47,7 @@ const Categories = (props) => {
             selectedCategoryId={selectedCategoryId}
           />
         </div>
-        <div className={classnames(style.details, 'ml-2')}>
+        <div className={classnames(style.details, 'ml-3')}>
           <CategoryEditForm categoryId={selectedCategoryId} />
         </div>
       </div>

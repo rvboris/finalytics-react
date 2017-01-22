@@ -376,7 +376,7 @@ class AccountEditForm extends React.Component {
               onClick={this.removeAccount}
               disabled={process}
               color="danger"
-              className="mr-1"
+              className="mr-3"
             >
               {
                 this.props.process

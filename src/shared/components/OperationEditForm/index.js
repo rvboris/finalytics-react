@@ -192,7 +192,7 @@ const TypeFormField = field => {
   const onTypeSelect = (type) => () => input.onChange(type);
 
   return (
-    <ButtonGroup className="btn-group-justified mb-1">
+    <ButtonGroup className="btn-group-justified mb-3">
       <Button
         onClick={onTypeSelect('expense')}
         type="button"
@@ -372,7 +372,7 @@ class OperationEditForm extends React.Component {
       <Button
         type="button"
         color="danger"
-        className="ml-1"
+        className="ml-3"
         onClick={() => toggleOperationDeleteModal(operation)}
       >
         <FormattedMessage {...messages.deleteButton} />
@@ -411,7 +411,7 @@ class OperationEditForm extends React.Component {
     }
 
     return (
-      <Button type="button" size="sm" className="mt-1" block onClick={this.setToday}>
+      <Button type="button" size="sm" className="mt-3" block onClick={this.setToday}>
         <FormattedMessage {...messages.todayButton} />
       </Button>
     );
@@ -551,7 +551,7 @@ class OperationEditForm extends React.Component {
 
                 { this.getTodayButton() }
               </div>
-              <div className={classnames(style.form, 'ml-1')}>
+              <div className={classnames(style.form, 'ml-3')}>
                 <Field
                   name="type"
                   component={TypeFormField}
