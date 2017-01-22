@@ -123,11 +123,14 @@ class Operations extends React.Component {
       <div className={style.container}>
         <div className={style.operations}>
           { accountsExist &&
-            <OperationEditForm
-              operation={operationToEdit}
-              editOperation={this.editOperation}
-              toggleOperationDeleteModal={this.toggleOperationDeleteModal}
-            /> }
+            <div className="mb-3">
+              <OperationEditForm
+                operation={operationToEdit}
+                editOperation={this.editOperation}
+                toggleOperationDeleteModal={this.toggleOperationDeleteModal}
+              />
+            </div>
+          }
           { accountsExist &&
             <OperationList
               editOperation={this.editOperation}
@@ -175,7 +178,7 @@ class Operations extends React.Component {
             </ModalFooter>
           </Modal>
         </div>
-        <div className={classnames(style.balance, 'ml-2')}>
+        <div className={classnames(style.balance, 'ml-3')}>
           <AccountList />
         </div>
       </div>

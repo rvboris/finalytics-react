@@ -14,7 +14,7 @@ const messages = defineMessages({
 });
 
 const SelectInput = (props) => {
-  const { intl, input, virtualized, options, name } = props;
+  const { intl, input, virtualized, options } = props;
   const formatMessage = intl.formatMessage;
 
   const onChange = (event) => {
@@ -38,7 +38,7 @@ const SelectInput = (props) => {
         onChange={onChange}
         options={options}
         noResultsText={formatMessage(messages.notFoud)}
-        instanceId={name}
+        instanceId={input.name}
         maxHeight={300}
       />
     );
@@ -52,7 +52,7 @@ const SelectInput = (props) => {
       onChange={onChange}
       options={options}
       noResultsText={formatMessage(messages.notFoud)}
-      instanceId={name}
+      instanceId={input.name}
     />
   );
 };
@@ -61,7 +61,6 @@ SelectInput.propTypes = {
   intl: React.PropTypes.object.isRequired,
   input: React.PropTypes.object.isRequired,
   options: React.PropTypes.array.isRequired,
-  name: React.PropTypes.string.isRequired,
   virtualized: React.PropTypes.bool,
 };
 

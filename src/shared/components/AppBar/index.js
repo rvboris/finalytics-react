@@ -1,13 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Link } from 'react-router';
+import { Link } from 'react-router/lib/index';
 import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import {
   Navbar,
   NavbarBrand,
+  NavbarToggler,
   Nav,
+  Collapse,
   NavItem,
   NavDropdown,
   DropdownToggle,
@@ -89,6 +91,7 @@ class AppBar extends React.Component {
 
     this.state = {
       menuOpen: false,
+      navOpen: false,
     };
   }
 
@@ -96,42 +99,49 @@ class AppBar extends React.Component {
     this.setState(Object.assign({}, this.state, { menuOpen: !this.state.menuOpen }));
   }
 
+  toggleNavbar = () => {
+    this.setState(Object.assign({}, this.state, { navOpen: !this.state.navOpen }));
+  }
+
   render() {
     const { userLogin, manageAccounts, manageCategories } = this.props;
-    const { menuOpen } = this.state;
+    const { menuOpen, navOpen } = this.state;
 
     return (
-      <Navbar color="primary" inverse>
+      <Navbar color="primary" inverse toggleable>
+        <NavbarToggler onClick={this.toggleNavbar} />
         <NavbarBrand href="/dashboard/operations">Finalytics</NavbarBrand>
-        <Nav navbar>
-          <NavItem>
-            <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
-          </NavItem>
-          <NavDropdown isOpen={menuOpen} toggle={this.menuToggle}>
-            <DropdownToggle color="primary" nav caret>
-              <FormattedMessage {...messages.more} />
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={manageAccounts}>
-                <FormattedMessage {...messages.manageAccounts} />
-              </DropdownItem>
-              <DropdownItem onClick={manageCategories}>
-                <FormattedMessage {...messages.manageCategories} />
-              </DropdownItem>
-            </DropdownMenu>
-          </NavDropdown>
-        </Nav>
 
-        <Nav className="float-xs-right" navbar>
-          <NavItem>
-            <NavLink to="/dashboard/profile">
-              <FormattedMessage {...messages.profile} /> {userLogin && `(${userLogin})`}
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
-          </NavItem>
-        </Nav>
+        <Collapse isOpen={navOpen} navbar>
+          <Nav navbar>
+            <NavItem>
+              <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+            </NavItem>
+            <NavDropdown isOpen={menuOpen} toggle={this.menuToggle}>
+              <DropdownToggle color="primary" nav caret>
+                <FormattedMessage {...messages.more} />
+              </DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem onClick={manageAccounts}>
+                  <FormattedMessage {...messages.manageAccounts} />
+                </DropdownItem>
+                <DropdownItem onClick={manageCategories}>
+                  <FormattedMessage {...messages.manageCategories} />
+                </DropdownItem>
+              </DropdownMenu>
+            </NavDropdown>
+          </Nav>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink to="/dashboard/profile">
+                <FormattedMessage {...messages.profile} /> {userLogin && `(${userLogin})`}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
       </Navbar>
     );
   }

@@ -1,5 +1,5 @@
 import { renderToString } from 'react-dom/server';
-import { RouterContext, match } from 'react-router';
+import { RouterContext, match } from 'react-router/lib/index';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
 import { pick } from 'lodash';

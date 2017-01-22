@@ -225,7 +225,7 @@ class CategoryEditForm extends React.Component {
     }
 
     return (
-      <Button type="button" className="float-xs-right" color="danger" onClick={this.toggleModal}>
+      <Button type="button" className="float-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
@@ -385,7 +385,7 @@ class CategoryEditForm extends React.Component {
               onClick={this.removeCategory}
               disabled={process}
               color="danger"
-              className="mr-1"
+              className="mr-3"
             >
               {
                 this.props.process

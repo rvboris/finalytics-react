@@ -42,8 +42,8 @@ class Logout extends React.Component {
         <Spinner />
         {
           process
-            ? <h4 className="mt-1"><FormattedMessage {...messages.process} /></h4>
-            : <h4 className="mt-1"><FormattedMessage {...messages.done} /></h4>
+            ? <h4 className="mt-3"><FormattedMessage {...messages.process} /></h4>
+            : <h4 className="mt-3"><FormattedMessage {...messages.done} /></h4>
         }
       </div>
     );

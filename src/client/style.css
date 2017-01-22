@@ -2,7 +2,7 @@ html {
   font-size: 16px;
 }
 
-:global .wf-active body {
+:global .wf-active * {
   font-family: "Noto Sans";
 }
 

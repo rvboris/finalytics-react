@@ -231,7 +231,7 @@ class AccountEditForm extends React.Component {
     }
 
     return (
-      <Button className="float-xs-right" color="danger" onClick={this.toggleModal}>
+      <Button className="float-right" color="danger" onClick={this.toggleModal}>
         <FormattedMessage {...messages.deleteButton} />
       </Button>
     );
@@ -376,7 +376,7 @@ class AccountEditForm extends React.Component {
               onClick={this.removeAccount}
               disabled={process}
               color="danger"
-              className="mr-1"
+              className="mr-3"
             >
               {
                 this.props.process
