@@ -26,16 +26,16 @@ const AccountList = (props) => (
     { props.accounts.length
     ? <ul className="list-group list-group-flush">
       {props.accounts.map((account) => (
-        <li className="list-group-item clearfix" key={account._id}>
-          <span className="float-xs-left">{account.name}</span>
-          <span className="float-xs-right">
+        <li className="list-group-item d-flex" key={account._id}>
+          <span>{account.name}</span>
+          <span className="ml-auto">
             <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
           </span>
         </li>
       ))}
     </ul>
     : <CardBlock>
-      <p className="text-xs-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
+      <p className="text-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
     </CardBlock>
   }
   </Card>

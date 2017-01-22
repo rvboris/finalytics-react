@@ -35,7 +35,7 @@ const CategoriesTree = ({ categories, onSelect, selectedCategoryId }) => {
     const label = (
       <span>
         <span className={style.textLabel}>{item.name}</span>
-        <span className={classnames('float-xs-right', style[item.type])}>
+        <span className={classnames('float-right', style[item.type])}>
           <FormattedMessage {...messages[item.type]} />
         </span>
       </span>

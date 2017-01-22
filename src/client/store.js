@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux';
-import { browserHistory } from 'react-router';
+import { browserHistory } from 'react-router/lib/index';
 import { values } from 'lodash';
 import Immutable from 'seamless-immutable';
 import createSagaMiddleware from 'redux-saga';

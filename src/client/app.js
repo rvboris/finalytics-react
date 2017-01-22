@@ -1,12 +1,10 @@
 import 'babel-polyfill';
 import React from 'react';
 import { render } from 'react-dom';
-import { Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
-import browserHistory from 'react-router/lib/browserHistory';
+import { browserHistory, match, Router } from 'react-router/lib/index';
 import WebFont from 'webfontloader';
-import match from 'react-router/lib/match';
 
 import './bootstrap.scss';
 import './style.css';

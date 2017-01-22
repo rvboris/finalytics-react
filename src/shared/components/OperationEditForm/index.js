@@ -386,7 +386,7 @@ class OperationEditForm extends React.Component {
     return (
       <Button
         type="button"
-        className="float-xs-right"
+        className="float-right"
         color="secondary"
         onClick={() => editOperation()}
       >
