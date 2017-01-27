@@ -33,7 +33,6 @@ module.exports = ({ target, options }) => {
   const ifClient = ifElse(isClient);
   const ifServer = ifElse(isServer);
   const ifDevClient = ifElse(isDev && isClient);
-  const ifDevServer = ifElse(isDev && isServer);
   const ifProdClient = ifElse(isProd && isClient);
 
   const config = configs[options.mode];
@@ -61,16 +60,6 @@ module.exports = ({ target, options }) => {
       'hidden-source-map'
     ),
     entry: _.merge(
-      ifClient({
-        vendor: [
-          'reselect',
-          'seamless-immutable',
-          'axios',
-          'history',
-          'moment',
-          'money',
-        ],
-      }),
       {
         main: _.compact([
           ifDevClient('react-hot-loader/patch'),
@@ -114,12 +103,10 @@ module.exports = ({ target, options }) => {
           eslint: {
             configFile: '.eslintrc',
           },
+          context: __dirname,
+          output: { path: './' },
         },
       }),
-      ifClient(new LodashModuleReplacementPlugin({
-        collections: true,
-        paths: true,
-      })),
       new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /^\.\/(en|ru)$/),
       new webpack.DefinePlugin({
         CONFIG: JSON.stringify(ifServer(config, configForClient)),
@@ -132,20 +119,18 @@ module.exports = ({ target, options }) => {
           CI: JSON.stringify(process.env.CI || ''),
         },
       }),
+      ifClient(new LodashModuleReplacementPlugin({
+        collections: true,
+        paths: true,
+      })),
       ifClient(new AssetsPlugin({
         filename: 'assets.json',
         path: path.resolve(__dirname, `../build/${target}`),
-      })),
-      ifClient(new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        children: true,
-        minChunks: 2,
       })),
       ifClient(new Visualizer({ filename: '../client-stats.html' })),
       ifServer(new Visualizer({ filename: '../server-stats.html' })),
       ifDev(new webpack.NoEmitOnErrorsPlugin()),
       ifDevClient(new webpack.HotModuleReplacementPlugin()),
-      ifDevServer(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })),
       ifProdClient(
         new webpack.LoaderOptionsPlugin({
           minimize: true,
@@ -167,12 +152,6 @@ module.exports = ({ target, options }) => {
           allChunks: true,
         })
       ),
-      new webpack.LoaderOptionsPlugin({
-        options: {
-          context: __dirname,
-          output: { path: './' },
-        },
-      }),
     ]),
     stats: 'minimal',
     module: {
@@ -209,11 +188,7 @@ module.exports = ({ target, options }) => {
             {
               cacheDirectory: false,
               babelrc: false,
-              env: {
-                development: {
-                  plugins: ['react-hot-loader/babel'],
-                },
-              },
+
               plugins: [
                 'transform-promise-to-bluebird',
                 'transform-runtime',
@@ -221,7 +196,14 @@ module.exports = ({ target, options }) => {
               ],
             },
             ifServer({ presets: ['react', 'es2017', 'stage-1'] }),
-            ifClient({ presets: ['react', 'latest', 'stage-1'] })
+            ifClient({ presets: ['react', 'latest', 'stage-1'] }),
+            ifDev({
+              env: {
+                development: {
+                  plugins: ['react-hot-loader/babel'],
+                },
+              },
+            })
           ),
         },
         _.merge(

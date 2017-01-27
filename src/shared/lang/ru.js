@@ -253,4 +253,7 @@ export default {
   'container.operations.removeOperationModalCancelButton': 'Отмена',
   'container.operations.removeOperationModalConfirmButton': 'Удалить',
   'container.operations.removeOperationModalProcessButton': 'Удаление...',
+
+  'meta.app.title': 'Анализируй и сохраняй деньги',
+  'meta.app.description': 'Легкая система контроля ваших финансов',
 };

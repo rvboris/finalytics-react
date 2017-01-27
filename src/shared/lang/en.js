@@ -254,4 +254,7 @@ export default {
   'container.operations.removeOperationModalCancelButton': 'Cancel',
   'container.operations.removeOperationModalConfirmButton': 'Delete',
   'container.operations.removeOperationModalProcessButton': 'Deleting...',
+
+  'meta.app.title': 'Analyze and save your money',
+  'meta.app.description': 'Simple and light system to control your money',
 };

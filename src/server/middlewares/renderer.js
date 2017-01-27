@@ -112,7 +112,6 @@ export default async (ctx, next) => {
         initialState: store.getState(),
         body: renderToString(initialView),
         head: Helmet.rewind(),
-        locale: ctx.language,
         assets,
       };
 

@@ -1,12 +1,12 @@
 import React from 'react';
 
-const HtmlPage = ({ initialState, body, assets, locale, head }) => {
+const HtmlPage = ({ initialState, body, assets, head }) => {
   delete initialState.locale;
 
   const inlineScript = [`window.INITIAL_STATE = ${JSON.stringify(initialState)};`];
 
   return (
-    <html lang={locale}>
+    <html lang={head.htmlAttributes.toComponent().lang}>
       <head>
         {head.title.toComponent()}
         {head.meta.toComponent()}
@@ -19,7 +19,8 @@ const HtmlPage = ({ initialState, body, assets, locale, head }) => {
 
       <body>
         <div dangerouslySetInnerHTML={{ __html: body }} />
-        {assets.javascript.map(({ path, key }) => <script key={key} src={path} />)}
+
+        {assets.javascript.reverse().map(({ path, key }) => <script key={key} src={path} />)}
       </body>
     </html>
   );
