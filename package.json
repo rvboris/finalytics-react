@@ -31,15 +31,11 @@
   "private": true,
   "babel": {
     "presets": [
-      "es2016",
-      "es2017",
+      "latest",
       "stage-1"
     ],
     "ignore": [
       "build/server/main"
-    ],
-    "plugins": [
-      "transform-es2015-modules-commonjs"
     ]
   },
   "repository": {
@@ -134,8 +130,6 @@
     "babel-plugin-transform-promise-to-bluebird": "1.1.1",
     "babel-plugin-transform-runtime": "6.22.0",
     "babel-polyfill": "6.22.0",
-    "babel-preset-es2016": "6.22.0",
-    "babel-preset-es2017": "6.22.0",
     "babel-preset-latest": "6.22.0",
     "babel-preset-react": "6.22.0",
     "babel-preset-stage-1": "6.22.0",

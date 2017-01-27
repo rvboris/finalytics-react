@@ -195,7 +195,7 @@ module.exports = ({ target, options }) => {
                 'lodash',
               ],
             },
-            ifServer({ presets: ['react', 'es2017', 'stage-1'] }),
+            ifServer({ presets: ['react', ['latest', { es2015: false, es2016: false }], 'stage-1'] }),
             ifClient({ presets: ['react', 'latest', 'stage-1'] }),
             ifDev({
               env: {
