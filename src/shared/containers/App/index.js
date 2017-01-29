@@ -9,8 +9,6 @@ import moment from 'moment';
 import config from '../../config';
 import styles from './style.css';
 
-const favicon = require('../../../images/favicon.png');
-
 const messages = defineMessages({
   title: {
     id: 'meta.app.title',
@@ -51,20 +49,28 @@ class App extends React.Component {
   getMetaTags() {
     const { formatMessage } = this.props.intl;
     const description = formatMessage(messages.description);
+    const browserConfig = require('../../../favicons/browserconfig.xml');
 
     return [
       { name: 'description', content: description },
       { name: 'theme-color', content: '#ffffff' },
+      { name: 'msapplication-config', content: browserConfig },
     ];
   }
 
   getLinkTags() {
+    const appleTouch = require('../../../favicons/apple-touch-icon.png');
+    const favicon32 = require('../../../favicons/favicon-32x32.png');
+    const favicon16 = require('../../../favicons/favicon-16x16.png');
+    const safari = require('../../../favicons/safari-pinned-tab.svg');
+    const manifest = require('../../../favicons/manifest.json');
+
     return [
-      { rel: 'apple-touch-icon', sizes: '180x180', href: favicon },
-      { rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon },
-      { rel: 'icon', type: 'image/png', sizes: '16x16', href: favicon },
-      { rel: 'manifest', href: favicon },
-      { rel: 'mask-icon', color: '#5bbad5', href: favicon },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: appleTouch },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon32 },
+      { rel: 'icon', type: 'image/png', sizes: '16x16', href: favicon16 },
+      { rel: 'manifest', href: manifest },
+      { rel: 'mask-icon', color: '#5bbad5', href: safari },
     ];
   }
 

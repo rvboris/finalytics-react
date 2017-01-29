@@ -117,6 +117,8 @@
     "tree-model": "1.0.6",
     "uuid": "3.0.1",
     "validator": "6.2.1",
+    "web-app-browserconfig-loader": "^0.0.0",
+    "web-app-manifest-loader": "^0.1.1",
     "webfontloader": "1.6.27"
   },
   "devDependencies": {
