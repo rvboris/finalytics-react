@@ -1,6 +1,6 @@
 {
   "name": "finalytics",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Simple finance managment system",
   "main": "build/server/main.js",
   "scripts": {
@@ -26,7 +26,7 @@
     ]
   },
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=7"
   },
   "private": true,
   "babel": {
