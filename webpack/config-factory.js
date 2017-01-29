@@ -176,7 +176,19 @@ module.exports = ({ target, options }) => {
           loader: 'file-loader',
         },
         {
-          test: /\.json$/,
+          test: /(mstile-150x150|android-chrome-192x192|android-chrome-256x256)\.png$/,
+          loader: 'file-loader',
+        },
+        {
+          test: /browserconfig.xml$/,
+          loader: 'file-loader?name=browserconfig.xml!web-app-browserconfig-loader',
+        },
+        {
+          test: /manifest.json$/,
+          loader: 'file-loader?name=manifest.json!web-app-manifest-loader',
+        },
+        {
+          test: /server.+\.json$/,
           exclude: /node_modules/,
           loader: 'json-loader',
         },
