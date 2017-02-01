@@ -30,7 +30,6 @@ HtmlPage.propTypes = {
   initialState: React.PropTypes.object.isRequired,
   body: React.PropTypes.string.isRequired,
   assets: React.PropTypes.object.isRequired,
-  locale: React.PropTypes.string.isRequired,
   head: React.PropTypes.object.isRequired,
 };
 
