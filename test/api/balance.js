@@ -2,8 +2,11 @@ import test from 'ava';
 import moment from 'moment';
 import TreeModel from 'tree-model';
 import { sample, filter } from 'lodash';
+import money from 'money';
+import big from 'big.js';
 
 import agent from '../agent';
+import rates from '../../src/server/fixtures/rates';
 
 let request;
 
@@ -14,6 +17,9 @@ let expenseCategoryList;
 let currencyList;
 
 test.before(async () => {
+  money.base = rates.base;
+  money.rates = rates.rates;
+
   request = await agent();
 
   await request.post('/api/auth/register').send({
@@ -534,4 +540,65 @@ test.serial('balance calculation accuracy', async (t) => {
   t.is(res.status, 200);
   t.is(res.body.amount, 10.02);
   t.is(res.body.balance, -289.98);
+});
+
+test.serial('balance total', async (t) => {
+  let res = await request.get('/api/user/profile');
+
+  const userProfile = res.body;
+  const { baseCurrency: baseCurrencyId } = userProfile.settings;
+  const baseCurrency = currencyList.find(({ _id }) => _id === baseCurrencyId);
+
+  res = await request.get('/api/account/load');
+
+  const { accounts } = res.body;
+
+  res = await request.get('/api/balance/total').query({ date: 'wrong date' });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'balance.total.error.date.invalid');
+
+  res = await request.get('/api/balance/total').query({ account: 'wrong account' });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'balance.total.error.account.invalid');
+
+  const accountToCheck = sample(accounts);
+  const accountCurrency = currencyList.find(({ _id }) => _id === accountToCheck.currency);
+  const valueCheck = accountCurrency.code !== baseCurrency.code
+    ? money(accountToCheck.currentBalance)
+      .from(accountCurrency.code)
+      .to(baseCurrency.code)
+    : accountToCheck.currentBalance;
+
+  const fixedValueToCheck = parseFloat(big(valueCheck).toFixed(baseCurrency.decimalDigits));
+
+  res = await request.get('/api/balance/total').query({ account: accountToCheck._id });
+
+  t.is(res.status, 200);
+  t.is(res.body.total, fixedValueToCheck);
+  t.is(res.body.currency, baseCurrency._id);
+
+  res = await request.get('/api/balance/total').query({
+    account: accountToCheck._id,
+    date: moment.utc(),
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.total, fixedValueToCheck);
+  t.is(res.body.currency, baseCurrency._id);
+
+  res = await request.get('/api/balance/total').query({ account: accounts.map(({ _id }) => _id) });
+
+  t.is(res.status, 200);
+  t.is(res.body.currency, baseCurrency._id);
+
+  res = await request.get('/api/operation/list');
+
+  res = await request.get('/api/balance/total').query({
+    date: moment.utc('2016-05-05').toISOString(),
+  });
+
+  t.is(res.status, 200);
+  t.is(res.body.total, 76420.05);
 });

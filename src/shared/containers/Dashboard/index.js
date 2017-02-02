@@ -7,7 +7,7 @@ import moment from 'moment';
 
 import style from './style.css';
 import config from '../../config';
-import { accountActions, categoryActions, currencyActions } from '../../actions';
+import { accountActions, categoryActions, currencyActions, balanceActions } from '../../actions';
 import AppBar from '../../components/AppBar';
 import Spinner from '../../components/Spinner';
 
@@ -24,6 +24,7 @@ class Dashboard extends React.Component {
     accountActions.load,
     categoryActions.load,
     currencyActions.load,
+    balanceActions.total,
   ];
 
   static propTypes = {

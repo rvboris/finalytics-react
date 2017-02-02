@@ -29,3 +29,10 @@
     }
   }
 }
+
+.card-header + .list-group .list-group-item:first-of-type {
+  border-top: none;
+}
+.card-header + .list-group .list-group-item:last-of-type {
+  border-bottom: none;
+}

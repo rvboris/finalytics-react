@@ -14,6 +14,7 @@ function* prepareDashboard() {
     'CATEGORY_LOAD_RESOLVED',
     'ACCOUNT_LOAD_RESOLVED',
     'CURRENCY_LOAD_RESOLVED',
+    'BALANCE_TOTAL_RESOLVED',
   ];
 
   if (IS_CLIENT) {
@@ -24,9 +25,7 @@ function* prepareDashboard() {
     ];
 
     while (true) {
-      yield take(dashboardRequiredData);
-      yield take(dashboardRequiredData);
-      yield take(dashboardRequiredData);
+      yield new Array(dashboardRequiredData.length).fill(take(dashboardRequiredData));
       break;
     }
 
@@ -52,9 +51,7 @@ function* onUserReady() {
   ];
 
   while (true) {
-    yield take(initUserActions);
-    yield take(initUserActions);
-    yield take(initUserActions);
+    new Array(initUserActions.length).fill(take(initUserActions));
     break;
   }
 

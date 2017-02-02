@@ -158,6 +158,7 @@ export default {
 
   'component.accountList.accounts': 'Счета',
   'component.accountList.noAccounts': 'У вас пока нет счетов',
+  'component.accountList.total': 'Всего',
 
   'component.selectInput.notFound': 'Ничего не найдено',
 

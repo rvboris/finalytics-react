@@ -159,6 +159,7 @@ export default {
 
   'component.accountList.accounts': 'Accounts',
   'component.accountList.noAccounts': 'You have no accounts',
+  'component.accountList.total': 'Total',
 
   'component.selectInput.notFound': 'Not found',
 

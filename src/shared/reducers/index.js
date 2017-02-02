@@ -8,6 +8,7 @@ export { default as account } from './account';
 export { default as currency } from './currency';
 export { default as operation } from './operation';
 export { default as dashboard } from './dashboard';
+export { default as balance } from './balance';
 
 export function form(state = Immutable({}), action) {
   return Immutable(formReducer(state, action));

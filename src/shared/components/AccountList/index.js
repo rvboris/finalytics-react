@@ -3,7 +3,8 @@ import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Card, CardHeader, CardBlock } from 'reactstrap';
+import { Card, CardHeader, CardFooter, CardBlock } from 'reactstrap';
+import BalanceTotal from '../BalanceTotal';
 
 import MoneyFormat from '../MoneyFormat';
 
@@ -17,6 +18,11 @@ const messages = defineMessages({
     id: 'component.accountList.noAccounts',
     description: 'Empty account list message',
     defaultMessage: 'You have no accounts',
+  },
+  total: {
+    id: 'component.accountList.total',
+    description: 'Total balance label',
+    defaultMessage: 'Total',
   },
 });
 
@@ -37,7 +43,11 @@ const AccountList = (props) => (
     : <CardBlock>
       <p className="text-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
     </CardBlock>
-  }
+    }
+    <CardFooter className="text-muted d-flex">
+      <span><FormattedMessage {...messages.total} /></span>
+      <span className="ml-auto"><BalanceTotal /></span>
+    </CardFooter>
   </Card>
 );
 

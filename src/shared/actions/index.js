@@ -5,3 +5,4 @@ export { default as accountActions } from './account';
 export { default as currencyActions } from './currency';
 export { default as operationActions } from './operation';
 export { default as dashboardActions } from './dashboard';
+export { default as balanceActions } from './balance';
