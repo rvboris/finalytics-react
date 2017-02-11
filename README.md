@@ -1,5 +1,7 @@
 # Finalytics
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/rvboris/finalytics.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/rvboris/finalytics.svg?branch=master)](https://travis-ci.org/rvboris/finalytics) [![GENERAL PUBLIC LICENSE](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/rvboris/finalytics/blob/master/LICENSE.txt)
 
 Simple personal finance service management and analysis, helping to preserve and increase your savings.
