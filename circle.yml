@@ -1,0 +1,26 @@
+machine:
+  pre:
+    - export DISPLAY=':99.0'
+    - Xvfb :99 -screen 0 800x600x24 > /dev/null 2>&1 &
+  node:
+    version: 7.5.0
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
+
+database:
+  pre:
+    - sudo service mongodb stop
+    - curl -Ol https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1404-3.4.2.tgz
+    - tar -zxvf mongodb-linux-x86_64-ubuntu1404-3.4.2.tgz
+    - mkdir -p ./data/db
+    - ./mongodb-linux-x86_64-ubuntu1404-3.4.2/bin/mongod --dbpath ./data/db --logpath ./mongod.log --fork || cat ./mongod.log
+
+test:
+  override:
+    - yarn test
