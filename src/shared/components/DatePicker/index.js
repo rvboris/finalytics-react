@@ -8,10 +8,12 @@ import './style.css';
 const DatePicker = ({ locale, input }) => {
   const { value } = input;
 
-  const onChange = (event, date) => {
-    if (input.onChange && event) {
-      input.onChange(moment(date).utc().format());
+  const handleDayClick = (day, { disabled, selected }) => {
+    if (disabled || selected || !input.onChange) {
+      return;
     }
+
+    input.onChange(moment(day).utc().format());
   };
 
   const selectedDays = (day) => DateUtils.isSameDay(moment(value).utc().toDate(), day);
@@ -20,9 +22,16 @@ const DatePicker = ({ locale, input }) => {
     <DayPicker
       localeUtils={LocaleUtils}
       locale={locale}
-      onDayClick={onChange}
+      onDayClick={handleDayClick}
       selectedDays={selectedDays}
       initialMonth={moment(value).utc().toDate()}
+      ref={elm => {
+        if (!elm) {
+          return;
+        }
+
+        elm.showMonth(moment(value).utc().toDate());
+      }}
     />
   );
 };
