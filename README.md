@@ -1,6 +1,6 @@
 # Finalytics
 
-[![Build Status](https://travis-ci.org/rvboris/finalytics.svg?branch=master)](https://travis-ci.org/rvboris/finalytics) [![GENERAL PUBLIC LICENSE](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/rvboris/finalytics/blob/master/LICENSE.txt)
+[![CircleCI](https://circleci.com/gh/rvboris/finalytics/tree/master.svg?style=shield)](https://circleci.com/gh/rvboris/finalytics/tree/master) [![GENERAL PUBLIC LICENSE](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/rvboris/finalytics/blob/master/LICENSE.txt)
 
 Simple personal finance service management and analysis, helping to preserve and increase your savings.
 
