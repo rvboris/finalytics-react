@@ -19,8 +19,6 @@ const connectOptions = {
   promiseLibrary: Promise,
 };
 
-mongoose.Promise = Promise;
-
 mongoose.set('debug', (coll, method, query, doc, options) => {
   db(`${coll}.${method}(${JSON.stringify(query)}, ${JSON.stringify(options)});`);
 });

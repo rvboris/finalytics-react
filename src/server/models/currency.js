@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+// Webpack first require fix
+mongoose.Promise = Promise;
+
 const model = new mongoose.Schema({
   symbol: { type: String, required: true },
   name: { type: String, required: true },

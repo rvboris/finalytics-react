@@ -51,7 +51,7 @@ function* onUserReady() {
   ];
 
   while (true) {
-    new Array(initUserActions.length).fill(take(initUserActions));
+    yield new Array(initUserActions.length).fill(take(initUserActions));
     break;
   }
 
