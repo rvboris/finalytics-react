@@ -19,7 +19,7 @@
     ],
     "failFast": true,
     "tap": false,
-    "concurrency": 4,
+    "concurrency": 1,
     "powerAssert": true,
     "require": [
       "babel-register"

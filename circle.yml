@@ -1,7 +1,8 @@
 machine:
   pre:
     - export DISPLAY=':99.0'
-    - Xvfb :99 -screen 0 800x600x24 > /dev/null 2>&1 &
+    - Xvfb :99 -screen 0 800x600x24:
+        background: true
   node:
     version: 7.5.0
   environment:
