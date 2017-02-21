@@ -68,7 +68,6 @@ module.exports = ({ target, options }) => {
           ifClient('webfontloader'),
           ifClient('react-toggle/style.css'),
           ifClient('react-select/dist/react-select.css'),
-          ifClient('react-virtualized-select/styles.css'),
           ifClient('react-day-picker/lib/style.css'),
 
           ifServer(

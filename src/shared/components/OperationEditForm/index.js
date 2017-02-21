@@ -569,7 +569,6 @@ class OperationEditForm extends React.Component {
                     component={SelectFormField}
                     optionRenderer={optionRenderer()}
                     valueRenderer={valueRenderer()}
-                    virtualized={false}
                   />,
                   <Field
                     key="account"

@@ -20,7 +20,7 @@ import {
   ModalFooter,
 } from 'reactstrap';
 
-import { virtualizedOptionRenderer, valueRenderer } from '../../utils/category-select';
+import { optionRenderer, valueRenderer } from '../../utils/category-select';
 import { categoryActions } from '../../actions';
 import { error } from '../../log';
 import SelectInput from '../SelectInput';
@@ -340,7 +340,7 @@ class CategoryEditForm extends React.Component {
             name="parent"
             options={availableParentsList}
             component={SelectFormField}
-            optionRenderer={virtualizedOptionRenderer(true)}
+            optionRenderer={optionRenderer(true)}
             valueRenderer={valueRenderer(true)}
           />
 
