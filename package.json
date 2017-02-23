@@ -26,13 +26,12 @@
     ]
   },
   "engines": {
-    "node": ">=7"
+    "node": ">=7.6.0"
   },
   "private": true,
   "babel": {
-    "presets": [
-      "latest",
-      "stage-1"
+    "plugins": [
+      "transform-es2015-modules-commonjs"
     ],
     "ignore": [
       "build/server/main"

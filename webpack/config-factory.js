@@ -199,14 +199,16 @@ module.exports = ({ target, options }) => {
             {
               cacheDirectory: false,
               babelrc: false,
-
               plugins: [
+                'transform-es2015-modules-commonjs',
+                'transform-class-properties',
+                'transform-object-rest-spread',
                 'transform-promise-to-bluebird',
                 'transform-runtime',
                 'lodash',
               ],
             },
-            ifServer({ presets: ['react', ['latest', { es2015: false, es2016: false }], 'stage-1'] }),
+            ifServer({ presets: ['react'] }),
             ifClient({ presets: ['react', 'latest', 'stage-1'] }),
             ifDev({
               env: {
