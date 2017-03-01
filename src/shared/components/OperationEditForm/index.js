@@ -663,7 +663,7 @@ const processSelector = createSelector(
 );
 
 const localeSelector = createSelector(
-  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
+  state => get(state, 'locale.currentLocale', config.defaultLocale),
   locale => locale,
 );
 

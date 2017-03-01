@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import isEmail from 'validator/lib/isEmail';
 import moment from 'moment';
+import { mapValues } from 'lodash';
 
 import { error } from '../../shared/log';
 import config from '../../shared/config';
@@ -47,7 +48,7 @@ const model = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     required: true,
     default: {
-      locale: config.defaultLang,
+      locale: config.defaultLocale,
     },
   },
   accounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Account', unique: true }],
@@ -69,6 +70,17 @@ model.methods.authenticate = async function authenticate(txt) {
   const verify = await pbkdf2(txt, salt, iterations, hashBytes, 'sha512');
 
   return verify.toString('binary') === hash;
+};
+
+model.methods.getProfile = function getProfile() {
+  const settings = mapValues(this.settings, (param) =>
+    param instanceof mongoose.Types.ObjectId ? param.toString() : param);
+
+  return {
+    email: this.email,
+    status: this.status,
+    settings,
+  };
 };
 
 model.methods.setPassword = async function setPassword(txt, txtRepeat) {

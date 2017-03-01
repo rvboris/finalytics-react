@@ -1,27 +1,38 @@
 import { handleActions } from 'redux-actions';
 import Immutable from 'seamless-immutable';
 import { addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ru from 'react-intl/locale-data/ru';
 import moment from 'moment';
+import { get } from 'lodash';
 
-import * as langs from '../lang';
 import config from '../config';
 
-addLocaleData(en);
-addLocaleData(ru);
-
 const initialState = Immutable({
-  messages: langs[config.defaultLang],
+  process: false,
+  messages: null,
+  availableLocales: config.availableLocales,
+  currentLocale: config.defaultLocale,
 });
 
 export default handleActions({
-  LOCALE_LOAD: (state, action) => {
-    if (langs[action.payload]) {
-      moment.locale(action.payload);
-      return state.set('messages', langs[action.payload]);
+  LOCALE_LOAD: (state) => state.set('process', true),
+
+  LOCALE_LOAD_RESOLVED: (state, action) => {
+    const locale = action.meta.payload;
+    const localeData = get(action, 'payload.0.default');
+    const intlLocaleData = get(action, 'payload.1');
+
+    if (!localeData || !intlLocaleData) {
+      return state.set('process', false);
     }
 
-    return state;
+    addLocaleData(intlLocaleData);
+    moment.locale(action.meta.payload);
+
+    return state
+      .set('currentLocale', locale)
+      .set('messages', localeData)
+      .set('process', false);
   },
+
+  LOCALE_LOAD_REJECTED: () => initialState,
 }, initialState);

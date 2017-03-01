@@ -1,4 +1,5 @@
 import Router from 'koa-66';
+import { get, omit } from 'lodash';
 
 import { CurrencyModel } from '../models';
 
@@ -16,13 +17,13 @@ router.get('/load', { jwt: true }, async (ctx) => {
     return;
   }
 
+  const { settings: { locale } } = ctx.user.getProfile();
+
   ctx.body = {
     currencyList: currencyList.map(currency => {
       const currencyObject = currency.toObject({ versionKey: false });
-      currencyObject.translatedName =
-        currencyObject.translate[ctx.language].name || currencyObject.name;
-      delete currencyObject.translate;
-      return currencyObject;
+      currencyObject.translatedName = get(currencyObject, `translate.${locale}.name`, currencyObject.name);
+      return omit(currencyObject, ['translate']);
     }),
   };
 });

@@ -24,10 +24,11 @@ const messages = defineMessages({
 
 const intlSelector = createSelector(
   state => state.locale.messages,
-  messages => ({
+  state => get(state, 'locale.currentLocale', config.defaultLocale),
+  (messages, locale) => ({
     messages,
-    defaultLocale: config.defaultLang,
-    locale: config.defaultLang,
+    defaultLocale: config.defaultLocale,
+    locale,
   })
 );
 
@@ -97,7 +98,7 @@ class App extends React.Component {
 }
 
 const localeSelector = createSelector(
-  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
+  state => get(state, 'locale.currentLocale', config.defaultLocale),
   locale => locale,
 );
 

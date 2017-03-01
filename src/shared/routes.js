@@ -65,6 +65,10 @@ const resolveCategoriesRoute = (nextState, cb) => {
   System.import('./containers/Categories').then(loadRoute(cb)).catch(handleError);
 };
 
+const resolveProfileRoute = (nextState, cb) => {
+  System.import('./containers/Profile').then(loadRoute(cb)).catch(handleError);
+};
+
 export default (store) => (
   <Route name="app" component={App} path="/">
     <IndexRoute getComponent={resolveHomeRoute} />
@@ -85,6 +89,10 @@ export default (store) => (
       <Route
         path="categories(/:categoryId)"
         getComponent={resolveCategoriesRoute}
+      />
+      <Route
+        path="profile"
+        getComponent={resolveProfileRoute}
       />
     </Route>
     <Route

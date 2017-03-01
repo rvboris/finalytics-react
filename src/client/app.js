@@ -3,15 +3,17 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
+import { addLocaleData } from 'react-intl';
 import { browserHistory, match, Router } from 'react-router/lib/index';
 import WebFont from 'webfontloader';
+import moment from 'moment';
 
 import './bootstrap.scss';
 import './style.css';
 
 import routes from '../shared/routes';
 import { error } from '../shared/log';
-import store, { runSaga } from './store';
+import store, { runSaga, initialLocale } from './store';
 
 Promise.config({
   warnings: false,
@@ -45,7 +47,13 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 }
 
 runSaga();
-renderApp();
+
+import(`react-intl/locale-data/${initialLocale}`).then((localeData) => {
+  addLocaleData(localeData);
+  moment.locale(initialLocale);
+
+  renderApp();
+});
 
 WebFont.load({
   google: {

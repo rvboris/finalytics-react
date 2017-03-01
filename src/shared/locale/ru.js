@@ -234,6 +234,24 @@ export default {
   'component.categoriesTree.income': 'доход',
   'component.categoriesTree.any': 'любая',
 
+  'component.profileEditForm.email.label': 'Email',
+  'component.profileEditForm.locale.label': 'Язык',
+  'component.profileEditForm.baseCurrency.label': 'Основная валюта',
+  'component.profileEditForm.baseCurrency.placeholder': 'Выберите основную валюту',
+  'component.profileEditForm.timezone.label': 'Часовой пояс',
+  'component.profileEditForm.timezone.placeholder': 'Выберите часовой пояс',
+  'component.profileEditForm.saveProcessButton': 'Сохранение...',
+  'component.profileEditForm.saveButton': 'Сохранить',
+  'component.profileEditForm.deleteButton': 'Удалить профиль',
+  'component.profileEditForm.deleteProcessButton': 'Удаление...',
+  'component.profileEditForm.deleteModalTitle': 'Удалить профиль',
+  'component.profileEditForm.deleteModalConfirm': 'Вы уверены что хотите удалить профиль {email}?',
+  'component.profileEditForm.deleteModalWarning': 'ВНИМАНИЕ эту операцию нельзя отменить.',
+  'component.profileEditForm.deleteModalError': 'Произошла ошибка при удалении вашего профиля',
+  'component.profileEditForm.cancelButton': 'Отмена',
+
+  'container.profile.profileSettings': 'Настройки профиля',
+
   'container.accounts.manageAccounts': 'Управление счетами',
   'container.accounts.createAccount': 'Создать новый счет',
 

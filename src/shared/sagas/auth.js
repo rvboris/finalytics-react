@@ -7,6 +7,7 @@ import {
   accountActions,
   currencyActions,
   dashboardActions,
+  balanceActions,
 } from '../actions';
 
 function* prepareDashboard() {
@@ -22,6 +23,7 @@ function* prepareDashboard() {
       put(categoryActions.load()),
       put(accountActions.load()),
       put(currencyActions.load()),
+      put(balanceActions.total()),
     ];
 
     while (true) {
@@ -61,18 +63,20 @@ function* onUserReady() {
 function* userTimezoneLocale() {
   if (IS_CLIENT) {
     yield put(authActions.setSettings({
-      timezone: new Date().getTimezoneOffset(),
+      timezone: -(new Date().getTimezoneOffset()),
       locale: 'auto',
     }));
   }
 }
 
 function* onProfile(action) {
-  yield put(localeActions.load(get(action, 'payload.data.profile.settings.locale')));
+  yield put(localeActions.load(get(action, 'payload.data.settings.locale')));
 }
 
 function* onSettings(action) {
   yield put(localeActions.load(get(action, 'payload.data.locale')));
+  yield put(currencyActions.load());
+  yield put(balanceActions.total());
 }
 
 function* onAuth(action) {
@@ -90,6 +94,12 @@ function* onAuth(action) {
   yield fork(prepareDashboard);
 }
 
+function* onLogout() {
+  const { currentLocale } = yield select((state) => state.locale);
+
+  yield put(localeActions.load(currentLocale));
+}
+
 export default function* () {
   yield fork(onUserReady);
 
@@ -97,5 +107,6 @@ export default function* () {
     takeLatest(['AUTH_LOGIN_RESOLVED', 'AUTH_REGISTER_RESOLVED'], onAuth),
     takeLatest('AUTH_GET_PROFILE_RESOLVED', onProfile),
     takeLatest('AUTH_SET_SETTINGS_RESOLVED', onSettings),
+    takeLatest(['AUTH_LOGOUT_RESOLVED', 'AUTH_REMOVE_PROFILE_RESOLVED'], onLogout),
   ];
 }

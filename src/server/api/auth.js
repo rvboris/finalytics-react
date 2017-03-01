@@ -34,7 +34,7 @@ const oauthHandler = (provider, options) => async (ctx, next) => {
     }
   }
 
-  await passport.authenticate(provider, options, (user) => {
+  await passport.authenticate(provider, options, (err, user) => {
     if (!user) {
       ctx.session = null;
       ctx.status = 401;
@@ -64,7 +64,7 @@ router.post('/register', async (ctx) => {
 
   const setPassword = await user.setPassword(password, repeatPassword);
 
-  user.settings.locale = ctx.language;
+  user.settings.locale = ctx.locale;
 
   if (setPassword.error) {
     ctx.body = setPassword;

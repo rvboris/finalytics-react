@@ -235,6 +235,24 @@ export default {
   'component.categoriesTree.income': 'income',
   'component.categoriesTree.any': 'any',
 
+  'component.profileEditForm.email.label': 'Email',
+  'component.profileEditForm.locale.label': 'Locale',
+  'component.profileEditForm.baseCurrency.label': 'Base currency',
+  'component.profileEditForm.baseCurrency.placeholder': 'Select base currency',
+  'component.profileEditForm.timezone.label': 'Timezone',
+  'component.profileEditForm.timezone.placeholder': 'Select timezone',
+  'component.profileEditForm.saveProcessButton': 'Saving...',
+  'component.profileEditForm.saveButton': 'Save',
+  'component.profileEditForm.deleteButton': 'Delete profile',
+  'component.profileEditForm.deleteProcessButton': 'Deleting...',
+  'component.profileEditForm.deleteModalTitle': 'Delete profile',
+  'component.profileEditForm.deleteModalConfirm': 'Are you sure want to delete your profile {email}?',
+  'component.profileEditForm.deleteModalWarning': 'WARNING, this operation can not be canceled.',
+  'component.profileEditForm.deleteModalError': 'When you delete an profile error occurred',
+  'component.profileEditForm.cancelButton': 'Cancel',
+
+  'container.profile.profileSettings': 'Profile settings',
+
   'container.accounts.manageAccounts': 'Account management',
   'container.accounts.createAccount': 'Create new account',
 

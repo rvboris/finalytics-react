@@ -12,7 +12,7 @@ acceptLanguage.languages(Object.keys(languagesBCP47Map));
 export default async (ctx, next) => {
   const header = ctx.request.header['accept-language'];
 
-  ctx.language = config.defaultLang;
+  ctx.locale = config.defaultLocale;
 
   if (!header) {
     await next();
@@ -30,7 +30,7 @@ export default async (ctx, next) => {
     return;
   }
 
-  ctx.language = languagesBCP47Map[parsed] || ctx.language;
+  ctx.locale = languagesBCP47Map[parsed] || ctx.locale;
 
   await next();
 };

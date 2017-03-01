@@ -11,7 +11,7 @@ const initialState = Immutable({
   process: false,
   profile: {
     settings: {
-      locale: config.defaultLang,
+      locale: config.defaultLocale,
     },
   },
 });
@@ -31,7 +31,7 @@ export default handleActions({
   AUTH_LOGOUT_RESOLVED: (state) =>
     initialState.setIn(
       ['profile', 'settings', 'locale'],
-      get(state, 'profile.settings.locale', config.defaultLang)
+      get(state, 'profile.settings.locale', config.defaultLocale)
     ),
 
   AUTH_LOGOUT_REJECTED: (state) => state.set('process', false),
@@ -55,6 +55,12 @@ export default handleActions({
       }),
 
   AUTH_GET_PROFILE_REJECTED: (state) => state.set('process', false),
+
+  AUTH_REMOVE_PROFILE: (state) => state.set('process', true),
+
+  AUTH_REMOVE_PROFILE_RESOLVED: (state) => state.set('process', false),
+
+  AUTH_REMOVE_PROFILE_REJECTED: (state) => state.set('process', false),
 
   AUTH_SET_SETTINGS: (state) => state.set('process', true),
 

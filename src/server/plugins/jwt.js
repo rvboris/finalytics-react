@@ -1,7 +1,16 @@
 import passport from 'koa-passport';
 
 export default (ctx, next) =>
-  passport.authenticate('jwt', async (user) => {
+  passport.authenticate('jwt', async (err, user) => {
+    if (err) {
+      ctx.log.error(err);
+      ctx.status = 500;
+      ctx.session = null;
+      ctx.body = { error: 'global.error.technical' };
+
+      return;
+    }
+
     if (user) {
       ctx.user = user;
 

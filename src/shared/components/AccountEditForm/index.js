@@ -21,7 +21,6 @@ import {
   InputGroupAddon,
 } from 'reactstrap';
 
-import config from '../../config';
 import { error } from '../../log';
 import { accountActions } from '../../actions';
 import validationHandler from '../../utils/validation-handler';
@@ -430,8 +429,8 @@ const isNewAccountSelector = createSelector(
 const accountDefaultsSelector = createSelector(
   accountSelector,
   state => get(state, 'currency.currencyList', []),
-  state => get(state, 'auth.profile.settings.locale', config.defaultLang),
-  (accountToEdit, currencyList, locale) => {
+  state => get(state, 'auth.profile.settings.baseCurrency'),
+  (accountToEdit, currencyList, baseCurrency) => {
     let result = defaultValues;
 
     if (accountToEdit) {
@@ -439,10 +438,7 @@ const accountDefaultsSelector = createSelector(
     }
 
     if (!result.currency) {
-      const currencyCode = locale === 'ru' ? 'RUB' : 'USD';
-      const defaultCurrency = currencyList.find(({ code }) => code === currencyCode);
-
-      result.currency = defaultCurrency._id;
+      result.currency = baseCurrency;
     }
 
     if (!result.type) {

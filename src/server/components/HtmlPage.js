@@ -1,8 +1,6 @@
 import React from 'react';
 
 const HtmlPage = ({ initialState, body, assets, head }) => {
-  delete initialState.locale;
-
   const inlineScript = [`window.INITIAL_STATE = ${JSON.stringify(initialState)};`];
 
   return (

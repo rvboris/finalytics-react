@@ -2,7 +2,7 @@ import { renderToString } from 'react-dom/server';
 import { RouterContext, match } from 'react-router/lib/index';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
-import { pick } from 'lodash';
+import { get } from 'lodash';
 import passport from 'koa-passport';
 import React from 'react';
 import Helmet from 'react-helmet';
@@ -13,7 +13,7 @@ import storeCreator from '../store-creator';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
 import HtmlPage from '../components/HtmlPage';
-import { authActions, dashboardActions } from '../../shared/actions';
+import { authActions, localeActions, dashboardActions } from '../../shared/actions';
 
 import ClientBundleAssets from '../../../build/client/assets.json';
 
@@ -39,11 +39,15 @@ export default async (ctx, next) => {
     return;
   }
 
-  await passport.authenticate('jwt', async (user) => {
+  await passport.authenticate('jwt', async (authError, user) => {
     const { token } = ctx.session;
 
-    if (token && !user) {
-      ctx.status = 403;
+    if ((token && !user) || authError) {
+      if (authError) {
+        ctx.log.error(authError);
+      }
+
+      ctx.status = authError ? 500 : 403;
       ctx.session = null;
       ctx.redirect('/login');
 
@@ -58,11 +62,15 @@ export default async (ctx, next) => {
     }
 
     if (token && user) {
+      const userProfile = user.getProfile();
+
       store.dispatch(authActions.setToken(token));
-      store.dispatch(authActions.getProfileResolved(pick(user, ['email', 'settings', 'status'])));
+      store.dispatch(authActions.getProfileResolved(userProfile));
+      store.dispatch(localeActions.load(get(userProfile, 'settings.locale')));
       store.dispatch(dashboardActions.ready());
     } else {
-      store.dispatch(authActions.setSettingsResolved({ locale: ctx.language }));
+      store.dispatch(authActions.setSettingsResolved({ locale: ctx.locale }));
+      store.dispatch(localeActions.load(ctx.locale));
     }
 
     let err;

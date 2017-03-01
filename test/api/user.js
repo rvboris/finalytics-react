@@ -1,4 +1,5 @@
 import test from 'ava';
+import mongoose from 'mongoose';
 
 import agent from '../agent';
 
@@ -24,7 +25,21 @@ test.serial('user get profile', async (t) => {
 });
 
 test.serial('user set settings', async (t) => {
-  let res = await request.post('/api/user/settings').send({ test: 1 });
+  let res = await request.post('/api/user/settings').send({
+    baseCurrency: 'invalid id',
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'user.settings.error.baseCurrency.invalid');
+
+  res = await request.post('/api/user/settings').send({
+    baseCurrency: mongoose.Types.ObjectId(),
+  });
+
+  t.is(res.status, 400);
+  t.is(res.body.error, 'user.settings.error.baseCurrency.notFound');
+
+  res = await request.post('/api/user/settings').send({ test: 1 });
 
   t.true(typeof res.body.locale === 'string');
   t.true(typeof res.body.baseCurrency === 'string');

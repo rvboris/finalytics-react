@@ -206,6 +206,7 @@ module.exports = ({ target, options }) => {
                 'transform-promise-to-bluebird',
                 'transform-runtime',
                 'lodash',
+                'syntax-dynamic-import',
               ],
             },
             ifServer({ presets: ['react'] }),
@@ -223,8 +224,8 @@ module.exports = ({ target, options }) => {
           { test: /.scss$/ },
           ifProdClient({
             loader: ExtractTextPlugin.extract({
-              fallbackLoader: 'style-loader',
-              loader: 'css-loader!postcss-loader!sass-loader',
+              fallback: 'style-loader',
+              use: 'css-loader!postcss-loader!sass-loader',
             }),
           }),
           ifDevClient({ loaders: ['style-loader', 'css-loader', 'sass-loader'] })
@@ -234,8 +235,8 @@ module.exports = ({ target, options }) => {
           ifServer({ loader: 'css-loader/locals' }),
           ifProdClient({
             loader: ExtractTextPlugin.extract({
-              fallbackLoader: 'style-loader',
-              loader: 'css-loader',
+              fallback: 'style-loader',
+              use: 'css-loader',
             }),
           }),
           ifDevClient({ loaders: ['style-loader', 'css-loader'] })
@@ -245,8 +246,8 @@ module.exports = ({ target, options }) => {
           ifServer({ loaders: ['css-loader/locals?modules', 'postcss-loader'] }),
           ifProdClient({
             loader: ExtractTextPlugin.extract({
-              fallbackLoader: 'style-loader',
-              loader: 'css-loader?modules!postcss-loader',
+              fallback: 'style-loader',
+              use: 'css-loader?modules!postcss-loader',
             }),
           }),
           ifDevClient({

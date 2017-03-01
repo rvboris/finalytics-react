@@ -10,12 +10,18 @@ const sessionKeys = [
   '5',
 ];
 
+const availableLocales = [
+  { key: 'ru', name: 'Русский' },
+  { key: 'en', name: 'English' },
+];
+
 module.exports = {
   env: 'development',
   port,
   devPort: port + 10,
   loglevel: 'silly',
-  defaultLang: 'ru',
+  defaultLocale: availableLocales[0].key,
+  availableLocales,
   hostname,
   apiUrl,
   sessionKeys,

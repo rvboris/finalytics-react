@@ -47,6 +47,16 @@ export const getProfile = createAction('AUTH_GET_PROFILE',
   })
 );
 
+export const removeProfile = createAction('AUTH_REMOVE_PROFILE',
+  undefined,
+  () => ({
+    request: {
+      url: `${USER_API}/delete`,
+      method: 'post',
+    },
+  })
+);
+
 export const getProfileResolved = createAction('AUTH_GET_PROFILE_RESOLVED',
   (profile) => ({ data: profile })
 );
@@ -90,6 +100,7 @@ export default {
   logout,
   register,
   getProfile,
+  removeProfile,
   getProfileResolved,
   setSettings,
   setSettingsResolved,
