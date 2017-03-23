@@ -21,6 +21,8 @@ const logStream = Writable({
 
 logStream.isTTY = process.stdout.isTTY;
 
+process.traceDeprecation = true;
+
 module.exports = ({ target, options }) => {
   log(`Creating webpack "${target}" config in "${options.mode}" mode`);
 
@@ -100,6 +102,8 @@ module.exports = ({ target, options }) => {
       new webpack.LoaderOptionsPlugin({
         options: {
           eslint: {
+            failOnWarning: false,
+            failOnError: false,
             configFile: '.eslintrc',
           },
           context: __dirname,
