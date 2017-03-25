@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import Helmet from 'react-helmet';
 import moment from 'moment';
 
+import renderRoutes from '../../utils/render-routes';
 import config from '../../config';
 import styles from './style.css';
 
@@ -36,7 +37,7 @@ const ConnectedIntlProvider = connect(intlSelector)(IntlProvider);
 
 class App extends React.Component {
   static propTypes = {
-    children: React.PropTypes.object.isRequired,
+    route: React.PropTypes.object.isRequired,
     locale: React.PropTypes.string.isRequired,
     intl: React.PropTypes.object.isRequired,
   };
@@ -76,7 +77,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { locale, children } = this.props;
+    const { locale, route } = this.props;
     const { formatMessage } = this.props.intl;
 
     const metaTags = this.getMetaTags();
@@ -91,7 +92,7 @@ class App extends React.Component {
           meta={metaTags}
           link={linkTags}
         />
-        {children}
+        {renderRoutes(route.routes)}
       </div>
     );
   }

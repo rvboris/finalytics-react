@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 const Accounts = (props) => {
-  const selectedAccountId = get(props, 'params.accountId', null);
+  const selectedAccountId = get(props, 'match.params.accountId', null);
 
   return (
     <div>

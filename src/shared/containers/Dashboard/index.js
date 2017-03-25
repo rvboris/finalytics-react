@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import moment from 'moment';
 
+import renderRoutes from '../../utils/render-routes';
 import style from './style.css';
 import config from '../../config';
 import { accountActions, categoryActions, currencyActions, balanceActions } from '../../actions';
@@ -20,15 +21,17 @@ const messages = defineMessages({
 });
 
 class Dashboard extends React.Component {
-  static needs = [
-    accountActions.load,
-    categoryActions.load,
-    currencyActions.load,
-    balanceActions.total,
-  ];
+  static needs = {
+    user: [
+      accountActions.load,
+      categoryActions.load,
+      currencyActions.load,
+      balanceActions.total,
+    ],
+  }
 
   static propTypes = {
-    children: React.PropTypes.object.isRequired,
+    route: React.PropTypes.object.isRequired,
     isReady: React.PropTypes.bool.isRequired,
     locale: React.PropTypes.string.isRequired,
   }
@@ -40,7 +43,7 @@ class Dashboard extends React.Component {
   }
 
   render() {
-    const { isReady, children } = this.props;
+    const { isReady, route } = this.props;
 
     if (!isReady) {
       return (
@@ -54,7 +57,7 @@ class Dashboard extends React.Component {
     return (
       <div className="pt-3">
         <div className="container"><AppBar /></div>
-        <div className="container mt-3">{ children }</div>
+        <div className="container mt-3">{renderRoutes(route.routes)}</div>
       </div>
     );
   }

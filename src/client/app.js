@@ -4,16 +4,17 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import { addLocaleData } from 'react-intl';
-import { browserHistory, match, Router } from 'react-router/lib/index';
+import { ConnectedRouter } from 'react-router-redux';
+import { renderRoutes } from 'react-router-config';
 import WebFont from 'webfontloader';
 import moment from 'moment';
+
+import routes from '../shared/routes';
 
 import './bootstrap.scss';
 import './style.css';
 
-import routes from '../shared/routes';
-import { error } from '../shared/log';
-import store, { runSaga, initialLocale } from './store';
+import store, { runSaga, initialLocale, history } from './store';
 
 Promise.config({
   warnings: false,
@@ -23,22 +24,16 @@ Promise.config({
 });
 
 const renderApp = () => {
-  const matchRouter = { history: browserHistory, routes: routes(store) };
-
-  match(matchRouter, (err, redirectLocation, renderProps) => {
-    if (err) {
-      error('router match failed');
-    }
-
-    render(
-      <AppContainer>
-        <Provider store={store}>
-          <Router {...renderProps} />
-        </Provider>
-      </AppContainer>,
-      document.body.childNodes[0]
-    );
-  });
+  render(
+    <AppContainer>
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
+          {renderRoutes(routes)}
+        </ConnectedRouter>
+      </Provider>
+    </AppContainer>,
+    document.body.childNodes[0]
+  );
 };
 
 if (process.env.NODE_ENV === 'development' && module.hot) {

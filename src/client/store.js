@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
-import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux';
-import { browserHistory } from 'react-router/lib/index';
+import { routerReducer, routerMiddleware } from 'react-router-redux';
+import createHistory from 'history/createBrowserHistory';
 import { values, get } from 'lodash';
 import Immutable from 'seamless-immutable';
 import createSagaMiddleware from 'redux-saga';
@@ -16,9 +16,11 @@ const reducer = createRootReducer({ ...reducers, routing: routerReducer });
 
 const sagaMiddleware = createSagaMiddleware();
 
+export const history = createHistory();
+
 const sagaStoreEnhancer = [
   sagaMiddleware,
-  routerMiddleware(browserHistory),
+  routerMiddleware(history),
   ...values(middlewares),
 ];
 
@@ -41,5 +43,4 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 
 export default store;
 export const initialLocale = get(initialState, 'locale.currentLocale', config.defaultLocale);
-export const history = syncHistoryWithStore(browserHistory, store);
 export const runSaga = () => sagaMiddleware.run(sagas);

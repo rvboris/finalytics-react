@@ -1,37 +1,21 @@
 import { renderToString } from 'react-dom/server';
-import { RouterContext, match } from 'react-router/lib/index';
+import { StaticRouter } from 'react-router-dom';
+import { matchRoutes } from 'react-router-config';
 import { Provider } from 'react-redux';
 import { push } from 'react-router-redux';
 import { get } from 'lodash';
 import passport from 'koa-passport';
 import React from 'react';
 import Helmet from 'react-helmet';
-import uuid from 'uuid';
 
 import sagas from '../../shared/sagas';
 import storeCreator from '../store-creator';
+import renderRoutes from '../../shared/utils/render-routes';
 import routes from '../../shared/routes';
 import fetcher from '../utils/fetcher';
+import assets from '../utils/assets';
 import HtmlPage from '../components/HtmlPage';
 import { authActions, localeActions, dashboardActions } from '../../shared/actions';
-
-import ClientBundleAssets from '../../../build/client/assets.json';
-
-const chunks = Object.keys(ClientBundleAssets).map(key => ClientBundleAssets[key]);
-
-const assets = chunks.reduce((acc, chunk) => {
-  if (chunk.js) {
-    acc.javascript.push({ path: chunk.js, key: uuid.v4() });
-  }
-  if (chunk.css) {
-    acc.css.push({ path: chunk.css, key: uuid.v4() });
-  }
-  return acc;
-}, { javascript: [], css: [] });
-
-const runRouter = (location, routes) =>
-  new Promise((resolve) =>
-    match({ routes, location }, (...args) => resolve(args)));
 
 export default async (ctx, next) => {
   if (ctx.request.url.startsWith('/api')) {
@@ -61,7 +45,9 @@ export default async (ctx, next) => {
       store.dispatch(authActions.setUserAgent(userAgent));
     }
 
-    if (token && user) {
+    const isAuthenticated = token && user;
+
+    if (isAuthenticated) {
       const userProfile = user.getProfile();
 
       store.dispatch(authActions.setToken(token));
@@ -73,21 +59,15 @@ export default async (ctx, next) => {
       store.dispatch(localeActions.load(ctx.locale));
     }
 
+    store.dispatch(push(ctx.request.url));
+
     let err;
-    let redirect;
-    let renderProps;
 
     try {
-      [err, redirect, renderProps] = await runRouter(ctx.request.url, routes(store));
+      const branch = matchRoutes(routes, ctx.request.url);
+      await fetcher(store.dispatch, isAuthenticated, branch);
     } catch (e) {
       err = e;
-    }
-
-    if (redirect) {
-      ctx.status = 307;
-      ctx.redirect(redirect.pathname);
-
-      return;
     }
 
     if (err) {
@@ -96,30 +76,40 @@ export default async (ctx, next) => {
       ctx.status = 500;
       ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
 
-      return;
-    }
-
-    if (!renderProps) {
-      ctx.status = 404;
+      store.close();
 
       return;
     }
+
+    const routerContext = {};
 
     const initialView = (
       <Provider store={store}>
-        <RouterContext {...renderProps} />
+        <StaticRouter context={routerContext} location={ctx.request.url}>
+          {renderRoutes(routes)}
+        </StaticRouter>
       </Provider>
     );
 
     try {
       await store.runSaga(sagas);
-      store.dispatch(push(ctx.request.url));
-      await fetcher(store.dispatch, renderProps.components, renderProps.params);
+
+      const initialState = store.getState();
+      const body = renderToString(initialView);
+      const head = Helmet.rewind();
+
+      if (routerContext.url) {
+        ctx.status = routerContext.status;
+        ctx.redirect(routerContext.url);
+        store.close();
+
+        return;
+      }
 
       const layoutProps = {
-        initialState: store.getState(),
-        body: renderToString(initialView),
-        head: Helmet.rewind(),
+        initialState,
+        body,
+        head,
         assets,
       };
 
@@ -131,6 +121,7 @@ export default async (ctx, next) => {
 
       ctx.body = process.env.NODE_ENV === 'development' ? err.stack : err.message;
       ctx.status = 500;
+
       store.close();
     }
   })(ctx, next);

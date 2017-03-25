@@ -1,114 +1,81 @@
-import React from 'react';
-import { Route, IndexRoute, IndexRedirect } from 'react-router/lib/index';
 import App from './containers/App';
-import { error } from './log';
+import Home from './containers/Home';
+import Login from './containers/Login';
+import Register from './containers/Register';
+import Logout from './containers/Logout';
+import Dashboard from './containers/Dashboard';
+import Operations from './containers/Operations';
+import Accounts from './containers/Accounts';
+import Categories from './containers/Categories';
+import Profile from './containers/Profile';
 
-const requireAuth = (store) => (nextState, replace) => {
-  const auth = store.getState().auth;
-
-  if (auth.isAuthenticated) {
-    return;
-  }
-
-  replace({
-    pathname: '/login',
-    state: { nextPathname: nextState.location.pathname },
-  });
-};
-
-const requireGuest = (store) => (nextState, replace) => {
-  const auth = store.getState().auth;
-
-  if (!auth.isAuthenticated) {
-    return;
-  }
-
-  replace({ pathname: '/dashboard/operations' });
-};
-
-const handleError = (err) => {
-  error('Error occurred loading dynamic route');
-  error(err);
-};
-
-const loadRoute = (cb) => (module) => cb(null, module.default);
-
-const resolveHomeRoute = (nextState, cb) => {
-  System.import('./containers/Home').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveLoginRoute = (nextState, cb) => {
-  System.import('./containers/Login').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveLogoutRoute = (nextState, cb) => {
-  System.import('./containers/Logout').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveRegisterRoute = (nextState, cb) => {
-  System.import('./containers/Register').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveDashboardRoute = (nextState, cb) => {
-  System.import('./containers/Dashboard').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveOperationsRoute = (nextState, cb) => {
-  System.import('./containers/Operations').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveAccountsRoute = (nextState, cb) => {
-  System.import('./containers/Accounts').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveCategoriesRoute = (nextState, cb) => {
-  System.import('./containers/Categories').then(loadRoute(cb)).catch(handleError);
-};
-
-const resolveProfileRoute = (nextState, cb) => {
-  System.import('./containers/Profile').then(loadRoute(cb)).catch(handleError);
-};
-
-export default (store) => (
-  <Route name="app" component={App} path="/">
-    <IndexRoute getComponent={resolveHomeRoute} />
-    <Route
-      path="dashboard"
-      getComponent={resolveDashboardRoute}
-      onEnter={requireAuth(store)}
-    >
-      <IndexRedirect to="operations" />
-      <Route
-        path="operations"
-        getComponent={resolveOperationsRoute}
-      />
-      <Route
-        path="accounts(/:accountId)"
-        getComponent={resolveAccountsRoute}
-      />
-      <Route
-        path="categories(/:categoryId)"
-        getComponent={resolveCategoriesRoute}
-      />
-      <Route
-        path="profile"
-        getComponent={resolveProfileRoute}
-      />
-    </Route>
-    <Route
-      path="login"
-      getComponent={resolveLoginRoute}
-      onEnter={requireGuest(store)}
-    />
-    <Route
-      path="logout"
-      getComponent={resolveLogoutRoute}
-      onEnter={requireAuth(store)}
-    />
-    <Route
-      path="register"
-      getComponent={resolveRegisterRoute}
-      onEnter={requireGuest(store)}
-    />
-  </Route>
-);
+export default [
+  {
+    component: App,
+    routes: [
+      {
+        path: '/login',
+        component: Login,
+        auth: {
+          required: false,
+          redirect: '/dashboard',
+          status: 307,
+        },
+      },
+      {
+        path: '/register',
+        component: Register,
+        auth: {
+          required: false,
+          redirect: '/dashboard',
+          status: 307,
+        },
+      },
+      {
+        path: '/logout',
+        component: Logout,
+        auth: {
+          required: true,
+          redirect: '/login',
+        },
+      },
+      {
+        path: '/dashboard',
+        component: Dashboard,
+        auth: {
+          required: true,
+          redirect: '/login',
+          status: 307,
+        },
+        routes: [
+          {
+            path: '/dashboard/accounts/:accountId?',
+            component: Accounts,
+          },
+          {
+            path: '/dashboard/categories/:categoryId?',
+            component: Categories,
+          },
+          {
+            path: '/dashboard/profile',
+            component: Profile,
+          },
+          {
+            path: '/dashboard/operations',
+            component: Operations,
+          },
+          {
+            path: '/dashboard',
+            exact: true,
+            component: Operations,
+          },
+        ],
+      },
+      {
+        path: '/',
+        exact: true,
+        component: Home,
+      },
+    ],
+  },
+];

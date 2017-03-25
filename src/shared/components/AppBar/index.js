@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Link } from 'react-router/lib/index';
+import { NavLink } from 'react-router-dom';
 import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import {
@@ -61,17 +61,17 @@ const messages = defineMessages({
   },
 });
 
-const NavLink = (props) => (
-  <Link {...props} className="nav-link" activeClassName="active">
+const StyledLink = (props) => (
+  <NavLink {...props} className="nav-link" activeClassName="active">
     {props.children}
-  </Link>
+  </NavLink>
 );
 
-NavLink.propTypes = {
+StyledLink.propTypes = {
   children: React.PropTypes.any,
 };
 
-NavLink.defaultProps = {
+StyledLink.defaultProps = {
   children: null,
 };
 
@@ -115,7 +115,7 @@ class AppBar extends React.Component {
         <Collapse isOpen={navOpen} navbar>
           <Nav navbar>
             <NavItem>
-              <NavLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></NavLink>
+              <StyledLink to="/dashboard/operations"><FormattedMessage {...messages.operations} /></StyledLink>
             </NavItem>
             <NavDropdown isOpen={menuOpen} toggle={this.menuToggle}>
               <DropdownToggle color="primary" nav caret>
@@ -133,12 +133,12 @@ class AppBar extends React.Component {
           </Nav>
           <Nav className="ml-auto" navbar>
             <NavItem>
-              <NavLink to="/dashboard/profile">
+              <StyledLink to="/dashboard/profile">
                 <FormattedMessage {...messages.profile} /> {userLogin && `(${userLogin})`}
-              </NavLink>
+              </StyledLink>
             </NavItem>
             <NavItem>
-              <NavLink to="/logout"><FormattedMessage {...messages.exit} /></NavLink>
+              <StyledLink to="/logout"><FormattedMessage {...messages.exit} /></StyledLink>
             </NavItem>
           </Nav>
         </Collapse>

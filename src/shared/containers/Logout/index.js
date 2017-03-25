@@ -31,7 +31,8 @@ class Logout extends React.Component {
 
   componentDidMount() {
     const { logout, goToLogin } = this.props;
-    logout().finally(Promise.delay(2000).then(goToLogin));
+
+    Promise.delay(1500).then(logout).finally(goToLogin);
   }
 
   render() {

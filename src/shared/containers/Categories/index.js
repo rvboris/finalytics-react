@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 const Categories = (props) => {
-  const selectedCategoryId = get(props, 'params.categoryId', null);
+  const selectedCategoryId = get(props, 'match.params.categoryId', null);
 
   return (
     <div>
