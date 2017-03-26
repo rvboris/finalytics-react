@@ -8,13 +8,20 @@ import Operations from './containers/Operations';
 import Accounts from './containers/Accounts';
 import Categories from './containers/Categories';
 import Profile from './containers/Profile';
+import NotFound from './containers/NotFound';
 
 export default [
   {
     component: App,
     routes: [
       {
+        path: '/',
+        exact: true,
+        component: Home,
+      },
+      {
         path: '/login',
+        exact: true,
         component: Login,
         auth: {
           required: false,
@@ -24,6 +31,7 @@ export default [
       },
       {
         path: '/register',
+        exact: true,
         component: Register,
         auth: {
           required: false,
@@ -33,6 +41,7 @@ export default [
       },
       {
         path: '/logout',
+        exact: true,
         component: Logout,
         auth: {
           required: true,
@@ -58,10 +67,12 @@ export default [
           },
           {
             path: '/dashboard/profile',
+            exact: true,
             component: Profile,
           },
           {
             path: '/dashboard/operations',
+            exact: true,
             component: Operations,
           },
           {
@@ -72,9 +83,7 @@ export default [
         ],
       },
       {
-        path: '/',
-        exact: true,
-        component: Home,
+        component: NotFound,
       },
     ],
   },

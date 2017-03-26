@@ -39,6 +39,8 @@ const RouteManager = (props, context) => (
           key={uuid.v4()}
           path={route.path}
           render={(props) => checkAuth(context.store, route, props)}
+          exact={route.exact}
+          strict={route.strict}
         />
       ))
     }

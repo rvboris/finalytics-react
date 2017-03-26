@@ -13,14 +13,14 @@ const getNeeds = (component, isAuthenticated) => {
   ];
 };
 
-export default (dispatch, isAuthenticated, branch) => {
+export default (dispatch, isAuthenticated, branch = []) => {
   const promises = branch.reduce((prev, { route: { component } }) => {
     if (!component) {
       return prev;
     }
 
     return getNeeds(component, isAuthenticated).concat(prev);
-  });
+  }, []);
 
   return Promise.all(promises.map(need => {
     if (isFunction(need)) {
