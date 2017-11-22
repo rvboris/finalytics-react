@@ -25,7 +25,8 @@ test.serial('logout', async t => {
   const res = await request.post('/api/auth/logout');
 
   t.is(res.status, 200);
-  t.is(res.headers['set-cookie'].length, 1);
+  t.is(res.headers['set-cookie'].length, 2);
+  t.true(res.headers['set-cookie'][0].indexOf('koa.sid=;') >= 0);
 });
 
 test.serial('login wrong password', async (t) => {

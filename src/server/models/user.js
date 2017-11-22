@@ -56,7 +56,7 @@ const model = new mongoose.Schema({
       locale: config.defaultLocale,
     },
   },
-  accounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Account', unique: true }],
+  accounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Account' }],
 });
 
 const encryptionConfig = {

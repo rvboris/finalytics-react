@@ -25,6 +25,5 @@ export default (req) => new Promise(async (resolve) => {
     }
   }
 
-  console.log('no token');
   resolve(null);
 });

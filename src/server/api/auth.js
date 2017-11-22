@@ -42,13 +42,7 @@ const oauthHandler = (provider, options) => async (ctx, next) => {
       return;
     }
 
-    const token = getToken(user);
-
-    console.log('set token');
-
-    ctx.session.token = token;
-
-    console.log(ctx.session);
+    ctx.session.token = getToken(user);
 
     if (provider !== 'local') {
       ctx.redirect('/dashboard');
@@ -95,9 +89,7 @@ router.post('/register', async (ctx) => {
     return;
   }
 
-  const token = getToken(user);
-
-  ctx.session.token = token;
+  ctx.session.token = getToken(user);
   ctx.status = 200;
 });
 
