@@ -4,7 +4,8 @@ import config from '../config';
 
 const CURRENCY_API = `${config.apiUrl}/currency`;
 
-export const load = createAction('CURRENCY_LOAD',
+export const load = createAction(
+  'CURRENCY_LOAD',
   undefined,
   () => ({
     request: {

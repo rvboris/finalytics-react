@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -17,9 +18,9 @@ export const format = (num, currency) => {
 const MoneyFormat = ({ sum, currency }) => (<span>{format(sum, currency)}</span>);
 
 MoneyFormat.propTypes = {
-  sum: React.PropTypes.number.isRequired,
-  currency: React.PropTypes.object,
-  currencyId: React.PropTypes.string.isRequired,
+  sum: PropTypes.number.isRequired,
+  currency: PropTypes.object,
+  currencyId: PropTypes.string.isRequired,
 };
 
 MoneyFormat.defaultProps = {

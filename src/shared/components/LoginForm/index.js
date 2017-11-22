@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
-import { mapValues, get } from 'lodash';
+import { mapValues, get, noop } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import FaFacebookIcon from 'react-icons/lib/fa/facebook';
 import FaGoogleIcon from 'react-icons/lib/fa/google';
@@ -18,7 +19,7 @@ import {
   Alert,
   Card,
   CardHeader,
-  CardBlock,
+  CardBody,
 } from 'reactstrap';
 
 import validationHandler from '../../utils/validation-handler';
@@ -83,7 +84,7 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
-const FormField = (field) =>
+const FormField = (field) => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <Input
@@ -92,11 +93,14 @@ const FormField = (field) =>
       {...field.input}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 let LoginForm = (props) => {
   const {
-    form: { error, handleSubmit, pristine, submitting },
+    form: {
+      error, handleSubmit, pristine, submitting,
+    },
     intl: { formatMessage },
     process,
     login,
@@ -125,6 +129,8 @@ let LoginForm = (props) => {
         return;
       }
 
+      console.log(result);
+
       resolve(get(result, 'data.token'));
     }).then(onSuccess, onError);
 
@@ -133,7 +139,7 @@ let LoginForm = (props) => {
       <Card className={style.form}>
         <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
 
-        <CardBlock>
+        <CardBody>
           <Form onSubmit={handleSubmit(submitHandler)} noValidate>
             <Field
               name="email"
@@ -168,7 +174,8 @@ let LoginForm = (props) => {
               >{process
                 ? <FormattedMessage {...messages.processButton} />
                 : <FormattedMessage {...messages.button} />
-              }</Button>
+              }
+              </Button>
             </div>
           </Form>
 
@@ -185,20 +192,25 @@ let LoginForm = (props) => {
               <FaTwitterIcon size={30} />
             </Button>
           </ButtonGroup>
-        </CardBlock>
+        </CardBody>
       </Card>
     </div>
   );
 };
 
 LoginForm.propTypes = {
-  form: React.PropTypes.object.isRequired,
-  intl: React.PropTypes.object.isRequired,
-  process: React.PropTypes.bool.isRequired,
-  login: React.PropTypes.func.isRequired,
-  go: React.PropTypes.func.isRequired,
-  onSuccess: React.PropTypes.func,
-  onError: React.PropTypes.func,
+  form: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
+  process: PropTypes.bool.isRequired,
+  login: PropTypes.func.isRequired,
+  go: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func,
+  onError: PropTypes.func,
+};
+
+LoginForm.defaultProps = {
+  onSuccess: noop,
+  onError: noop,
 };
 
 const selector = createSelector(

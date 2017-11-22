@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import style from './style.css';
@@ -22,8 +23,8 @@ const Spinner = ({ color, size }) => {
 };
 
 Spinner.propTypes = {
-  color: React.PropTypes.string,
-  size: React.PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
 };
 
 Spinner.defaultProps = {

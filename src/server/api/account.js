@@ -13,7 +13,7 @@ router.get('/load', { jwt: true }, async (ctx) => {
 
   if (ctx.user.accounts.length || ctx.user.status === 'ready') {
     try {
-      accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
+      ({ accounts } = (await UserModel.populate(ctx.user, 'accounts')));
     } catch (e) {
       ctx.log.error(e);
       ctx.status = 500;
@@ -22,7 +22,6 @@ router.get('/load', { jwt: true }, async (ctx) => {
     }
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
-
     return;
   }
 
@@ -221,7 +220,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
   let accounts;
 
   try {
-    accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
+    ({ accounts } = (await UserModel.populate(ctx.user, 'accounts')));
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -291,7 +290,7 @@ router.post('/delete', { jwt: true }, async (ctx) => {
 
     await ctx.user.save();
 
-    accounts = (await UserModel.populate(ctx.user, 'accounts')).accounts;
+    ({ accounts } = (await UserModel.populate(ctx.user, 'accounts')));
 
     ctx.body = { accounts: accounts.map(account => account.toObject({ versionKey: false })) };
   } catch (e) {

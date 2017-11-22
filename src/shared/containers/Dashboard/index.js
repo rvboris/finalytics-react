@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -31,9 +32,9 @@ class Dashboard extends React.Component {
   }
 
   static propTypes = {
-    route: React.PropTypes.object.isRequired,
-    isReady: React.PropTypes.bool.isRequired,
-    locale: React.PropTypes.string.isRequired,
+    route: PropTypes.object.isRequired,
+    isReady: PropTypes.bool.isRequired,
+    locale: PropTypes.string.isRequired,
   }
 
   constructor(props, context) {

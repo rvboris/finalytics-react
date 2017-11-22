@@ -4,7 +4,8 @@ import config from '../config';
 
 const ACCOUNT_API = `${config.apiUrl}/account`;
 
-export const load = createAction('ACCOUNT_LOAD',
+export const load = createAction(
+  'ACCOUNT_LOAD',
   undefined,
   () => ({
     request: {
@@ -14,7 +15,8 @@ export const load = createAction('ACCOUNT_LOAD',
   })
 );
 
-export const create = createAction('ACCOUNT_CREATE',
+export const create = createAction(
+  'ACCOUNT_CREATE',
   undefined,
   (values) => ({
     request: {
@@ -25,7 +27,8 @@ export const create = createAction('ACCOUNT_CREATE',
   })
 );
 
-export const save = createAction('ACCOUNT_SAVE',
+export const save = createAction(
+  'ACCOUNT_SAVE',
   undefined,
   (values) => ({
     request: {
@@ -36,7 +39,8 @@ export const save = createAction('ACCOUNT_SAVE',
   })
 );
 
-export const remove = createAction('ACCOUNT_REMOVE',
+export const remove = createAction(
+  'ACCOUNT_REMOVE',
   undefined,
   (values) => ({
     request: {

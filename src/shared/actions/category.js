@@ -4,7 +4,8 @@ import config from '../config';
 
 const CATEGORY_API = `${config.apiUrl}/category`;
 
-export const load = createAction('CATEGORY_LOAD',
+export const load = createAction(
+  'CATEGORY_LOAD',
   undefined,
   () => ({
     request: {
@@ -14,7 +15,8 @@ export const load = createAction('CATEGORY_LOAD',
   })
 );
 
-export const update = createAction('CATEGORY_UPDATE',
+export const update = createAction(
+  'CATEGORY_UPDATE',
   undefined,
   (values) => ({
     request: {
@@ -25,7 +27,8 @@ export const update = createAction('CATEGORY_UPDATE',
   })
 );
 
-export const remove = createAction('CATEGORY_REMOVE',
+export const remove = createAction(
+  'CATEGORY_REMOVE',
   undefined,
   (values) => ({
     request: {
@@ -36,7 +39,8 @@ export const remove = createAction('CATEGORY_REMOVE',
   })
 );
 
-export const add = createAction('CATEGORY_ADD',
+export const add = createAction(
+  'CATEGORY_ADD',
   undefined,
   (values) => ({
     request: {
@@ -47,7 +51,8 @@ export const add = createAction('CATEGORY_ADD',
   })
 );
 
-export const move = createAction('CATEGORY_MOVE',
+export const move = createAction(
+  'CATEGORY_MOVE',
   undefined,
   (values) => ({
     request: {

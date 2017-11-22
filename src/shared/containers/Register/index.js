@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -9,8 +10,8 @@ const Register = ({ register, onSuccess }) =>
   <RegisterForm register={register} onSuccess={onSuccess} />;
 
 Register.propTypes = {
-  register: React.PropTypes.func.isRequired,
-  onSuccess: React.PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

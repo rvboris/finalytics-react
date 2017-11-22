@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const getCursorPosition = (element) => {
@@ -75,8 +76,8 @@ const MoneyInput = ({ input, className }) => {
 };
 
 MoneyInput.propTypes = {
-  input: React.PropTypes.object.isRequired,
-  className: React.PropTypes.string,
+  input: PropTypes.object.isRequired,
+  className: PropTypes.string,
 };
 
 MoneyInput.defaultProps = {

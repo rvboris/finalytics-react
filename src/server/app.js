@@ -22,7 +22,7 @@ const createApp = (instance, jobs) => {
   };
 
   app.use(middlewares.assets);
-  app.use(middlewares.session);
+  app.use(middlewares.session(app));
   app.use(middlewares.ctxLog(app.instance));
   app.use(middlewares.errorHandler);
   app.use(middlewares.httpLog);

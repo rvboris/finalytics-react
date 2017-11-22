@@ -1,6 +1,6 @@
 import Router from 'koa-66';
 import mongoose from 'mongoose';
-import { pick, isUndefined, isArray, get } from 'lodash';
+import { pick, isUndefined, isArray, get, isNaN } from 'lodash';
 import money from 'money';
 import big from 'big.js';
 
@@ -75,7 +75,7 @@ router.get('/total', { jwt: true }, async (ctx) => {
   let balance = [];
 
   try {
-    accounts = (await UserModel.populate(ctx.user, accountsQuery)).accounts;
+    ({ accounts } = (await UserModel.populate(ctx.user, accountsQuery)));
 
     balance = accounts.map(async account => ({
       value: getBalanceFromAccount
@@ -108,8 +108,7 @@ router.get('/total', { jwt: true }, async (ctx) => {
   balance = balance.map(({ value, currencyCode }) =>
     currencyCode !== baseCurrency.code
       ? money(value).from(currencyCode).to(baseCurrency.code)
-      : value
-  );
+      : value);
 
   const total = balance
     .reduce((prev, value) => prev.plus(value), big(0))

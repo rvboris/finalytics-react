@@ -1,6 +1,4 @@
 import path from 'path';
-
-import convert from 'koa-convert';
 import staticCache from 'koa-static-cache';
 import config from '../../shared/config';
 
@@ -17,7 +15,7 @@ const clientStatic = {
   prefix: getStaticPrefix(process.env.NODE_ENV === 'development'),
 };
 
-export default convert(staticCache(clientStatic.path, {
+export default staticCache(clientStatic.path, {
   maxAge: 365 * 24 * 60 * 60,
   prefix: clientStatic.prefix,
-}));
+});

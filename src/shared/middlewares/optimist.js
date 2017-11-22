@@ -36,7 +36,7 @@ export default ({ dispatch }) => (next) => (action) => {
     delete newAction.meta.promise;
   }
 
-  const skipOptimist = action.meta.skipOptimist;
+  const { skipOptimist } = action.meta;
 
   if (!skipOptimist) {
     next(newAction);

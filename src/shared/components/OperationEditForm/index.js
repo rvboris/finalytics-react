@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -16,7 +17,7 @@ import moment from 'moment';
 import {
   Card,
   CardHeader,
-  CardBlock,
+  CardBody,
   ButtonGroup,
   Button,
   Form,
@@ -166,7 +167,7 @@ const messages = defineMessages({
   },
 });
 
-const SelectFormField = field =>
+const SelectFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <SelectInput
@@ -175,9 +176,10 @@ const SelectFormField = field =>
       clearable={false}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
-const NumberFormField = field =>
+const NumberFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <InputGroup>
@@ -185,7 +187,8 @@ const NumberFormField = field =>
       <InputGroupAddon>{field.currency.code}</InputGroupAddon>
     </InputGroup>
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 const TypeFormField = field => {
   const { input } = field;
@@ -235,33 +238,45 @@ const formId = 'operationEdit';
 
 class OperationEditForm extends React.Component {
   static propTypes = {
-    form: React.PropTypes.object.isRequired,
-    intl: React.PropTypes.object.isRequired,
-    isNewOperation: React.PropTypes.bool.isRequired,
-    operationId: React.PropTypes.string,
-    operation: React.PropTypes.object,
-    process: React.PropTypes.bool.isRequired,
-    addOperation: React.PropTypes.func.isRequired,
-    addTransferOperation: React.PropTypes.func.isRequired,
-    updateTransferOperation: React.PropTypes.func.isRequired,
-    updateOperation: React.PropTypes.func.isRequired,
-    removeOperation: React.PropTypes.func.isRequired,
-    editOperation: React.PropTypes.func.isRequired,
-    toggleOperationDeleteModal: React.PropTypes.func.isRequired,
-    locale: React.PropTypes.string.isRequired,
-    accountList: React.PropTypes.array.isRequired,
-    availableAccountListFrom: React.PropTypes.array.isRequired,
-    availableAccountListTo: React.PropTypes.array.isRequired,
-    availableCategoryList: React.PropTypes.array.isRequired,
-    selectedAccountCurrency: React.PropTypes.object,
-    selectedTransferAccountsCurrency: React.PropTypes.object,
-    selectedType: React.PropTypes.string,
-    selectedCategory: React.PropTypes.string,
-    selectedAccount: React.PropTypes.string,
-    selectedCreated: React.PropTypes.string,
-    selectedTransferAccounts: React.PropTypes.object,
-    changeFieldValue: React.PropTypes.func.isRequired,
-    batchMode: React.PropTypes.func.isRequired,
+    form: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+    isNewOperation: PropTypes.bool.isRequired,
+    operationId: PropTypes.string,
+    operation: PropTypes.object,
+    process: PropTypes.bool.isRequired,
+    addOperation: PropTypes.func.isRequired,
+    addTransferOperation: PropTypes.func.isRequired,
+    updateTransferOperation: PropTypes.func.isRequired,
+    updateOperation: PropTypes.func.isRequired,
+    removeOperation: PropTypes.func.isRequired,
+    editOperation: PropTypes.func.isRequired,
+    toggleOperationDeleteModal: PropTypes.func.isRequired,
+    locale: PropTypes.string.isRequired,
+    accountList: PropTypes.array.isRequired,
+    availableAccountListFrom: PropTypes.array.isRequired,
+    availableAccountListTo: PropTypes.array.isRequired,
+    availableCategoryList: PropTypes.array.isRequired,
+    selectedAccountCurrency: PropTypes.object,
+    selectedTransferAccountsCurrency: PropTypes.object,
+    selectedType: PropTypes.string,
+    selectedCategory: PropTypes.string,
+    selectedAccount: PropTypes.string,
+    selectedCreated: PropTypes.string,
+    selectedTransferAccounts: PropTypes.object,
+    changeFieldValue: PropTypes.func.isRequired,
+    batchMode: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    selectedAccountCurrency: null,
+    selectedTransferAccountsCurrency: null,
+    selectedType: null,
+    selectedCategory: null,
+    selectedAccount: null,
+    selectedCreated: null,
+    selectedTransferAccounts: null,
+    operationId: null,
+    operation: null,
   };
 
   componentDidMount() {
@@ -415,21 +430,21 @@ class OperationEditForm extends React.Component {
         <FormattedMessage {...messages.todayButton} />
       </Button>
     );
-  }
+  };
 
   setToday = () => {
     this.props.changeFieldValue(formId, 'created', moment.utc().format());
-  }
+  };
 
   scrollMe = () => {
     this.operationEditForm.scrollIntoView(true, { behavior: 'smooth' });
-  }
+  };
 
   cleanFields = () => {
     ['amountFrom', 'amountTo', 'amount'].forEach((fieldName) => {
       this.props.changeFieldValue(formId, fieldName, null);
     });
-  }
+  };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
     const {
@@ -496,8 +511,10 @@ class OperationEditForm extends React.Component {
       error(err);
 
       const validationResult =
-          mapValues(validationHandler(toValidate, err),
-            val => this.props.intl.formatMessage({ id: val }));
+          mapValues(
+            validationHandler(toValidate, err),
+            val => this.props.intl.formatMessage({ id: val })
+          );
 
       reject(new SubmissionError(validationResult));
 
@@ -540,7 +557,7 @@ class OperationEditForm extends React.Component {
               : <FormattedMessage {...messages.editOperationHeader} />
             }
           </CardHeader>
-          <CardBlock>
+          <CardBody>
             <Form onSubmit={handleSubmit(this.submitHandler)} noValidate className={style.content}>
               <div className={style.datepicker}>
                 <Field
@@ -633,7 +650,7 @@ class OperationEditForm extends React.Component {
                 </div>
               </div>
             </Form>
-          </CardBlock>
+          </CardBody>
         </Card>
       </div>
     );
@@ -686,9 +703,7 @@ const categoryTreeSelector = createSelector(
   state => get(state, 'category.data'),
   categoryData => {
     const tree = new TreeModel();
-    const rootNode = tree.parse(categoryData);
-
-    return rootNode;
+    return tree.parse(categoryData);
   }
 );
 
@@ -795,9 +810,7 @@ const selectedAccountCurrencySelector = createSelector(
     }
 
     const account = accountList.find(({ _id }) => _id === selectedAccount);
-    const selectedCurrency = currencyList.find(({ _id }) => _id === account.currency);
-
-    return selectedCurrency;
+    return currencyList.find(({ _id }) => _id === account.currency);
   },
 );
 

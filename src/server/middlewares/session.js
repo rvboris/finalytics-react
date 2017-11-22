@@ -1,6 +1,5 @@
-import session from 'koa-generic-session';
-import convert from 'koa-convert';
-import MongooseStore from 'koa-session-mongoose';
+import session from 'koa-session';
+import SessionStore from '../utils/session-store';
 
 export const cookieSettings = {
   path: '/',
@@ -13,12 +12,12 @@ export const cookieSettings = {
 export const sessionPrefix = 'koa.sess.';
 export const cookiePrefix = 'koa.sid';
 
-export const store = new MongooseStore();
+export const store = new SessionStore();
 
-export default convert(session({
+export default (app) => session({
   store,
   rolling: true,
   cookie: cookieSettings,
   prefix: sessionPrefix,
   key: cookiePrefix,
-}));
+}, app);

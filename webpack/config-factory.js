@@ -7,7 +7,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const log = require('debug')('webpack');
 const Visualizer = require('webpack-visualizer-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const Writable = require('stream').Writable;
+const { Writable } = require('stream');
 const configs = require('../config');
 
 const ifElse = (condition) => (then, or) => (condition ? then : or);
@@ -58,27 +58,24 @@ module.exports = ({ target, options }) => {
     },
     externals: _.compact([ifServer(nodeExternals())]),
     devtool: ifElse(isServer || isDev)(
-      'source-map',
-      'hidden-source-map'
+      'source-map'
     ),
-    entry: _.merge(
-      {
-        main: _.compact([
-          ifDevClient('react-hot-loader/patch'),
-          ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
+    entry: _.merge({
+      main: _.compact([
+        ifDevClient('react-hot-loader/patch'),
+        ifDevClient(`webpack-hot-middleware/client?reload=true&path=${reloadPath}`),
 
-          ifClient('webfontloader'),
-          ifClient('react-toggle/style.css'),
-          ifClient('react-select/dist/react-select.css'),
-          ifClient('react-day-picker/lib/style.css'),
+        ifClient('webfontloader'),
+        ifClient('react-toggle/style.css'),
+        ifClient('react-select/dist/react-select.css'),
+        ifClient('react-day-picker/lib/style.css'),
 
-          ifServer(
-            path.resolve(__dirname, `../src/${target}/bootstrap.js`),
-            path.resolve(__dirname, `../src/${target}/app.js`)
-          ),
-        ]),
-      }
-    ),
+        ifServer(
+          path.resolve(__dirname, `../src/${target}/bootstrap.js`),
+          path.resolve(__dirname, `../src/${target}/app.js`)
+        ),
+      ]),
+    }),
     output: {
       path: path.resolve(__dirname, `../build/${target}`),
       filename: ifProdClient(
@@ -134,27 +131,21 @@ module.exports = ({ target, options }) => {
       ifServer(new Visualizer({ filename: '../server-stats.html' })),
       ifDev(new webpack.NoEmitOnErrorsPlugin()),
       ifDevClient(new webpack.HotModuleReplacementPlugin()),
-      ifProdClient(
-        new webpack.LoaderOptionsPlugin({
-          minimize: true,
-          debug: false,
-        })
-      ),
-      ifProdClient(
-        new webpack.optimize.UglifyJsPlugin({
-          compress: {
-            screw_ie8: true,
-            warnings: false,
-          },
-        })
-      ),
-      ifClient(
-        new ExtractTextPlugin({
-          filename: '[name]-[chunkhash].css',
-          disable: false,
-          allChunks: true,
-        })
-      ),
+      ifProdClient(new webpack.LoaderOptionsPlugin({
+        minimize: true,
+        debug: false,
+      })),
+      ifProdClient(new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          screw_ie8: true,
+          warnings: false,
+        },
+      })),
+      ifClient(new ExtractTextPlugin({
+        filename: '[name]-[chunkhash].css',
+        disable: false,
+        allChunks: true,
+      })),
     ]),
     stats: 'minimal',
     module: {

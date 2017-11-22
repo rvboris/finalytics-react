@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { get, isUndefined, pick, mapValues, isEmpty } from 'lodash';
@@ -130,7 +131,7 @@ const messages = defineMessages({
   },
 });
 
-const TextFormField = field =>
+const TextFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <Input
@@ -139,9 +140,10 @@ const TextFormField = field =>
       {...field.input}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
-const SelectFormField = field =>
+const SelectFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <SelectInput
@@ -150,7 +152,8 @@ const SelectFormField = field =>
       options={field.options}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 const defaultValues = {
   type: 'expense',
@@ -165,21 +168,26 @@ const availableTypesListLabeled = availableTypesList.map(type => ({ value: type,
 
 class CategoryEditForm extends React.Component {
   static propTypes = {
-    categoryId: React.PropTypes.string,
-    process: React.PropTypes.bool.isRequired,
-    form: React.PropTypes.object.isRequired,
-    intl: React.PropTypes.object.isRequired,
-    updateCategory: React.PropTypes.func.isRequired,
-    removeCategory: React.PropTypes.func.isRequired,
-    addCategory: React.PropTypes.func.isRequired,
-    moveCategory: React.PropTypes.func.isRequired,
-    selectCategory: React.PropTypes.func.isRequired,
-    isNewCategory: React.PropTypes.bool.isRequired,
-    isSystemCategory: React.PropTypes.bool.isRequired,
-    availableParentsList: React.PropTypes.array.isRequired,
-    availableTypesList: React.PropTypes.array.isRequired,
-    canChangeType: React.PropTypes.bool.isRequired,
-    categoryNode: React.PropTypes.object,
+    categoryId: PropTypes.string,
+    process: PropTypes.bool.isRequired,
+    form: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+    updateCategory: PropTypes.func.isRequired,
+    removeCategory: PropTypes.func.isRequired,
+    addCategory: PropTypes.func.isRequired,
+    moveCategory: PropTypes.func.isRequired,
+    selectCategory: PropTypes.func.isRequired,
+    isNewCategory: PropTypes.bool.isRequired,
+    isSystemCategory: PropTypes.bool.isRequired,
+    availableParentsList: PropTypes.array.isRequired,
+    availableTypesList: PropTypes.array.isRequired,
+    canChangeType: PropTypes.bool.isRequired,
+    categoryNode: PropTypes.object,
+  };
+
+  static defaultProps = {
+    categoryId: null,
+    categoryNode: null,
   };
 
   static getParentNode = (node) => {
@@ -232,7 +240,13 @@ class CategoryEditForm extends React.Component {
   };
 
   submitHandler = (values) => new Promise(async (resolve, reject) => {
-    const { isNewCategory, categoryNode, addCategory, categoryId, intl } = this.props;
+    const {
+      isNewCategory,
+      categoryNode,
+      addCategory,
+      categoryId,
+      intl,
+    } = this.props;
     let result;
 
     try {
@@ -299,7 +313,7 @@ class CategoryEditForm extends React.Component {
         error(e);
         this.setState(Object.assign(this.state, { categoryDeleteError: true }));
       });
-  }
+  };
 
   render() {
     const {
@@ -315,14 +329,16 @@ class CategoryEditForm extends React.Component {
     const { handleSubmit, error: formError, initialValues } = this.props.form;
     const { categoryDeleteModal } = this.state;
 
-    const deleteConfirmMessage =
-      (<FormattedMessage
+    const deleteConfirmMessage = (
+      <FormattedMessage
         {
-        ...Object.assign(messages.deleteModalConfirm,
+        ...Object.assign(
+          messages.deleteModalConfirm,
           { values: { name: (<strong>{initialValues.name}</strong>) } }
-        )
+          )
         }
-      />);
+      />
+    );
 
     if (!categoryId) {
       return (<Alert color="info"><FormattedMessage {...messages.infoAlert} /></Alert>);
@@ -420,9 +436,7 @@ const categoryTreeSelector = createSelector(
   state => get(state, 'category.data'),
   categoryData => {
     const tree = new TreeModel();
-    const rootNode = tree.parse(categoryData);
-
-    return rootNode;
+    return tree.parse(categoryData);
   }
 );
 
@@ -543,8 +557,7 @@ const availableTypesListSelector = createSelector(
     }
 
     return availableTypesListLabeled.map(type =>
-      Object.assign({}, type, { label: formatMessage(messages[type.label]) })
-    );
+      Object.assign({}, type, { label: formatMessage(messages[type.label]) }));
   }
 );
 

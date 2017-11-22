@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { push } from 'react-router-redux';
 import { get } from 'lodash';
@@ -56,8 +57,8 @@ const Categories = (props) => {
 };
 
 Categories.propTypes = {
-  onSelectCategory: React.PropTypes.func.isRequired,
-  onNewCategory: React.PropTypes.func.isRequired,
+  onSelectCategory: PropTypes.func.isRequired,
+  onNewCategory: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

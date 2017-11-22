@@ -18,7 +18,12 @@ const randomBytes = Promise.promisify(crypto.randomBytes);
 const pbkdf2 = Promise.promisify(crypto.pbkdf2);
 
 const model = new mongoose.Schema({
-  status: { type: String, required: true, enum: ['ready', 'init'], default: 'init' },
+  status: {
+    type: String,
+    required: true,
+    enum: ['ready', 'init'],
+    default: 'init',
+  },
   googleId: { type: String, index: { unique: true, sparse: true } },
   facebookId: { type: String, index: { unique: true, sparse: true } },
   twitterId: { type: String, index: { unique: true, sparse: true } },
@@ -115,7 +120,7 @@ model.statics.encryptPassword = async function encryptPassword(txt) {
     'sha512'
   );
 
-  const combined = new Buffer(hash.length + salt.length + 8);
+  const combined = Buffer.alloc(hash.length + salt.length + 8);
 
   combined.writeUInt32BE(salt.length, 0, true);
   combined.writeUInt32BE(encryptionConfig.iterations, 4, true);

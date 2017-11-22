@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -24,9 +25,9 @@ const messages = defineMessages({
 
 class Logout extends React.Component {
   static propTypes = {
-    logout: React.PropTypes.func.isRequired,
-    goToLogin: React.PropTypes.func.isRequired,
-    process: React.PropTypes.bool.isRequired,
+    logout: PropTypes.func.isRequired,
+    goToLogin: PropTypes.func.isRequired,
+    process: PropTypes.bool.isRequired,
   };
 
   componentDidMount() {

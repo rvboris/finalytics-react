@@ -4,7 +4,8 @@ import config from '../config';
 
 const OPERATION_API = `${config.apiUrl}/operation`;
 
-export const add = createAction('OPERATION_ADD',
+export const add = createAction(
+  'OPERATION_ADD',
   undefined,
   (values) => ({
     request: {
@@ -15,7 +16,8 @@ export const add = createAction('OPERATION_ADD',
   })
 );
 
-export const remove = createAction('OPERATION_REMOVE',
+export const remove = createAction(
+  'OPERATION_REMOVE',
   undefined,
   (values) => ({
     request: {
@@ -26,7 +28,8 @@ export const remove = createAction('OPERATION_REMOVE',
   })
 );
 
-export const update = createAction('OPERATION_UPDATE',
+export const update = createAction(
+  'OPERATION_UPDATE',
   undefined,
   (values) => ({
     request: {
@@ -37,7 +40,8 @@ export const update = createAction('OPERATION_UPDATE',
   })
 );
 
-export const addTransfer = createAction('OPERATION_ADD_TRANSFER',
+export const addTransfer = createAction(
+  'OPERATION_ADD_TRANSFER',
   undefined,
   (values) => ({
     request: {
@@ -48,7 +52,8 @@ export const addTransfer = createAction('OPERATION_ADD_TRANSFER',
   })
 );
 
-export const updateTransfer = createAction('OPERATION_UPDATE_TRANSFER',
+export const updateTransfer = createAction(
+  'OPERATION_UPDATE_TRANSFER',
   undefined,
   (values) => ({
     request: {
@@ -59,7 +64,8 @@ export const updateTransfer = createAction('OPERATION_UPDATE_TRANSFER',
   })
 );
 
-export const list = createAction('OPERATION_LIST',
+export const list = createAction(
+  'OPERATION_LIST',
   undefined,
   (values) => ({
     request: {

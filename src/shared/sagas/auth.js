@@ -1,4 +1,4 @@
-import { select, fork, put, take, takeLatest } from 'redux-saga/effects';
+import { select, spawn, put, take, takeLatest } from 'redux-saga/effects';
 import { get } from 'lodash';
 import {
   authActions,
@@ -26,9 +26,9 @@ function* prepareDashboard() {
       put(balanceActions.total()),
     ];
 
-    while (true) {
-      yield new Array(dashboardRequiredData.length).fill(take(dashboardRequiredData));
-      break;
+    for (let i = 0; i < dashboardRequiredData.length; i++) {
+      yield take(dashboardRequiredData);
+      i++;
     }
 
     while (true) {
@@ -52,9 +52,9 @@ function* onUserReady() {
     'ACCOUNT_LOAD_RESOLVED',
   ];
 
-  while (true) {
-    yield new Array(initUserActions.length).fill(take(initUserActions));
-    break;
+  for (let i = 0; i < initUserActions.length; i++) {
+    yield take(initUserActions);
+    i++;
   }
 
   yield put(authActions.setStatus('ready'));
@@ -82,16 +82,15 @@ function* onSettings(action) {
 function* onAuth(action) {
   yield put(authActions.setToken(get(action, 'payload.data.token')));
   yield put(authActions.getProfile());
-
   yield take('AUTH_GET_PROFILE_RESOLVED');
 
   const auth = yield select((state) => state.auth);
 
   if (get(auth, 'profile.status') === 'init') {
-    yield fork(userTimezoneLocale);
+    yield spawn(userTimezoneLocale);
   }
 
-  yield fork(prepareDashboard);
+  yield spawn(prepareDashboard);
 }
 
 function* onLogout() {
@@ -101,7 +100,7 @@ function* onLogout() {
 }
 
 export default function* () {
-  yield fork(onUserReady);
+  yield spawn(onUserReady);
 
   yield [
     takeLatest(['AUTH_LOGIN_RESOLVED', 'AUTH_REGISTER_RESOLVED'], onAuth),

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { List, AutoSizer, WindowScroller } from 'react-virtualized';
@@ -23,15 +24,15 @@ const messages = defineMessages({
 
 class OperationList extends React.Component {
   static propTypes = {
-    process: React.PropTypes.bool.isRequired,
-    operationList: React.PropTypes.array.isRequired,
-    operationListQuery: React.PropTypes.object.isRequired,
-    operationListTotal: React.PropTypes.number.isRequired,
-    operationNeedUpdate: React.PropTypes.bool.isRequired,
-    loadNextPage: React.PropTypes.func.isRequired,
-    toggleOperationDeleteModal: React.PropTypes.func.isRequired,
-    editOperation: React.PropTypes.func.isRequired,
-    editOperationItem: React.PropTypes.object,
+    process: PropTypes.bool.isRequired,
+    operationList: PropTypes.array.isRequired,
+    operationListQuery: PropTypes.object.isRequired,
+    operationListTotal: PropTypes.number.isRequired,
+    operationNeedUpdate: PropTypes.bool.isRequired,
+    loadNextPage: PropTypes.func.isRequired,
+    toggleOperationDeleteModal: PropTypes.func.isRequired,
+    editOperation: PropTypes.func.isRequired,
+    editOperationItem: PropTypes.object,
   };
 
   static defaultProps = {

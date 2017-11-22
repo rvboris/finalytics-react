@@ -1,6 +1,7 @@
 import { createAction } from 'redux-actions';
 
-export const load = createAction('LOCALE_LOAD',
+export const load = createAction(
+  'LOCALE_LOAD',
   undefined,
   (locale) => ({
     promise: Promise.all([

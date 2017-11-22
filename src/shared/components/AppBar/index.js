@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { NavLink } from 'react-router-dom';
@@ -68,7 +69,7 @@ const StyledLink = (props) => (
 );
 
 StyledLink.propTypes = {
-  children: React.PropTypes.any,
+  children: PropTypes.node,
 };
 
 StyledLink.defaultProps = {
@@ -77,9 +78,9 @@ StyledLink.defaultProps = {
 
 class AppBar extends React.Component {
   static propTypes = {
-    userLogin: React.PropTypes.string,
-    manageAccounts: React.PropTypes.func.isRequired,
-    manageCategories: React.PropTypes.func.isRequired,
+    userLogin: PropTypes.string,
+    manageAccounts: PropTypes.func.isRequired,
+    manageCategories: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -97,11 +98,11 @@ class AppBar extends React.Component {
 
   menuToggle = () => {
     this.setState(Object.assign({}, this.state, { menuOpen: !this.state.menuOpen }));
-  }
+  };
 
   toggleNavbar = () => {
     this.setState(Object.assign({}, this.state, { navOpen: !this.state.navOpen }));
-  }
+  };
 
   render() {
     const { userLogin, manageAccounts, manageCategories } = this.props;

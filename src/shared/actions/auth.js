@@ -5,7 +5,8 @@ import config from '../config';
 const USER_API = `${config.apiUrl}/user`;
 const AUTH_API = `${config.apiUrl}/auth`;
 
-export const login = createAction('AUTH_LOGIN',
+export const login = createAction(
+  'AUTH_LOGIN',
   undefined,
   (values) => ({
     request: {
@@ -16,7 +17,8 @@ export const login = createAction('AUTH_LOGIN',
   })
 );
 
-export const logout = createAction('AUTH_LOGOUT',
+export const logout = createAction(
+  'AUTH_LOGOUT',
   undefined,
   () => ({
     request: {
@@ -26,7 +28,8 @@ export const logout = createAction('AUTH_LOGOUT',
   })
 );
 
-export const register = createAction('AUTH_REGISTER',
+export const register = createAction(
+  'AUTH_REGISTER',
   undefined,
   (values) => ({
     request: {
@@ -37,7 +40,8 @@ export const register = createAction('AUTH_REGISTER',
   })
 );
 
-export const getProfile = createAction('AUTH_GET_PROFILE',
+export const getProfile = createAction(
+  'AUTH_GET_PROFILE',
   undefined,
   () => ({
     request: {
@@ -47,7 +51,8 @@ export const getProfile = createAction('AUTH_GET_PROFILE',
   })
 );
 
-export const removeProfile = createAction('AUTH_REMOVE_PROFILE',
+export const removeProfile = createAction(
+  'AUTH_REMOVE_PROFILE',
   undefined,
   () => ({
     request: {
@@ -57,11 +62,13 @@ export const removeProfile = createAction('AUTH_REMOVE_PROFILE',
   })
 );
 
-export const getProfileResolved = createAction('AUTH_GET_PROFILE_RESOLVED',
+export const getProfileResolved = createAction(
+  'AUTH_GET_PROFILE_RESOLVED',
   (profile) => ({ data: profile })
 );
 
-export const setSettings = createAction('AUTH_SET_SETTINGS',
+export const setSettings = createAction(
+  'AUTH_SET_SETTINGS',
   undefined,
   (values) => ({
     request: {
@@ -72,19 +79,23 @@ export const setSettings = createAction('AUTH_SET_SETTINGS',
   })
 );
 
-export const setSettingsResolved = createAction('AUTH_SET_SETTINGS_RESOLVED',
+export const setSettingsResolved = createAction(
+  'AUTH_SET_SETTINGS_RESOLVED',
   (settings) => ({ data: settings })
 );
 
-export const setToken = createAction('AUTH_SET_TOKEN',
+export const setToken = createAction(
+  'AUTH_SET_TOKEN',
   (token) => ({ token })
 );
 
-export const setUserAgent = createAction('AUTH_SET_USER_AGENT',
+export const setUserAgent = createAction(
+  'AUTH_SET_USER_AGENT',
   (userAgent) => ({ userAgent })
 );
 
-export const setStatus = createAction('AUTH_SET_STATUS',
+export const setStatus = createAction(
+  'AUTH_SET_STATUS',
   undefined,
   (status) => ({
     request: {

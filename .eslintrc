@@ -8,7 +8,7 @@
         "objects": "always-multiline",
         "imports": "always-multiline",
         "exports": "always-multiline",
-        "functions": "ignore",
+        "functions": "ignore"
     }],
     "no-param-reassign": ["error", { "props": false }],
     "no-shadow": 0,
@@ -26,10 +26,12 @@
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "react/jsx-filename-extension": 0,
+    "react/jsx-no-bind": 0,
     "react/forbid-prop-types": 0,
     "react/no-unused-prop-types": 0,
     "react/require-extension": "off",
     "react/no-danger": 0,
+    "react/no-unused-state": 0
   },
   "globals": {
     "CONFIG": false,

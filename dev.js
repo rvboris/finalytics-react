@@ -50,9 +50,7 @@ class HotServer {
     this.compiler = compiler;
     this.instance = null;
 
-    const compiledOutputPath = path.resolve(
-      compiler.options.output.path, `${Object.keys(compiler.options.entry)[0]}.js`
-    );
+    const compiledOutputPath = path.resolve(compiler.options.output.path, `${Object.keys(compiler.options.entry)[0]}.js`);
 
     try {
       this.instance = cp.fork(compiledOutputPath, {

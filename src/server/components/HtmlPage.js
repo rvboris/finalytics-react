@@ -1,6 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
-const HtmlPage = ({ initialState, body, assets, head }) => {
+const HtmlPage = ({
+  initialState, body, assets, head,
+}) => {
   const inlineScript = [`window.INITIAL_STATE = ${JSON.stringify(initialState)};`];
 
   return (
@@ -25,10 +28,10 @@ const HtmlPage = ({ initialState, body, assets, head }) => {
 };
 
 HtmlPage.propTypes = {
-  initialState: React.PropTypes.object.isRequired,
-  body: React.PropTypes.string.isRequired,
-  assets: React.PropTypes.object.isRequired,
-  head: React.PropTypes.object.isRequired,
+  initialState: PropTypes.object.isRequired,
+  body: PropTypes.string.isRequired,
+  assets: PropTypes.object.isRequired,
+  head: PropTypes.object.isRequired,
 };
 
 export default HtmlPage;

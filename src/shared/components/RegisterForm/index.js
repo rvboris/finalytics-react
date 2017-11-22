@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { reduxForm, Field, SubmissionError } from 'redux-form';
-import { mapValues, get } from 'lodash';
+import { mapValues, get, noop } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import FaFacebookIcon from 'react-icons/lib/fa/facebook';
 import FaGoogleIcon from 'react-icons/lib/fa/google';
@@ -18,7 +19,7 @@ import {
   Alert,
   Card,
   CardHeader,
-  CardBlock,
+  CardBody,
 } from 'reactstrap';
 
 import style from './style.css';
@@ -90,7 +91,7 @@ const onTwitter = () => {
   window.location.pathname = '/api/auth/twitter';
 };
 
-const FormField = (field) =>
+const FormField = (field) => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <Input
@@ -99,11 +100,14 @@ const FormField = (field) =>
       {...field.input}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 let RegisterForm = (props) => {
   const {
-    form: { error, handleSubmit, pristine, submitting },
+    form: {
+      error, handleSubmit, pristine, submitting,
+    },
     intl: { formatMessage },
     process,
     register,
@@ -140,7 +144,7 @@ let RegisterForm = (props) => {
     <div className={style.container}>
       <Card className={style.form}>
         <CardHeader><FormattedMessage {...messages.title} /></CardHeader>
-        <CardBlock>
+        <CardBody>
           <Form onSubmit={handleSubmit(submitHandler)} noValidate>
             <Field
               name="email"
@@ -177,7 +181,8 @@ let RegisterForm = (props) => {
             >{process
               ? <FormattedMessage {...messages.processButton} />
               : <FormattedMessage {...messages.button} />
-            }</Button>
+            }
+            </Button>
           </Form>
 
           <ButtonGroup className="btn-group-justified">
@@ -193,19 +198,24 @@ let RegisterForm = (props) => {
               <FaTwitterIcon size={30} />
             </Button>
           </ButtonGroup>
-        </CardBlock>
+        </CardBody>
       </Card>
     </div>
   );
 };
 
 RegisterForm.propTypes = {
-  form: React.PropTypes.object.isRequired,
-  intl: React.PropTypes.object.isRequired,
-  process: React.PropTypes.bool.isRequired,
-  register: React.PropTypes.func.isRequired,
-  onSuccess: React.PropTypes.func,
-  onError: React.PropTypes.func,
+  form: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
+  process: PropTypes.bool.isRequired,
+  register: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func,
+  onError: PropTypes.func,
+};
+
+RegisterForm.defaultProps = {
+  onSuccess: noop,
+  onError: noop,
 };
 
 const selector = createSelector(

@@ -1,17 +1,15 @@
 import Cookies from 'cookies';
-import co from 'co';
 import { ExtractJwt } from 'passport-jwt';
 
 import config from '../../shared/config';
-import { store, cookieSettings, sessionPrefix, cookiePrefix } from '../middlewares/session';
+import { store, cookieSettings, cookiePrefix } from '../middlewares/session';
 
-export default co.wrap(function* tokenExtractor(req) {
-  let token = null;
-
-  token = ExtractJwt.fromAuthHeader()(req);
+export default (req) => new Promise(async (resolve) => {
+  const token = ExtractJwt.fromAuthHeaderWithScheme('jwt')(req);
 
   if (token) {
-    return yield Promise.resolve(token);
+    resolve(token);
+    return;
   }
 
   const options = Object.assign({}, cookieSettings, { keys: config.sessionKeys });
@@ -19,12 +17,14 @@ export default co.wrap(function* tokenExtractor(req) {
   const sid = cookie.get(cookiePrefix);
 
   if (sid) {
-    const session = yield store.get(sessionPrefix + sid);
+    const session = await store.get(sid);
 
     if (session && session.token) {
-      token = session.token;
+      resolve(session.token);
+      return;
     }
   }
 
-  return yield Promise.resolve(token);
+  console.log('no token');
+  resolve(null);
 });

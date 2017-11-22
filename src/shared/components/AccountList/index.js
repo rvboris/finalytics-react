@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Card, CardHeader, CardFooter, CardBlock } from 'reactstrap';
+import { Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
 import BalanceTotal from '../BalanceTotal';
 
 import MoneyFormat from '../MoneyFormat';
@@ -29,20 +30,21 @@ const messages = defineMessages({
 const AccountList = (props) => (
   <Card>
     <CardHeader><FormattedMessage {...messages.accounts} /></CardHeader>
-    { props.accounts.length
-    ? <ul className="list-group list-group-flush">
-      {props.accounts.map((account) => (
-        <li className="list-group-item d-flex" key={account._id}>
-          <span>{account.name}</span>
-          <span className="ml-auto">
-            <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
-          </span>
-        </li>
-      ))}
-    </ul>
-    : <CardBlock>
-      <p className="text-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
-    </CardBlock>
+    { props.accounts.length ?
+      <ul className="list-group list-group-flush">
+        {props.accounts.map((account) => (
+          <li className="list-group-item d-flex" key={account._id}>
+            <span>{account.name}</span>
+            <span className="ml-auto">
+              <MoneyFormat sum={account.currentBalance} currencyId={account.currency} />
+            </span>
+          </li>
+        ))}
+      </ul>
+      :
+      <CardBody>
+        <p className="text-center m-0"><FormattedMessage {...messages.noAccounts} /></p>
+      </CardBody>
     }
     <CardFooter className="text-muted d-flex">
       <span><FormattedMessage {...messages.total} /></span>
@@ -52,7 +54,7 @@ const AccountList = (props) => (
 );
 
 AccountList.propTypes = {
-  accounts: React.PropTypes.array.isRequired,
+  accounts: PropTypes.array.isRequired,
 };
 
 const selector = createSelector(

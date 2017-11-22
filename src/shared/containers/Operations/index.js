@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -62,10 +63,10 @@ const messages = defineMessages({
 
 class Operations extends React.Component {
   static propTypes = {
-    accountsExist: React.PropTypes.bool.isRequired,
-    operationProcess: React.PropTypes.bool.isRequired,
-    listOperations: React.PropTypes.func.isRequired,
-    removeOperation: React.PropTypes.func.isRequired,
+    accountsExist: PropTypes.bool.isRequired,
+    operationProcess: PropTypes.bool.isRequired,
+    listOperations: PropTypes.func.isRequired,
+    removeOperation: PropTypes.func.isRequired,
   }
 
   constructor(...args) {

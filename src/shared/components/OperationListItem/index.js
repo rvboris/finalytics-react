@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
 import { noop } from 'lodash';
@@ -29,10 +30,10 @@ const messages = defineMessages({
 
 class OperationListItem extends React.Component {
   static propTypes = {
-    operation: React.PropTypes.object,
-    editOperation: React.PropTypes.func,
-    editOperationItem: React.PropTypes.object,
-    toggleOperationDeleteModal: React.PropTypes.func,
+    operation: PropTypes.object,
+    editOperation: PropTypes.func,
+    editOperationItem: PropTypes.object,
+    toggleOperationDeleteModal: PropTypes.func,
   };
 
   static defaultProps = {
@@ -40,7 +41,7 @@ class OperationListItem extends React.Component {
     editOperation: noop,
     editOperationItem: null,
     toggleOperationDeleteModal: noop,
-  }
+  };
 
   static getDate(date) {
     const now = moment().utc();
@@ -154,20 +155,20 @@ class OperationListItem extends React.Component {
   removeOperation = () => {
     const { toggleOperationDeleteModal, operation } = this.props;
     toggleOperationDeleteModal(operation);
-  }
+  };
 
   editOperation = () => {
     const { editOperation, operation } = this.props;
     editOperation(operation);
-  }
+  };
 
   showControls = () => {
     this.setState(Object.assign({}, this.state, { showControls: true }));
-  }
+  };
 
   hideControls = () => {
     this.setState(Object.assign({}, this.state, { showControls: false }));
-  }
+  };
 
   isEditActive(editOperationItem) {
     const { operation } = this.props;
@@ -178,7 +179,7 @@ class OperationListItem extends React.Component {
     this.setState(Object.assign({}, this.state, {
       isEdit: this.isEditActive(editOperationItem),
     }));
-  }
+  };
 
   render() {
     const { operation } = this.props;
@@ -200,6 +201,8 @@ class OperationListItem extends React.Component {
       <div
         className={itemClassName}
         onMouseOver={this.showControls}
+        onFocus={this.showControls}
+        onBlur={this.hideControls}
         onMouseLeave={this.hideControls}
       >
         {OperationListItem.getColorMark(operation.type)}

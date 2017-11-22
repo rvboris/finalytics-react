@@ -17,6 +17,7 @@ const dbURI = `mongodb://${config.db.hostname}/${dbName}`;
 
 const connectOptions = {
   promiseLibrary: Promise,
+  useMongoClient: true,
 };
 
 mongoose.set('debug', (coll, method, query, doc, options) => {

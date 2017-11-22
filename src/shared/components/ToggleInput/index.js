@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Toggle from 'react-toggle';
 
@@ -20,8 +21,8 @@ const ToggleInput = ({ input, disabled }) => {
 };
 
 ToggleInput.propTypes = {
-  input: React.PropTypes.object.isRequired,
-  disabled: React.PropTypes.bool,
+  input: PropTypes.object.isRequired,
+  disabled: PropTypes.bool,
 };
 
 ToggleInput.defaultProps = {

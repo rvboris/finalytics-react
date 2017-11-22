@@ -7,31 +7,37 @@ Strategy.prototype.authenticate = function authenticate(req) {
       return;
     }
 
-    Strategy.JwtVerifier(token, this._secretOrKey, this._verifOpts, (jwtError, payload) => {
-      if (jwtError) {
-        this.fail(jwtError);
-        return;
+    this._secretOrKeyProvider(req, token, (secretOrKeyError, secretOrKey) => {
+      if (secretOrKeyError) {
+        this.fail(secretOrKeyError);
       }
 
-      const verified = (err, user, info) => {
-        if (err) {
-          return this.error(err);
-        } else if (!user) {
-          return this.fail(info);
+      Strategy.JwtVerifier(token, secretOrKey, this._verifOpts, (jwtErr, payload) => {
+        if (jwtErr) {
+          this.fail(jwtErr);
+          return;
         }
 
-        return this.success(user, info);
-      };
+        const verified = (err, user, info) => {
+          if (err) {
+            return this.error(err);
+          } else if (!user) {
+            return this.fail(info);
+          }
+          return this.success(user, info);
+        };
 
-      try {
-        if (this._passReqToCallback) {
-          this._verify(req, payload, verified);
-        } else {
+        try {
+          if (this._passReqToCallback) {
+            this._verify(req, payload, verified);
+            return;
+          }
+
           this._verify(payload, verified);
+        } catch (ex) {
+          this.error(ex);
         }
-      } catch (ex) {
-        this.error(ex);
-      }
+      });
     });
   });
 };

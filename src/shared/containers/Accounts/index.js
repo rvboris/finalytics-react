@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { get } from 'lodash';
 import { push } from 'react-router-redux';
@@ -56,8 +57,8 @@ const Accounts = (props) => {
 };
 
 Accounts.propTypes = {
-  onSelectAccount: React.PropTypes.func.isRequired,
-  onNewAccount: React.PropTypes.func.isRequired,
+  onSelectAccount: PropTypes.func.isRequired,
+  onNewAccount: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

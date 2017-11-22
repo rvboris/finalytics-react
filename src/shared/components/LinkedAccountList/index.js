@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -45,9 +46,9 @@ const LinkedAccountList = ({ accounts, selectedAccountId, onSelect }) => {
 };
 
 LinkedAccountList.propTypes = {
-  accounts: React.PropTypes.array.isRequired,
-  onSelect: React.PropTypes.func.isRequired,
-  selectedAccountId: React.PropTypes.string,
+  accounts: PropTypes.array.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  selectedAccountId: PropTypes.string,
 };
 
 LinkedAccountList.defaultProps = {

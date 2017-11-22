@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DayPicker, { DateUtils } from 'react-day-picker';
 import LocaleUtils from 'react-day-picker/moment';
@@ -37,8 +38,8 @@ const DatePicker = ({ locale, input }) => {
 };
 
 DatePicker.propTypes = {
-  input: React.PropTypes.object.isRequired,
-  locale: React.PropTypes.string.isRequired,
+  input: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 };
 
 export default DatePicker;

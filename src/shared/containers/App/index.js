@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -37,9 +38,9 @@ const ConnectedIntlProvider = connect(intlSelector)(IntlProvider);
 
 class App extends React.Component {
   static propTypes = {
-    route: React.PropTypes.object.isRequired,
-    locale: React.PropTypes.string.isRequired,
-    intl: React.PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
+    locale: PropTypes.string.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props, context) {
@@ -69,8 +70,12 @@ class App extends React.Component {
 
     return [
       { rel: 'apple-touch-icon', sizes: '180x180', href: appleTouch },
-      { rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon32 },
-      { rel: 'icon', type: 'image/png', sizes: '16x16', href: favicon16 },
+      {
+        rel: 'icon', type: 'image/png', sizes: '32x32', href: favicon32,
+      },
+      {
+        rel: 'icon', type: 'image/png', sizes: '16x16', href: favicon16,
+      },
       { rel: 'manifest', href: manifest },
       { rel: 'mask-icon', color: '#5bbad5', href: safari },
     ];

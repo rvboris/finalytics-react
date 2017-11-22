@@ -2,7 +2,7 @@ import Router from 'koa-66';
 import mongoose from 'mongoose';
 import big from 'big.js';
 import TreeModel from 'tree-model';
-import { pick, isUndefined, isArray, mapValues } from 'lodash';
+import { pick, isUndefined, isArray, mapValues, isNaN } from 'lodash';
 
 import { OperationModel, UserModel, CategoryModel } from '../models';
 
@@ -76,7 +76,7 @@ router.post('/add', { jwt: true }, async (ctx) => {
       return;
     }
 
-    account = accounts[0];
+    ([account] = accounts);
   } catch (e) {
     ctx.log.error(e);
     ctx.status = 500;
@@ -265,7 +265,7 @@ router.post('/update', { jwt: true }, async (ctx) => {
         return;
       }
 
-      operation.account = accounts[0];
+      ([operation.account] = accounts);
     } catch (e) {
       ctx.log.error(e);
       ctx.status = 500;
@@ -662,8 +662,18 @@ router.post('/updateTransfer', { jwt: true }, async (ctx) => {
 });
 
 router.get('/list', { jwt: true }, async (ctx) => {
-  const params = pick(ctx.request.query, 'account', 'type', 'category', 'amountFrom',
-      'amountTo', 'dateFrom', 'dateTo', 'skip', 'limit');
+  const params = pick(
+    ctx.request.query,
+    'account',
+    'type',
+    'category',
+    'amountFrom',
+    'amountTo',
+    'dateFrom',
+    'dateTo',
+    'skip',
+    'limit'
+  );
 
   const query = { user: ctx.user };
   const transferQuery = {};

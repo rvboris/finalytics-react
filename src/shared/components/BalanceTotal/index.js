@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -10,8 +11,8 @@ const BalanceTotal = ({ total, currencyId }) => (
 );
 
 BalanceTotal.propTypes = {
-  total: React.PropTypes.number.isRequired,
-  currencyId: React.PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  currencyId: PropTypes.string.isRequired,
 };
 
 const processSelector = createSelector(

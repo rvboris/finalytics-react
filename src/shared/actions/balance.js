@@ -4,7 +4,8 @@ import config from '../config';
 
 const OPERATION_API = `${config.apiUrl}/balance`;
 
-export const total = createAction('BALANCE_TOTAL',
+export const total = createAction(
+  'BALANCE_TOTAL',
   undefined,
   (values) => ({
     request: {

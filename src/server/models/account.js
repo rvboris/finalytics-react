@@ -9,9 +9,13 @@ const model = new mongoose.Schema({
   currency: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required: true },
   startBalance: { type: Number, required: true, default: 0 },
   currentBalance: { type: Number, required: true, default: 0 },
-  status: { type: String, required: true, default: 'active', enum: ['active', 'closed'] },
+  status: {
+    type: String, required: true, default: 'active', enum: ['active', 'closed'],
+  },
   order: { type: Number, required: true, default: 0 },
-  type: { type: String, required: true, default: 'standart', enum: ['standart', 'debt'] },
+  type: {
+    type: String, required: true, default: 'standart', enum: ['standart', 'debt'],
+  },
   created: { type: Date, required: true },
   updated: { type: Date, required: true },
 });
@@ -55,7 +59,7 @@ model.pre('save', function preSave(next) {
 });
 
 model.post('save', async function postSave(accountModel, next) {
-  const wasNew = accountModel.wasNew;
+  const { wasNew } = accountModel;
 
   const account = accountModel.toObject({ depopulate: false, version: false });
 

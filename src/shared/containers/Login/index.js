@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
@@ -9,9 +10,9 @@ const Login = ({ login, go, onSuccess }) =>
   <LoginForm login={login} go={go} onSuccess={onSuccess} />;
 
 Login.propTypes = {
-  login: React.PropTypes.func.isRequired,
-  go: React.PropTypes.func.isRequired,
-  onSuccess: React.PropTypes.func.isRequired,
+  login: PropTypes.func.isRequired,
+  go: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

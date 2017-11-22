@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Select from 'react-select';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -14,7 +15,7 @@ const messages = defineMessages({
 
 const SelectInput = (props) => {
   const { intl, input, options } = props;
-  const formatMessage = intl.formatMessage;
+  const { formatMessage } = intl;
 
   const onChange = (event) => {
     if (input.onChange && event) {
@@ -42,9 +43,9 @@ const SelectInput = (props) => {
 };
 
 SelectInput.propTypes = {
-  intl: React.PropTypes.object.isRequired,
-  input: React.PropTypes.object.isRequired,
-  options: React.PropTypes.array.isRequired,
+  intl: PropTypes.object.isRequired,
+  input: PropTypes.object.isRequired,
+  options: PropTypes.array.isRequired,
 };
 
 export default injectIntl(SelectInput);

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -129,7 +130,7 @@ const messages = defineMessages({
   },
 });
 
-const TextFormField = field =>
+const TextFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <Input
@@ -138,9 +139,10 @@ const TextFormField = field =>
       {...field.input}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
-const NumberFormField = field =>
+const NumberFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <InputGroup>
@@ -148,9 +150,10 @@ const NumberFormField = field =>
       <InputGroupAddon>{field.currency.code}</InputGroupAddon>
     </InputGroup>
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
-const SelectFormField = field =>
+const SelectFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <SelectInput
@@ -159,14 +162,16 @@ const SelectFormField = field =>
       clearable={false}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
-const ToggleFormField = field =>
+const ToggleFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <ToggleInput {...field} />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 const defaultValues = {
   name: null,
@@ -184,17 +189,21 @@ const accountTypeMap = {
 
 class AccountEditForm extends React.Component {
   static propTypes = {
-    form: React.PropTypes.object.isRequired,
-    intl: React.PropTypes.object.isRequired,
-    isNewAccount: React.PropTypes.bool.isRequired,
-    accountId: React.PropTypes.string,
-    process: React.PropTypes.bool.isRequired,
-    createAccount: React.PropTypes.func.isRequired,
-    saveAccount: React.PropTypes.func.isRequired,
-    removeAccount: React.PropTypes.func.isRequired,
-    selectAccount: React.PropTypes.func.isRequired,
-    currencyList: React.PropTypes.array.isRequired,
-    selectedCurrency: React.PropTypes.object.isRequired,
+    form: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+    isNewAccount: PropTypes.bool.isRequired,
+    accountId: PropTypes.string,
+    process: PropTypes.bool.isRequired,
+    createAccount: PropTypes.func.isRequired,
+    saveAccount: PropTypes.func.isRequired,
+    removeAccount: PropTypes.func.isRequired,
+    selectAccount: PropTypes.func.isRequired,
+    currencyList: PropTypes.array.isRequired,
+    selectedCurrency: PropTypes.object.isRequired,
+  };
+
+  static defaultProps = {
+    accountId: null,
   };
 
   constructor(...args) {
@@ -237,7 +246,9 @@ class AccountEditForm extends React.Component {
   };
 
   submitHandler = (values) => {
-    const { isNewAccount, accountId, createAccount, saveAccount, selectAccount, intl } = this.props;
+    const {
+      isNewAccount, accountId, createAccount, saveAccount, selectAccount, intl,
+    } = this.props;
     const toValidate = Object.assign({}, defaultValues, values);
 
     toValidate.type = invert(accountTypeMap)[toValidate.type];
@@ -292,16 +303,19 @@ class AccountEditForm extends React.Component {
         error(e);
         this.setState(Object.assign(this.state, { accountDeleteError: true }));
       });
-  }
+  };
 
   render() {
-    const { accountId, isNewAccount, currencyList, selectedCurrency, process } = this.props;
+    const {
+      accountId, isNewAccount, currencyList, selectedCurrency, process,
+    } = this.props;
     const { formatMessage } = this.props.intl;
     const { handleSubmit, error: formError, initialValues } = this.props.form;
     const deleteConfirmMessage =
       (<FormattedMessage
         {
-        ...Object.assign(messages.deleteModalConfirm,
+        ...Object.assign(
+          messages.deleteModalConfirm,
           { values: { name: (<strong>{initialValues.name}</strong>) } }
         )
         }
@@ -457,9 +471,7 @@ const selectedCurrencySelector = createSelector(
   state => get(state, 'currency.currencyList'),
   (initialValues, currentValues, currencyList) => {
     const values = Object.assign({}, initialValues, currentValues);
-    const selectedCurrency = currencyList.find(({ _id }) => _id === values.currency);
-
-    return selectedCurrency;
+    return currencyList.find(({ _id }) => _id === values.currency);
   },
 );
 

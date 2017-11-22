@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -113,7 +114,7 @@ const messages = defineMessages({
   },
 });
 
-const SelectFormField = field =>
+const SelectFormField = field => (
   <FormGroup color={field.meta.error ? 'danger' : null}>
     <Label>{field.label}</Label>
     <SelectInput
@@ -122,7 +123,8 @@ const SelectFormField = field =>
       clearable={false}
     />
     {field.meta.touched && field.meta.error && <FormFeedback>{field.meta.error}</FormFeedback>}
-  </FormGroup>;
+  </FormGroup>
+);
 
 const defaultValues = {
   locale: null,
@@ -134,19 +136,18 @@ const getTimezoneList = memoize(() =>
   timezones.map(({ id, text }) => ({
     value: id,
     label: text,
-  }))
-);
+  })));
 
 class ProfileEditForm extends React.Component {
   static propTypes = {
-    form: React.PropTypes.object.isRequired,
-    intl: React.PropTypes.object.isRequired,
-    process: React.PropTypes.bool.isRequired,
-    setSettings: React.PropTypes.func.isRequired,
-    removeProfile: React.PropTypes.func.isRequired,
-    goToRegister: React.PropTypes.func.isRequired,
-    localeList: React.PropTypes.array.isRequired,
-    currencyList: React.PropTypes.array.isRequired,
+    form: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+    process: PropTypes.bool.isRequired,
+    setSettings: PropTypes.func.isRequired,
+    removeProfile: PropTypes.func.isRequired,
+    goToRegister: PropTypes.func.isRequired,
+    localeList: PropTypes.array.isRequired,
+    currencyList: PropTypes.array.isRequired,
   };
 
   constructor(...args) {
@@ -220,7 +221,7 @@ class ProfileEditForm extends React.Component {
         error(e);
         this.setState(Object.assign(this.state, { profileDeleteError: true }));
       });
-  }
+  };
 
   render() {
     const { currencyList, localeList, process } = this.props;
@@ -232,9 +233,10 @@ class ProfileEditForm extends React.Component {
     const deleteConfirmMessage =
       (<FormattedMessage
         {
-        ...Object.assign(messages.deleteModalConfirm,
-          { values: { email: (<strong>{initialValues.email}</strong>) } }
-        )
+          ...Object.assign(
+            messages.deleteModalConfirm,
+            { values: { email: (<strong>{initialValues.email}</strong>) } }
+          )
         }
       />);
 

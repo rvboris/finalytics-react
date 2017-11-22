@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -64,9 +65,9 @@ const CategoriesTree = ({ categories, onSelect, selectedCategoryId }) => {
 };
 
 CategoriesTree.propTypes = {
-  categories: React.PropTypes.object.isRequired,
-  onSelect: React.PropTypes.func.isRequired,
-  selectedCategoryId: React.PropTypes.string,
+  categories: PropTypes.object.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  selectedCategoryId: PropTypes.string,
 };
 
 CategoriesTree.defaultProps = {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { noop } from 'lodash';
 import classnames from 'classnames';
@@ -6,17 +7,17 @@ import FaAngleUp from 'react-icons/lib/fa/angle-up';
 
 export default class TreeView extends React.Component {
   static propTypes = {
-    itemId: React.PropTypes.string.isRequired,
-    label: React.PropTypes.any.isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    onSelect: React.PropTypes.func,
-    children: React.PropTypes.any,
-    itemClassName: React.PropTypes.string,
-    itemNoChildrenClassName: React.PropTypes.string,
-    chidlrenContainerClassName: React.PropTypes.string,
-    labelClassName: React.PropTypes.string,
-    labelSelectedClassName: React.PropTypes.string,
-    arrowClassName: React.PropTypes.string,
+    itemId: PropTypes.string.isRequired,
+    label: PropTypes.any.isRequired,
+    selected: PropTypes.bool.isRequired,
+    onSelect: PropTypes.func,
+    children: PropTypes.any,
+    itemClassName: PropTypes.string,
+    itemNoChildrenClassName: PropTypes.string,
+    chidlrenContainerClassName: PropTypes.string,
+    labelClassName: PropTypes.string,
+    labelSelectedClassName: PropTypes.string,
+    arrowClassName: PropTypes.string,
   };
 
   static defaultProps = {
